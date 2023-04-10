@@ -19,12 +19,19 @@ const channelMention = new SlashCommandChannelOption().setName("channel").setDes
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('channel')
+        .addChannelOption(channelMention)
+        .addStringOption(channelChoices)
         .setDescription('Allows you to set a channel for a specific purpose'),
     async execute(interaction) {
         const db = await getDBConnection();
         const userChoice = interaction.options.getString("channel-options")
         const channel = interaction.options.getChannel("channel")
+        const guild = interaction.guild.id
 
         // write this later
+        console.log(userChoice)
+        console.log(channel.id)
+        await db.run('INSERT INTO Channels(guild, channelid, purpose) VALUES (?, ?, ?)', [guild, channel.id, userChoice])
+        return interaction.editReply({content:`Successfully linked ${channel} for ${userChoice}!`})
     }
 }

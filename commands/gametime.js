@@ -25,15 +25,16 @@ module.exports = {
         const team1 = interaction.options.getRole("team-1");
         const team2 = interaction.options.getRole("team-2");
         const time = interaction.options.getString("time");
+        const guild = interaction.guild.id
 
         // then, check if gametime is enabled
-        const gametimeChannel = await db.get("SELECT channelid FROM Channels WHERE purpose = ?", "gametime");
+        const gametimeChannel = await db.get("SELECT channelid FROM Channels WHERE purpose = ? AND guild = ?", ["gametime", guild]);
         if (!gametimeChannel) {
             return interaction.editReply({ content:"Gametimes are currently disabled!", ephemeral:true })
         }
 
         // then, check if a valid user ran the command
-        const validUser = await db.get('SELECT * FROM Players WHERE role = "FO" OR role = "GM" AND discordid = ?', interaction.user.id)
+        const validUser = await db.get('SELECT * FROM Players WHERE role = "FO" OR role = "GM" AND discordid = ? AND guild = ?', [interaction.user.id, guild])
         if (!admins.includes(interaction.user.id) && !managers.includes(interaction.user.id) && !validUser) {
             return interaction.editReply({ content:"You are not permitted to run this command!", ephemeral:true })
         }
