@@ -18,7 +18,8 @@ module.exports = {
 
             // first, check to see if the user is authorized to advance the season
             const user = interaction.user.id;
-            if (!admins.includes(user)) {
+            const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [user, guild])
+            if (!authorized) {
                 await db.close();
                 return interaction.editReply({ content:"You are not authorized to mass release!", ephemeral:true });
             }

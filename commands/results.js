@@ -39,7 +39,10 @@ module.exports = {
 
         // first, check to see if the user is authorized to advance the season
         const user = interaction.user.id;
-        if (!admins.includes(user) && !managers.includes(user)) {
+        const guild = interaction.guild.id
+        const adminAuth = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [user, guild])
+        const managerAuth = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [user, guild])
+        if (!adminAuth && !managerAuth) {
             await db.close();
             return interaction.editReply({ content:"You are not authorized to report game results!", ephemeral: true });
         }
@@ -56,7 +59,7 @@ module.exports = {
 
         // then, check if the two teams pinged are actual teams
         // note, use a sql join
-        const teams = await db.all("SELECT t.code, t.name FROM Teams t, Roles r WHERE r.code = t.code AND (r.roleid = ? OR r.roleid = ?)", [team1Role.id, team2Role.id])
+        const teams = await db.all("SELECT t.code, t.name FROM Teams t, Roles r WHERE r.code = t.code AND (r.roleid = ? OR r.roleid = ?) AND r.guild = ?", [team1Role.id, team2Role.id, guild])
 
         // if teams length is less than 2, that means not all teams passed in are valid. so, check and send an ephmeral message
         if (teams.length < 2) {
@@ -81,7 +84,7 @@ module.exports = {
                 {name:"Forfeit Tie!", value:`${team1Role} and ${team2Role} will both receive -25 points against
                 their differential.`}
             )
-            await db.run('UPDATE Teams SET ties = ties + 1, ptdifferential = ptdifferential - 25 WHERE name = ? OR name = ?', [team1Role.name, team2Role.name])
+            await db.run('UPDATE Teams SET ties = ties + 1, ptdifferential = ptdifferential - 25 WHERE name = ? OR name = ? AND guild = ?', [team1Role.name, team2Role.name, guild])
             // then, get the transaction channel ID and send a transaction message
             const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "results"')
 

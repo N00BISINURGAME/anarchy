@@ -91,7 +91,7 @@ module.exports = {
 
         // return interaction.editReply({ content:"double check database to see if fixed", ephemeral:true });
 
-        if (!admins.includes(interaction.user.id)) {
+        if (!(interaction.user.id === "168490999235084288")) {
             await db.close();
             return interaction.editReply({ content:"You are not authorized to refresh bot commands!", ephemeral:true });
         }
