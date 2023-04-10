@@ -22,7 +22,9 @@ module.exports = {
 
         // first, check to see if the user is authorized to create a team
         const user = interaction.user.id;
-        if (!admins.includes(user)) {
+        const guild = interaction.guild.id
+        const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [user, guild])
+        if (!authorized) {
             await db.close();
             return interaction.editReply({ content:"You are not authorized to create a new team!", ephemeral:true });
         }
@@ -32,21 +34,21 @@ module.exports = {
         const logo = interaction.options.getString('team-logo')
 
         // Checks to see if a team exists
-        const teamExists = await db.get('SELECT code FROM Teams WHERE code = ? OR name = ?', [shortName, fullName]);
+        const teamExists = await db.get('SELECT code FROM Teams WHERE code = ? OR name = ? AND guild = ?', [shortName, fullName, guild]);
         if (teamExists) {
             await db.close();
             return interaction.editReply({ content:"This team already exists! Please ensure that the team is unique. Unique teams must have a unique full name and a unique short name.", ephemeral:true });
         }
 
         // then, insert the team
-        await db.run('INSERT INTO Teams (code, name, logo) VALUES (?, ?, ?)', shortName.toUpperCase(), fullName, logo);
+        await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [shortName.toUpperCase(), fullName, logo, guild]);
 
         // Then, create the role for the team in the guild that the command was called in.
         const newRole = await interaction.guild.roles.create({
             name: fullName
         });
 
-        await db.run('INSERT INTO Roles (code, roleid) VALUES (?, ?)', shortName, newRole.id);
+        await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [shortName, newRole.id, guild]);
 
         await interaction.editReply({ content:'Team has successfully been created!', ephemeral:true });
 

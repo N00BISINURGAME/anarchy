@@ -22,10 +22,11 @@ module.exports = {
         // first, get player stats
         const link = interaction.options.getString('link')
         const team = interaction.options.getRole('team')
+        const guild = interaction.guild.id
 
-        const code = await db.get('SELECT code FROM Roles WHERE roleid = ?', team.id)
+        const code = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [team.id, guild])
 
-        await db.run('UPDATE Teams SET logo = ? WHERE code = ?', [link, code.code])
+        await db.run('UPDATE Teams SET logo = ? WHERE code = ? AND guild = ?', [link, code.code, guild])
         
         await db.close()
         return interaction.editReply({ content:`Successfully changed logo!`, ephemeral:true })

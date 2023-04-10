@@ -30,14 +30,20 @@ module.exports = {
         const userId = interaction.user.id;
         const roleChoice = interaction.options.getString('role');
         const userChoice = interaction.options.getMember('player');
+        const guild = interaction.guild.id
+
+        // check if a transaction channel has been set
+        const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
+        if (!transactionExists) {
+            return interaction.editReply({ content: "A transaction channel has not been set!", ephemeral: true})
+        }
 
         // check if the user is trying to assign themselves a role
-
         if (userId === userChoice.id) return interaction.editReply({ content:'You cannot assign yourself a role!', ephemeral:true });
 
         // if the choice is to assign a general manager or head coach, check if they are authorized.
         // this means the person must be a franchise owner.
-        const userInfo = await db.get('SELECT team FROM Players WHERE discordid = ? AND role = "FO"', userId);
+        const userInfo = await db.get('SELECT team FROM Players WHERE discordid = ? AND role = "FO" AND guild = ?', [userId, guild]);
         if (!userInfo) {
             await db.close();
             return interaction.editReply({ content:`You are not authorized to assign a ${roleChoice}! To do so you must be a franchise owner.`, ephemeral:true });
@@ -45,14 +51,14 @@ module.exports = {
 
         // then, check to see if the user pinged is on the same team as the user who ran the command
         const chosenUserId = userChoice.id;
-        const userOnTeam = await db.get('SELECT * FROM Players WHERE discordid = ? AND team = ?', [chosenUserId, userInfo.team]);
+        const userOnTeam = await db.get('SELECT * FROM Players WHERE discordid = ? AND team = ? AND guild = ?', [chosenUserId, userInfo.team, guild]);
         if (!userOnTeam) {
             await db.close();
             return interaction.editReply({ content:'This user is not signed to your team!', ephemeral:true });
         }
 
         // then, check to see if the role is taken or not
-        const roleTaken = await db.get('SELECT * FROM Players WHERE role = ? AND team = ?', [roleChoice, userInfo.team]);
+        const roleTaken = await db.get('SELECT * FROM Players WHERE role = ? AND team = ? AND guild = ?', [roleChoice, userInfo.team, guild]);
 
         if (roleTaken) {
             await db.close();

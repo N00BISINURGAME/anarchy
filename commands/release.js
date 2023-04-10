@@ -16,10 +16,17 @@ module.exports = {
         .addUserOption(userOption),
     async execute(interaction) {
         const db = await getDBConnection();
+        const guild = interaction.guild.id
+
+        // check if a transaction channel has been set
+        const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
+        if (!transactionExists) {
+            return interaction.editReply({ content: "A transaction channel has not been set!", ephemeral: true})
+        }
 
         // first, check and see if the user that sent the command is authorized to release a player (as in, they are a FO or GM)
         const userSent = interaction.user.id;
-        const info = await db.get('SELECT p.team, p.role, t.logo, t.playercount FROM Players p, Teams t WHERE p.discordid = ?', userSent);
+        const info = await db.get('SELECT p.team, p.role, t.logo, t.playercount FROM Players p, Teams t WHERE p.discordid = ? AND p.guild = ?', [userSent, guild]);
         if (!info || info.role === "P") {
             await db.close();
             return interaction.editReply({ content:'You are not authorized to release a player!', ephemeral:true });
@@ -33,7 +40,7 @@ module.exports = {
         }
 
         // then, check to see if the user is already without a team
-        const userSigned = await db.get('SELECT team, role FROM Players WHERE discordid = ?', user.id);
+        const userSigned = await db.get('SELECT team, role FROM Players WHERE discordid = ? AND guild = ?', [user.id, guild]);
         if (!userSigned) {
             await db.close();
             return interaction.editReply({ content:`This user is not currently in a team!`, ephemeral:true });
@@ -46,30 +53,30 @@ module.exports = {
         }
 
         // then, release the user
-        await db.run('UPDATE Players SET team = "FA", role = "P" WHERE discordid = ?', userid);
+        await db.run('UPDATE Players SET team = "FA", role = "P" WHERE discordid = ? AND guild = ?', [userid, guild]);
 
         // then, increment the team's player count by 1
-        await db.run('UPDATE Teams SET playercount = playercount - 1 WHERE code = ?', info.team)
+        await db.run('UPDATE Teams SET playercount = playercount - 1 WHERE code = ? AND guild = ?', [info.team, guild])
 
         // then, remove the role from the user
         // update this to remove gm/hc roles if necessary
-        const role = await db.get('SELECT roleid FROM Roles WHERE code = ?', info.team);
+        const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info.team, guild]);
         const roleObj = await interaction.guild.roles.fetch(role.roleId)
         await user.roles.remove(role.roleid);
 
         if (userSigned.role !== "P") {
-            const specialRole = await db.get('SELECT roleid FROM Roles WHERE code = ?', userSigned.role)
+            const specialRole = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [userSigned.role, guild])
             await user.roles.remove(specialRole.roleid);
         }
 
 
         // then, get the team logo and player count
-        const logo = await db.get('SELECT logo, playercount FROM Teams WHERE code = ?', info.team);
+        const logo = await db.get('SELECT logo, playercount FROM Teams WHERE code = ? AND guild = ?', [info.team, guild]);
         const playerCount = logo.playercount
         const logoStr = logo.logo;
 
         // then, get the transaction channel ID and send a transaction message
-        const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions"')
+        const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
         const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
         const transactionEmbed = new EmbedBuilder()

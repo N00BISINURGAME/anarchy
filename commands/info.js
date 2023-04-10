@@ -19,19 +19,20 @@ module.exports = {
 
         // then, get the id of the mentioned
         const id = mentioned.id;
+        const guild = interaction.guild.id
 
         // two branches: one for pinged role, one for pinged person
         if (mentioned.user) {
             // this means we pinged a person; get information, construct an embed and do stuff
             // first, check that the id is in players. if not, send an error
-            const userInfo = await db.get('SELECT * FROM Players WHERE discordid = ?', id);
+            const userInfo = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [id, guild])
             if (!userInfo) {
                 await db.close();
                 return interaction.editReply({ content:'This user may be a bot! If you believe this is an error, please DM Donovan#3771', ephemeral:true});
             }
 
             // get the player's team role id. if it does not exist, it means they are a free agent
-            const teamId = await db.get('SELECT roleid FROM Roles WHERE code = ?', userInfo.team)
+            const teamId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [userInfo.team, guild])
             const team = (teamId ? await interaction.guild.roles.fetch(teamId.roleid) : "Free Agent")
             const role = (userInfo.role === "P" ? "Player" : (userInfo.role === "HC" ? "Head Coach" : (userInfo.role === "GM" ? "General Manager" : "Franchise Owner")))
 

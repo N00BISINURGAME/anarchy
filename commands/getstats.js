@@ -19,6 +19,7 @@ module.exports = {
         .setDescription('Gets the stats of the top 10 people in a particular category.')
         .addStringOption(roleOption),
     async execute(interaction) {
+        // needs to be implemented
         const db = await getDBConnection();
 
         await db.close();

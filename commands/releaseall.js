@@ -14,6 +14,7 @@ module.exports = {
         .addMentionableOption(teamOption),
     async execute(interaction) {
             const db = await getDBConnection();
+            const guild = interaction.guild.id
 
             // first, check to see if the user is authorized to advance the season
             const user = interaction.user.id;
@@ -25,14 +26,14 @@ module.exports = {
             const team = interaction.options.getMentionable('team')
 
             // check to see if the team exists
-            const teamExists = await db.get('SELECT * FROM Roles WHERE roleid = ?', team.id)
+            const teamExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [team.id, guild])
             if (!teamExists) {
                 await db.close();
                 return interaction.editReply({ content:"This team does not exist! Ensure you're pinging a team that exists.", ephemeral:true });
             }
 
             // then, remove roles from players
-            const users = await db.all("SELECT p.discordid, r.roleid FROM Players p, Roles r WHERE r.roleid = ? AND p.team = r.code AND NOT p.role = 'FO'", team.id);
+            const users = await db.all("SELECT p.discordid, r.roleid FROM Players p, Roles r WHERE r.roleid = ? AND p.team = r.code AND NOT p.role = 'FO' AND r.guild = ?", [team.id, guild]);
             const guildMembers = interaction.guild.members;
             let userStr = ""
             // this needs to be updated to remove gm/hc roles too
@@ -50,18 +51,18 @@ module.exports = {
             if (userStr === "") userStr = "None"
 
             // then, remove all players from the team
-            await db.run('UPDATE Players SET team = "FA", role = "P" WHERE team = ? AND NOT role = "FO"', teamExists.code);
+            await db.run('UPDATE Players SET team = "FA", role = "P" WHERE team = ? AND NOT role = "FO" AND guild = ?', [teamExists.code, guild]);
 
             // then, set player count to 1
-            await db.run('UPDATE Teams SET playercount = (SELECT COUNT(*) FROM Players WHERE team = ?) WHERE code = ?', [teamExists.code,teamExists.code])
+            await db.run('UPDATE Teams SET playercount = (SELECT COUNT(*) FROM Players WHERE team = ? AND guild = ?) WHERE code = ? AND guild = ?', [teamExists.code,guild,teamExists.code,guild])
 
             // then, get the team logo and player count
-            const logo = await db.get('SELECT logo, playercount FROM Teams WHERE code = ?', teamExists.code);
+            const logo = await db.get('SELECT logo, playercount FROM Teams WHERE code = ? AND guild = ?', [teamExists.code, guild]);
             const playerCount = logo.playercount
             const logoStr = logo.logo;
 
             // then, get the transaction channel ID and send a transaction message
-            const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions"')
+            const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
             const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
             // then, format the embed and send it to the transaction channel

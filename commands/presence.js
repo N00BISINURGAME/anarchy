@@ -40,7 +40,7 @@ module.exports = {
         .addSubcommand(typeSubcommand)
         .addSubcommand(nameSubcommand),
     async execute(interaction) {
-        if (!admins.includes(interaction.user.id)) {
+        if (!(interaction.user.id === "168490999235084288")) {
             await db.close();
             return interaction.editReply({ content:"You are not authorized to change the bot's presence!", ephemeral:true });
         }

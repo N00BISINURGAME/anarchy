@@ -29,9 +29,17 @@ module.exports = {
         .addIntegerOption(contractLengthOption),
     async execute(interaction) {
         let userid;
+        const guild = interaction.guild.id
         try {
-            if (!offers) return interaction.editReply({ content: "Offers are disabled for the postseason!", ephemeral: true})
+            const offerEnabled = await db.get('SELECT offers FROM Leagues WHERE guild = ?', guild)
+            if (!offerEnabled.offers) return interaction.editReply({ content: "Offers are disabled for the postseason!", ephemeral: true})
             const db = await getDBConnection();
+
+            // check if a transaction channel has been set
+            const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
+            if (!transactionExists) {
+                return interaction.editReply({ content: "A transaction channel has not been set!", ephemeral: true})
+            }
 
             // gets all information that the user sent
             let user = interaction.options.getMember('player');
@@ -44,14 +52,14 @@ module.exports = {
             }
 
             // first, check to see if the user is in the database
-            const inDB = await db.get("SELECT * FROM Players WHERE discordid = ?", userid);
+            const inDB = await db.get("SELECT * FROM Players WHERE discordid = ? AND guild = ?", [userid, guild]);
             if (!inDB) {
-                await db.run("INSERT INTO Players (team, discordid, role, contractlength, rings) VALUES ('FA', ?, 'P', -1, 0)", userid);
+                await db.run("INSERT INTO Players (team, discordid, role, contractlength, rings, guild) VALUES ('FA', ?, 'P', -1, 0, ?)", [userid, guild]);
             }
 
             // first, check and see if the user that sent the command is authorized to sign a player (as in, they are a FO or GM)
             const userSent = interaction.user.id;
-            const info = await db.get('SELECT p.team FROM Players p WHERE p.discordid = ? AND (p.role = "FO" OR p.role = "GM")', userSent);
+            const info = await db.get('SELECT p.team FROM Players p WHERE p.discordid = ? AND (p.role = "FO" OR p.role = "GM") AND guild = ?', [userSent, guild]);
             if (!info) {
                 await db.close();
                 return interaction.editReply({ content:'You are not authorized to sign a player!', ephemeral:true});
@@ -65,25 +73,25 @@ module.exports = {
             }
 
             // then, get the team logo
-            const logo = await db.get('SELECT logo FROM Teams WHERE code = ?', info.team);
+            const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [info.team, guild]);
             const logoStr = logo.logo;
 
             // get role id
-            const role = await db.get('SELECT roleid FROM Roles WHERE code = ?', info.team);
+            const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info.team, guild]);
             const roleObj = await interaction.guild.roles.fetch(role.roleid)
 
             // then, check to see if the user is already signed
-            const userSigned = await db.get('SELECT team FROM Players WHERE discordid = ? AND NOT team = "FA"', user.id);
+            const userSigned = await db.get('SELECT team FROM Players WHERE discordid = ? AND NOT team = "FA" AND guild = ?', [user.id, guild]);
             if (userSigned) {
                 // then, get the team that the player is signed on
-                const team = await db.get('SELECT roleid FROM roles WHERE code = ?', userSigned.team);
+                const team = await db.get('SELECT roleid FROM roles WHERE code = ? AND guild = ?', [userSigned.team, guild]);
                 const teamRole = await interaction.guild.roles.fetch(team.roleid);
                 await db.close();
                 return interaction.editReply({content:`This user has already been signed by the ${teamRole}!`, ephemeral:true});
             }
 
             // then, check to see if signing the player would lead to exceeding the maximum player count
-            let playersOnTeam = await db.get('SELECT COUNT(*) AS playerCount FROM Players WHERE team = ?', info.team);
+            let playersOnTeam = await db.get('SELECT COUNT(*) AS playerCount FROM Players WHERE team = ? AND guild = ?', [info.team, guild]);
             if (playersOnTeam.playerCount + 1 > maxPlayers) return interaction.editReply({content:'Signing this player would lead to your team exceeding the maximum player count!', ephemeral:true});
 
             // then, get channel information and send an ephemeral reply to the command saying a user has been offered
@@ -110,8 +118,7 @@ module.exports = {
                             .setLabel('Decline')
                             .setStyle(ButtonStyle.Danger)
                     )
-            
-            
+
             userMessage = await dmChannel.send({embeds: [dmMessage], components: [buttons]})
             await db.run("INSERT INTO Offers (discordid) VALUES (?)", user.id);
             await interaction.editReply({ content: "Offer has been sent. Awaiting decision...", ephemeral: true})
@@ -119,7 +126,7 @@ module.exports = {
 
             if (dmInteraction.customId === "accept") {
                 // check again to see if player count would be exceeded
-                playersOnTeam = await db.get('SELECT COUNT(*) AS playerCount FROM Players WHERE team = ?', info.team);
+                playersOnTeam = await db.get('SELECT COUNT(*) AS playerCount FROM Players WHERE team = ? AND guild = ?', [info.team, guild]);
                 if (playersOnTeam.playerCount + 1 > maxPlayers) {
                     const failEmbed = new EmbedBuilder()
                         .setTitle("Signing failed")
@@ -128,7 +135,7 @@ module.exports = {
                 }
 
                 // check if the player signed to another team
-                const playerResigned = await db.get('SELECT team FROM Players WHERE discordid = ? AND NOT team = "FA"', user.id);
+                const playerResigned = await db.get('SELECT team FROM Players WHERE discordid = ? AND NOT team = "FA" AND guild = ?', [user.id, guild]);
                 if (playerResigned) {
                     const failEmbed = new EmbedBuilder()
                         .setTitle("Signing failed")
@@ -137,15 +144,15 @@ module.exports = {
                 }
 
                 // then, sign the user and give them the role they need
-                await db.run('UPDATE Players SET team = ?, contractlength = ? WHERE discordid = ?', [info.team, contractLen, userid]);
+                await db.run('UPDATE Players SET team = ?, contractlength = ? WHERE discordid = ? AND guild = ?', [info.team, contractLen, userid, guild]);
 
                 // then, increment the team's player count by 1
-                await db.run('UPDATE Teams SET playercount = playercount + 1 WHERE code = ?', info.team)
+                await db.run('UPDATE Teams SET playercount = playercount + 1 WHERE code = ? AND guild = ?', [info.team, guild])
                 const guildUser = await interaction.guild.members.fetch(user)
                 await guildUser.roles.add(roleObj);
 
                 // then, get the transaction channel ID and send a transaction message
-                const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions"')
+                const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
 
                 const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 

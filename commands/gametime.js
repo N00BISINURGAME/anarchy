@@ -80,7 +80,11 @@ module.exports = {
         // note that i represents the interaction here
         collector.on('collect', async i => {
             // only managers and admins can referee a game for now
-            if (i.customId === "ref" && (admins.includes(i.user.id) || managers.includes(i.user.id))) {
+            const db = await getDBConnection()
+            const adminAuthorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+            const managerAuthorized = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+            await db.close()
+            if (i.customId === "ref" && (adminAuthorized || managerAuthorized)) {
                 embed.setFields({
                     name:"Referee", value:`${i.user}`
                 })
