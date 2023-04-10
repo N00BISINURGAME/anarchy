@@ -24,5 +24,7 @@ module.exports = {
         const db = await getDBConnection();
         const userChoice = interaction.options.getString("channel-options")
         const channel = interaction.options.getChannel("channel")
+
+        // write this later
     }
 }

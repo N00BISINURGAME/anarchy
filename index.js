@@ -23,7 +23,6 @@ client.once(Events.ClientReady, async () => {
 	try {
 		const db = await getDBConnection()
 		await db.run("DELETE FROM Offers")
-		await db.close()
 		const guilds = await client.guilds.fetch()
 
 		guilds.forEach(async guild => {
@@ -40,7 +39,8 @@ client.once(Events.ClientReady, async () => {
 		}
 
 		await db.close()
-	} catch {
+	} catch(err) {
+		console.log(err)
 		console.log("offers not deleted!");
 	}
 });
@@ -58,7 +58,7 @@ client.on(Events.InteractionCreate, async interaction => {
 		await interaction.deferReply({ ephemeral:true })
 		await command.execute(interaction);
 	} catch (error) {
-		await client.users.send("168490999235084288", `**Error for user ${interaction.user.tag} for command ${interaction.commandName}**\n\n ${error}`)
+		await client.users.send("168490999235084288", `**Error for user ${interaction.user.tag} for command ${interaction.commandName} in guild ${interaction.guild.id}**\n\n ${error}`)
 		await interaction.editReply({content:`An error has occured! Please DM Donovan#3771 with the following screenshot and explain what happened that caused the error:\n\n${error}`})
 		console.error(error);
 	}
@@ -68,11 +68,14 @@ client.on(Events.InteractionCreate, async interaction => {
 client.on(Events.GuildCreate, async guild => {
 	const members = await guild.members.fetch();
 	const db = await getDBConnection();
+	const guildid = guild.id
+
+	await db.run("INSERT INTO Leagues (guild, season, offers, filter, maxplayers) VALUES (?, 1, 1, 0, 18)", guildid)
 
 	members.forEach(async guildMember => {
 		if (!guildMember.user.bot) {
 			const id = guildMember.id;
-			await db.run('INSERT INTO Players (team, discordid, role, contractlength) VALUES ("FA", ?, "P", "-1")', id);
+			await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ? "P", "-1")', [id, guildid]);
 		}
 	})
 
@@ -87,7 +90,7 @@ client.on(Events.GuildMemberAdd, async member => {
 
 	// if they are not in the database, add them
 	if (!memberData) {
-		await db.run('INSERT INTO Players (team, discordid, role, contractlength) VALUES ("FA", ?, "P", "-1")', member.id);
+		await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ? "P", "-1")', [member.id, member.guild.id]);
 	}
 	await db.close();
 })
@@ -95,27 +98,28 @@ client.on(Events.GuildMemberAdd, async member => {
 // when a member leaves
 client.on(Events.GuildMemberRemove, async member => {
 	const memberId = member.id;
+	const guildId = member.guild.id
 	const db = await getDBConnection();
 
 	// if a member leaves, check to see if they are a player. if they are, remove them as a player.
-	const playerData = await db.get('SELECT * FROM Players WHERE discordid = ?', memberId);
+	const playerData = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [memberId, guildId]);
 	if (!playerData) {
 		return;
 	}
 	// rewrite this part
 	if (playerData && playerData.team !== "FA") {
 		// first, decrement the number of players on the team the player used to be on
-		query = "UPDATE Teams SET playercount = playercount - 1 WHERE code = ?"
-		await db.run(query, playerData.team);
-		await db.run("UPDATE Players SET team = 'FA', role = 'P', contractlength = -1 WHERE discordid = ?", memberId)
+		query = "UPDATE Teams SET playercount = playercount - 1 WHERE code = ? AND guild = ?"
+		await db.run(query, [playerData.team, guildId]);
+		await db.run("UPDATE Players SET team = 'FA', role = 'P', contractlength = -1 WHERE discordid = ? AND guild = ?", [memberId, guildId])
 
 		// then, get relevant information to send a notification
-		const role = await db.get('SELECT roleid FROM Roles WHERE code = ?', playerData.team)
-		const teamPlayers = await db.get('SELECT playercount FROM Teams WHERE code = ?', playerData.team)
+		const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [playerData.team, guildId])
+		const teamPlayers = await db.get('SELECT playercount FROM Teams WHERE code = ? AND guild = ?', [playerData.team, guildId])
 		const roleObj = await member.guild.roles.fetch(role.roleid)
-		const leaveChannel = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions"');
+		const leaveChannel = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guildId);
 		// then, get the team logo
-		const logo = await db.get('SELECT logo FROM Teams WHERE code = ?', playerData.team);
+		const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [playerData.team, guildId]);
 		const logoStr = logo.logo;
 		const transactionEmbed = new EmbedBuilder()
                 .setTitle("Player left!")

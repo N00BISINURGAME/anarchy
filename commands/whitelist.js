@@ -16,7 +16,8 @@ const fieldOption = new SlashCommandStringOption()
     .setName("role")
     .setDescription("The role you want to whitelist the user for")
     .addChoices(
-        {name:"Manager", value:"managers"}
+        {name:"Manager", value:"managers"},
+        {name:"Admin", value:"admins"}
     )
 
 module.exports = {
