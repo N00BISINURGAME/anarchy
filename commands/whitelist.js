@@ -31,6 +31,9 @@ module.exports = {
         const type = interaction.options.getString("role");
         const guild = interaction.guild.id
 
+        console.log(interaction.guild.owner)
+        console.log(interaction.user.id)
+
         if (interaction.guild.owner !== interaction.user.id) {
             return interaction.editReply({ content:`You are not authorized to whitelist individuals!`, ephemeral:true });
         }
