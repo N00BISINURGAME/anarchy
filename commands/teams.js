@@ -2,7 +2,6 @@ const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 const { SlashCommandBuilder, SlashCommandMentionableOption, ActionRowBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const { getDBConnection } = require('../getDBConnection');
-const { admins } = require('../config.json');
 
 const teamOption = new SlashCommandMentionableOption().setRequired(true).setName('team').setDescription('The team to get all players from.');
 
@@ -12,17 +11,17 @@ module.exports = {
         .setDescription('Shows all existing teams with their member counts'),
     async execute(interaction) {
         const db = await getDBConnection();
-        
+        const guild = interaction.guild.id
         // first, get all teams
-        const teams = await db.all('SELECT playercount, code FROM Teams ORDER BY playercount DESC')
+        const teams = await db.all('SELECT playercount, code FROM Teams WHERE guild = ? ORDER BY playercount DESC', guild)
 
         let page = 1;
         let lower = 0;
         let upper = 8;
         let teamStr = ""
         for (let i = lower; i < upper; i++) {
-            const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ?', teams[i].code);
-            const fo = await db.get('SELECT discordid FROM Players WHERE role = "FO" AND team = ?', teams[i].code)
+            const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teams[i].code, guild]);
+            const fo = await db.get('SELECT discordid FROM Players WHERE role = "FO" AND team = ? AND guild = ?', [teams[i].code, guild])
             const foStr = fo ? `<@${fo.discordid}>` : "Vacant"
             const role = await interaction.guild.roles.fetch(roleId.roleid);
             teamStr += `${role} - ${teams[i].playercount} members\nFranchise Owner:${foStr}\n\n`
@@ -61,8 +60,8 @@ module.exports = {
             teamStr = ""
 
             for (let i = lower; i < upper; i++) {
-                const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ?', teams[i].code);
-                const fo = await db.get('SELECT discordid FROM Players WHERE role = "FO" AND team = ?', teams[i].code)
+                const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teams[i].code, guild]);
+                const fo = await db.get('SELECT discordid FROM Players WHERE role = "FO" AND team = ? AND guild = ?', [teams[i].code, guild])
                 const foStr = fo ? `<@${fo.discordid}>` : "Vacant"
                 teamStr += `<@&${roleId.roleid}> - ${teams[i].playercount} members\nFranchise Owner:${foStr}\n\n`
             }

@@ -16,17 +16,17 @@ module.exports = {
         await interaction.guild.members.fetch()
 
         const team = interaction.options.getMentionable('team')
+        const guild = interaction.guild.id
 
         // check to see if the team exists
-        const teamExists = await db.get('SELECT * FROM Roles WHERE roleid = ?', team.id)
-        console.log(team.id);
+        const teamExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [team.id, guild])
         if (!teamExists) {
             await db.close();
             return interaction.editReply("This team does not exist! Ensure you're pinging a team that exists.");
         }
 
         // then, get all players from the specified team
-        const userInfo = await db.all('SELECT discordid, role, contractlength FROM Players WHERE team = ?', teamExists.code);
+        const userInfo = await db.all('SELECT discordid, role, contractlength FROM Players WHERE team = ? AND guild = ?', [teamExists.code, guild]);
 
         let fo = "Vacant";
         let gm = "Vacant";
@@ -50,7 +50,7 @@ module.exports = {
         if (players === "") players = "None";
         const desc = `**Franchise Owner**\n${fo}\n\n**General Manager**\n${gm}\n\n**Head Coach**\n${hc}\n\n**Players**\n${players}`
 
-        const logo = await db.get('SELECT logo FROM Teams where code = ?', teamExists.code)
+        const logo = await db.get('SELECT logo FROM Teams where code = ? AND guild = ?', [teamExists.code, guild])
 
         const embed = new EmbedBuilder()
             .setTitle(`${team.name} Roster`)

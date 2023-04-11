@@ -13,10 +13,12 @@ module.exports = {
         .addMentionableOption(teamOption),
     async execute(interaction) {
             const db = await getDBConnection();
+            const guild = interaction.guild.id
 
             // first, check to see if the user is authorized to advance the season
             const user = interaction.user.id;
-            if (!admins.includes(user)) {
+            const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [user, guild])
+            if (!authorized) {
                 await db.close();
                 return interaction.editReply({ content:"You are not authorized to award rings!", ephemeral:true });
             }
@@ -24,7 +26,7 @@ module.exports = {
             const team = interaction.options.getMentionable('team')
 
             // check to see if the team exists
-            const teamExists = await db.get('SELECT * FROM Roles WHERE roleid = ?', team.id)
+            const teamExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [team.id, guild])
             if (!teamExists) {
                 await db.close();
                 return interaction.editReply({content:"This team does not exist! Ensure you're pinging a team that exists.", ephemeral:true});

@@ -2,7 +2,6 @@ const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 const { SlashCommandBuilder, SlashCommandUserOption, SlashCommandStringOption, SlashCommandIntegerOption, SlashCommandNumberOption, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const { getDBConnection } = require('../getDBConnection');
-const { maxPlayers, offers } = require('../config.json');
 const { message } = require('noblox.js');
 
 
@@ -31,9 +30,11 @@ module.exports = {
         let userid;
         const guild = interaction.guild.id
         try {
+            const db = await getDBConnection();
+            const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
+            const maxPlayers = maxPlayerCount.maxplayers
             const offerEnabled = await db.get('SELECT offers FROM Leagues WHERE guild = ?', guild)
             if (!offerEnabled.offers) return interaction.editReply({ content: "Offers are disabled for the postseason!", ephemeral: true})
-            const db = await getDBConnection();
 
             // check if a transaction channel has been set
             const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)

@@ -3,8 +3,6 @@ const sqlite = require('sqlite');
 const fs = require('fs').promises
 const { SlashCommandBuilder, ComponentType, ButtonStyle, EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const { getDBConnection } = require('../getDBConnection');
-const { season } = require('../config.json');
-
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -12,9 +10,10 @@ module.exports = {
         .setDescription('Displays league standings'),
     async execute(interaction) {
         const db = await getDBConnection();
+        const guild = interaction.guild.id
 
         // get information on league standings, sorted by wins, then sorted by point differential
-        const teamStandings = await db.all('SELECT code, name, wins, losses, ties, ptdifferential FROM Teams ORDER BY wins DESC, ties DESC, ptdifferential DESC, name ASC')
+        const teamStandings = await db.all('SELECT code, name, wins, losses, ties, ptdifferential FROM Teams ORDER BY wins DESC, ties DESC, ptdifferential DESC, name ASC WHERE guild = ?', guild)
 
         const embed = new EmbedBuilder()
             .setTitle(`League Standings for season ${season}`)
@@ -28,7 +27,7 @@ module.exports = {
         let upper = 8;
         let standingsString = ""
         for (let i = lower; i < upper; i++) {
-            const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ?', teamStandings[i].code)
+            const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teamStandings[i].code, guild])
             standingsString += `**${i + 1})** <@&${roleId.roleid}> ${teamStandings[i].wins}-${teamStandings[i].losses}-${teamStandings[i].ties}, ${teamStandings[i].ptdifferential} point differential\n\n`
         }
         if (standingsString === "") standingsString = "There are no teams in this league!"
@@ -61,7 +60,7 @@ module.exports = {
             standingsString = ""
 
             for (let i = lower; i < upper; i++) {
-                const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ?', teamStandings[i].code)
+                const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teamStandings[i].code, guild])
                 standingsString += `**${i + 1})** <@&${roleId.roleid}> ${teamStandings[i].wins}-${teamStandings[i].losses}-${teamStandings[i].ties}, ${teamStandings[i].ptdifferential} point differential\n\n`
             }
             if (standingsString === "") standingsString = "There are no teams in this league!"

@@ -27,7 +27,7 @@ module.exports = {
         const code = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [team.id, guild])
 
         await db.run('UPDATE Teams SET logo = ? WHERE code = ? AND guild = ?', [link, code.code, guild])
-        
+
         await db.close()
         return interaction.editReply({ content:`Successfully changed logo!`, ephemeral:true })
     }
