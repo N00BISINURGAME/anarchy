@@ -34,7 +34,7 @@ module.exports = {
         console.log(interaction.guild.owner)
         console.log(interaction.user.id)
 
-        if (interaction.guild.owner !== interaction.user.id) {
+        if (interaction.guild.ownerId !== interaction.user.id) {
             return interaction.editReply({ content:`You are not authorized to whitelist individuals!`, ephemeral:true });
         }
 
