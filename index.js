@@ -4,7 +4,8 @@ const sqlite = require('sqlite');
 const sqlite3 = require('sqlite3');
 const { getDBConnection } = require('./getDBConnection');
 const { Client, Collection, Events, GatewayIntentBits, EmbedBuilder } = require('discord.js');
-const { token, presenceData, maxPlayers, filter } = require('./config.json');
+const { token, presenceData, maxPlayers, filter, clientId, guildId } = require('./config.json');
+const { REST, Routes } = require('discord.js');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages], presence: presenceData });
 
@@ -83,7 +84,33 @@ client.on(Events.GuildCreate, async guild => {
 		})
 	}
 
+	// deploy commands
+	const commands = [];
+
+	// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
+	for (const file of commandFiles) {
+		const command = require(`./commands/${file}`);
+		commands.push(command.data.toJSON());
+	}
+
+	const rest = new REST({ version: '10' }).setToken(token);
+
+	(async () => {
+		try {
+			console.log(`Started refreshing ${commands.length} application (/) commands.`);
 	
+			// The put method is used to fully refresh all commands in the guild with the current set
+			const data = await rest.put(
+				Routes.applicationCommands(clientId),
+				{ body: commands },
+			);
+	
+			console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+		} catch (error) {
+			// And of course, make sure you catch and log any errors!
+			console.error(error);
+		}
+	})();
 
 	await db.close();
 })
