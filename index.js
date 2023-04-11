@@ -70,14 +70,20 @@ client.on(Events.GuildCreate, async guild => {
 	const db = await getDBConnection();
 	const guildid = guild.id
 
-	await db.run("INSERT INTO Leagues (guild, season, offers, filter, maxplayers) VALUES (?, 1, 1, 0, 18)", guildid)
+	const guildExists = await db.get('SELECT * FROM Leagues WHERE guild = ?', guildid);
 
-	members.forEach(async guildMember => {
-		if (!guildMember.user.bot) {
-			const id = guildMember.id;
-			await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ? "P", "-1")', [id, guildid]);
-		}
-	})
+	if (!guildExists) {
+		await db.run("INSERT INTO Leagues (guild, season, offers, filter, maxplayers) VALUES (?, 1, 1, 0, 18)", guildid)
+
+		members.forEach(async guildMember => {
+			if (!guildMember.user.bot) {
+				const id = guildMember.id;
+				await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ? "P", "-1")', [id, guildid]);
+			}
+		})
+	}
+
+	
 
 	await db.close();
 })
