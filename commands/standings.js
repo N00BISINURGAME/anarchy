@@ -13,7 +13,7 @@ module.exports = {
         const guild = interaction.guild.id
 
         // get information on league standings, sorted by wins, then sorted by point differential
-        const teamStandings = await db.all('SELECT code, name, wins, losses, ties, ptdifferential FROM Teams ORDER BY wins DESC, ties DESC, ptdifferential DESC, name ASC WHERE guild = ?', guild)
+        const teamStandings = await db.all('SELECT code, name, wins, losses, ties, ptdifferential FROM Teams WHERE guild = ? ORDER BY wins DESC, ties DESC, ptdifferential DESC, name ASC', guild)
 
         const embed = new EmbedBuilder()
             .setTitle(`League Standings for season ${season}`)
