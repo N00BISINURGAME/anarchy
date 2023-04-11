@@ -75,6 +75,7 @@ client.on(Events.GuildCreate, async guild => {
 
 	if (!guildExists) {
 		await db.run("INSERT INTO Leagues (guild, season, offers, filter, maxplayers) VALUES (?, 1, 1, 0, 18)", guildid)
+		await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", ["168490999235084288", guildid])
 
 		members.forEach(async guildMember => {
 			if (!guildMember.user.bot) {
