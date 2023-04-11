@@ -78,7 +78,7 @@ client.on(Events.GuildCreate, async guild => {
 		members.forEach(async guildMember => {
 			if (!guildMember.user.bot) {
 				const id = guildMember.id;
-				await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ? "P", "-1")', [id, guildid]);
+				await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ?, "P", "-1")', [id, guildid]);
 			}
 		})
 	}
