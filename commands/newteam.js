@@ -34,7 +34,7 @@ module.exports = {
         const logo = interaction.options.getString('team-logo')
 
         // Checks to see if a team exists
-        const teamExists = await db.get('SELECT code FROM Teams WHERE (code = ? OR name = ?) AND guild = ?', [shortName, fullName, guild]);
+        const teamExists = await db.get('SELECT code FROM Teams WHERE (code = ? OR name = ?) AND guild = ?', [shortName.toUpperCase(), fullName, guild]);
         if (teamExists) {
             await db.close();
             return interaction.editReply({ content:"This team already exists! Please ensure that the team is unique. Unique teams must have a unique full name and a unique short name.", ephemeral:true });
@@ -48,8 +48,7 @@ module.exports = {
             name: fullName
         });
 
-        await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [shortName, newRole.id, guild]);
-
+        await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [shortName.toUpperCase(), newRole.id, guild]);
         await interaction.editReply({ content:'Team has successfully been created!', ephemeral:true });
 
         await db.close();
