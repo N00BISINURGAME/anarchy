@@ -19,7 +19,7 @@ module.exports = {
         let lower = 0;
         let upper = 8;
         let teamStr = ""
-        for (let i = lower; i < upper; i++) {
+        for (let i = lower; i < upper && i < teams.length; i++) {
             const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teams[i].code, guild]);
             const fo = await db.get('SELECT discordid FROM Players WHERE role = "FO" AND team = ? AND guild = ?', [teams[i].code, guild])
             const foStr = fo ? `<@${fo.discordid}>` : "Vacant"
@@ -59,7 +59,7 @@ module.exports = {
             upper = (i.customId === "pageup" ? (upper + 8 >= teams.length ? teams.length : upper + 8) : (upper - 8 <= 8 ? 8 : upper - 8))
             teamStr = ""
 
-            for (let i = lower; i < upper; i++) {
+            for (let i = lower; i < upper && i < teams.length; i++) {
                 const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teams[i].code, guild]);
                 const fo = await db.get('SELECT discordid FROM Players WHERE role = "FO" AND team = ? AND guild = ?', [teams[i].code, guild])
                 const foStr = fo ? `<@${fo.discordid}>` : "Vacant"
