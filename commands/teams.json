@@ -1,0 +1,228 @@
+{
+    "teams":[
+        {
+          "ID": 1,
+          "Name": "Arizona Cardinals",
+          "Abbreviation": "ARI",
+          "Conference": "NFC",
+          "Division": "West"
+        },
+        {
+          "ID": 2,
+          "Name": "Atlanta Falcons",
+          "Abbreviation": "ATL",
+          "Conference": "NFC",
+          "Division": "South"
+        },
+        {
+          "ID": 3,
+          "Name": "Baltimore Ravens",
+          "Abbreviation": "BAL",
+          "Conference": "AFC",
+          "Division": "North"
+        },
+        {
+          "ID": 4,
+          "Name": "Buffalo Bills",
+          "Abbreviation": "BUF",
+          "Conference": "AFC",
+          "Division": "East"
+        },
+        {
+          "ID": 5,
+          "Name": "Carolina Panthers",
+          "Abbreviation": "CAR",
+          "Conference": "NFC",
+          "Division": "South"
+        },
+        {
+          "ID": 6,
+          "Name": "Chicago Bears",
+          "Abbreviation": "CHI",
+          "Conference": "NFC",
+          "Division": "North"
+        },
+        {
+          "ID": 7,
+          "Name": "Cincinnati Bengals",
+          "Abbreviation": "CIN",
+          "Conference": "AFC",
+          "Division": "North"
+        },
+        {
+          "ID": 8,
+          "Name": "Cleveland Browns",
+          "Abbreviation": "CLE",
+          "Conference": "AFC",
+          "Division": "North"
+        },
+        {
+          "ID": 9,
+          "Name": "Dallas Cowboys",
+          "Abbreviation": "DAL",
+          "Conference": "NFC",
+          "Division": "East"
+        },
+        {
+          "ID": 10,
+          "Name": "Denver Broncos",
+          "Abbreviation": "DEN",
+          "Conference": "AFC",
+          "Division": "West"
+        },
+        {
+          "ID": 11,
+          "Name": "Detroit Lions",
+          "Abbreviation": "DET",
+          "Conference": "NFC",
+          "Division": "North"
+        },
+        {
+          "ID": 12,
+          "Name": "Green Bay Packers",
+          "Abbreviation": "GB",
+          "Conference": "NFC",
+          "Division": "North"
+        },
+        {
+          "ID": 13,
+          "Name": "Houston Texans",
+          "Abbreviation": "HOU",
+          "Conference": "AFC",
+          "Division": "South"
+        },
+        {
+          "ID": 14,
+          "Name": "Indianapolis Colts",
+          "Abbreviation": "IND",
+          "Conference": "AFC",
+          "Division": "South"
+        },
+        {
+          "ID": 15,
+          "Name": "Jacksonville Jaguars",
+          "Abbreviation": "JAX",
+          "Conference": "AFC",
+          "Division": "South"
+        },
+        {
+          "ID": 16,
+          "Name": "Kansas City Chiefs",
+          "Abbreviation": "KC",
+          "Conference": "AFC",
+          "Division": "West"
+        },
+        {
+          "ID": 17,
+          "Name": "Miami Dolphins",
+          "Abbreviation": "MIA",
+          "Conference": "AFC",
+          "Division": "East"
+        },
+        {
+          "ID": 18,
+          "Name": "Minnesota Vikings",
+          "Abbreviation": "MIN",
+          "Conference": "NFC",
+          "Division": "North"
+        },
+        {
+          "ID": 19,
+          "Name": "New England Patriots",
+          "Abbreviation": "NE",
+          "Conference": "AFC",
+          "Division": "East"
+        },
+        {
+          "ID": 20,
+          "Name": "New Orleans Saints",
+          "Abbreviation": "NO",
+          "Conference": "NFC",
+          "Division": "South"
+        },
+        {
+          "ID": 21,
+          "Name": "New York Giants",
+          "Abbreviation": "NYG",
+          "Conference": "NFC",
+          "Division": "East"
+        },
+        {
+          "ID": 22,
+          "Name": "New York Jets",
+          "Abbreviation": "NYJ",
+          "Conference": "AFC",
+          "Division": "East"
+        },
+        {
+          "ID": 23,
+          "Name": "Las Vegas Raiders",
+          "Abbreviation": "LV",
+          "Conference": "AFC",
+          "Division": "West"
+        },
+        {
+          "ID": 24,
+          "Name": "Philadelphia Eagles",
+          "Abbreviation": "PHI",
+          "Conference": "NFC",
+          "Division": "East"
+        },
+        {
+          "ID": 25,
+          "Name": "Pittsburgh Steelers",
+          "Abbreviation": "PIT",
+          "Conference": "AFC",
+          "Division": "North"
+        },
+        {
+          "ID": 26,
+          "Name": "Los Angeles Chargers",
+          "Abbreviation": "LAC",
+          "Conference": "AFC",
+          "Division": "West"
+        },
+        {
+          "ID": 27,
+          "Name": "San Francisco 49ers",
+          "Abbreviation": "SF",
+          "Conference": "NFC",
+          "Division": "West"
+        },
+        {
+          "ID": 28,
+          "Name": "Seattle Seahawks",
+          "Abbreviation": "SEA",
+          "Conference": "NFC",
+          "Division": "West"
+        },
+        {
+          "ID": 29,
+          "Name": "Los Angeles Rams",
+          "Abbreviation": "LAR",
+          "Conference": "NFC",
+          "Division": "West"
+        },
+        {
+          "ID": 30,
+          "Name": "Tampa Bay Buccaneers",
+          "Abbreviation": "TB",
+          "Conference": "NFC",
+          "Division": "South"
+        },
+        {
+          "ID": 31,
+          "Name": "Tennessee Titans",
+          "Abbreviation": "TEN",
+          "Conference": "AFC",
+          "Division": "South"
+        },
+        {
+          "ID": 32,
+          "Name": "Washington Commanders",
+          "Abbreviation": "WAS",
+          "Conference": "NFC",
+          "Division": "East"
+        }
+      ]
+}

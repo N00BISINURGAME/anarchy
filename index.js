@@ -120,6 +120,7 @@ client.on(Events.GuildCreate, async guild => {
 client.on(Events.GuildMemberAdd, async member => {
 	// first, check if they are already in the database
 	const db = await getDBConnection();
+	const guild = member.guild.id;
 	const memberData = await db.get('SELECT discordid FROM Players WHERE discordid = ? AND guild = ?', [member.id, guild]);
 
 	// if they are not in the database, add them
