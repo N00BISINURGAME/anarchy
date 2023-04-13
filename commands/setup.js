@@ -16,9 +16,7 @@ module.exports = {
         const guild = interaction.guild.id;
         const embed = new EmbedBuilder()
             .setTitle("Thank you for choosing Anarchy!")
-            .setDescription(`You will now run through the server setup. To
-                move on to the next step of the server setup, press the green button marked "next". Note that
-                setup should be completed within 15 minutes.`)
+            .setDescription(`You will now run through the server setup. To move on to the next step of the server setup, press the green button marked "next". Note that setup should be completed within 15 minutes.`)
 
         const buttons = new ActionRowBuilder()
             .addComponents(new ButtonBuilder()
