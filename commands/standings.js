@@ -15,6 +15,9 @@ module.exports = {
         // get information on league standings, sorted by wins, then sorted by point differential
         const teamStandings = await db.all('SELECT code, name, wins, losses, ties, ptdifferential FROM Teams WHERE guild = ? ORDER BY wins DESC, ties DESC, ptdifferential DESC, name ASC', guild)
 
+        const seasonQuery = await db.get('SELECT season FROM Leagues WHERE guild = ?', guild)
+        const season = seasonQuery.season
+
         const embed = new EmbedBuilder()
             .setTitle(`League Standings for season ${season}`)
 
