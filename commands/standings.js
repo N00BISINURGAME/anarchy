@@ -29,7 +29,7 @@ module.exports = {
         let lower = 0;
         let upper = 8;
         let standingsString = ""
-        for (let i = lower; i < upper; i++) {
+        for (let i = lower; i < upper && i < teamStandings.length; i++) {
             const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teamStandings[i].code, guild])
             standingsString += `**${i + 1})** <@&${roleId.roleid}> ${teamStandings[i].wins}-${teamStandings[i].losses}-${teamStandings[i].ties}, ${teamStandings[i].ptdifferential} point differential\n\n`
         }
@@ -62,7 +62,7 @@ module.exports = {
             upper = (i.customId === "pageup" ? (upper + 8 >= teamStandings.length ? teamStandings.length : upper + 8) : (upper - 8 <= 8 ? 8 : upper - 8))
             standingsString = ""
 
-            for (let i = lower; i < upper; i++) {
+            for (let i = lower; i < upper && i < teamStandings.length; i++) {
                 const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teamStandings[i].code, guild])
                 standingsString += `**${i + 1})** <@&${roleId.roleid}> ${teamStandings[i].wins}-${teamStandings[i].losses}-${teamStandings[i].ties}, ${teamStandings[i].ptdifferential} point differential\n\n`
             }
