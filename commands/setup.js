@@ -28,7 +28,7 @@ module.exports = {
         let messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 890000})
         if (messageCollector.customId === "next") {
             embed.setDescription("You will now be prompted to select your channels for certain commands. Note that you can change these channels at any time by running the /channel command.")
-            await interaction.editReply({ embeds:[embed], components:[buttons], ephemeral:true})
+            message = await interaction.update({ embeds:[embed], components:[buttons], ephemeral:true})
         }
 
         await db.close()
