@@ -24,7 +24,12 @@ module.exports = {
                             .setLabel('Continue')
                             .setStyle(ButtonStyle.Success))
 
-        await interaction.editReply({ embeds:[embed], components:[buttons], ephemeral:true})
+        let message = await interaction.editReply({ embeds:[embed], components:[buttons], ephemeral:true})
+        let messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 890000})
+        if (messageCollector.customId === "next") {
+            embed.setDescription("You will now be prompted to select your channels for certain commands. Note that you can change these channels at any time by running the /channel command.")
+            await interaction.editReply({ embeds:[embed], components:[buttons], ephemeral:true})
+        }
 
         await db.close()
     }
