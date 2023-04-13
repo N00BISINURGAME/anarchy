@@ -49,6 +49,7 @@ module.exports = {
                     )
 
         if (teams.length < upper) {
+            console.log(teams.length)
             return interaction.editReply({ embeds:[embed], ephemeral:true })
         }
 
@@ -70,7 +71,6 @@ module.exports = {
                 teamStr += `<@&${roleId.roleid}> - ${teams[i].playercount} members\nFranchise Owner:${foStr}\n\n`
             }
             if (teamStr === "") teamStr = "None"
-            
             embed.setFields({name:"Teams", value:teamStr})
             embed.setFooter({ text:`Page ${page} / ${Math.floor((teams.length / 8))}` })
             await i.update({ embeds:[embed], components: [buttons], ephemeral:true })
