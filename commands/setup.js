@@ -16,7 +16,7 @@ module.exports = {
         const guild = interaction.guild.id;
         const embed = new EmbedBuilder()
             .setTitle("Thank you for choosing Anarchy!")
-            .setDescription(`You will now run through the server setup. To move on to the next step of the server setup, press the green button marked "next". Note that setup should be completed within 15 minutes.`)
+            .setDescription(`You will now run through the server setup. To move on to the next step of the server setup, press the green button marked "next". Note that you will have 3 minutes per step.`)
 
         const buttons = new ActionRowBuilder()
             .addComponents(new ButtonBuilder()
@@ -25,10 +25,16 @@ module.exports = {
                             .setStyle(ButtonStyle.Success))
 
         let message = await interaction.editReply({ embeds:[embed], components:[buttons], ephemeral:true})
-        let messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 890000})
+        let messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 180000})
         if (messageCollector.customId === "next") {
             embed.setDescription("You will now be prompted to select your channels for certain commands. Note that you can change these channels at any time by running the /channel command.")
             message = await messageCollector.update({ embeds:[embed], components:[buttons], ephemeral:true})
+            messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 180000})
+        }
+        if (messageCollector.customId === "next") {
+            embed.setDescription("You will now be prompted to select your options for importing teams or starting from scratch. Note that you can create new teams at any time by running the /newteam command.")
+            message = await messageCollector.update({ embeds:[embed], components:[buttons], ephemeral:true})
+            messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 180000})
         }
 
         await db.close()
