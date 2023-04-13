@@ -48,6 +48,10 @@ module.exports = {
                             .setStyle(ButtonStyle.Primary)
                     )
 
+        if (teams.length < upper) {
+            return interaction.editReply({ embeds:[embed], ephemeral:true })
+        }
+
         const message = await interaction.editReply({ embeds:[embed], components: [buttons], ephemeral:true })
 
         const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 300000 });
