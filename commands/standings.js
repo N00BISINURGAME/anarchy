@@ -54,6 +54,7 @@ module.exports = {
         const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 300000 });
 
         collector.on('collect', async i => {
+            if (teamStandings.length < upper) return;
             const db = await getDBConnection();
             console.log(page + 1)
             console.log(Math.floor((teamStandings.length / 8)))
