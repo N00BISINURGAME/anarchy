@@ -33,7 +33,7 @@ module.exports = {
         await db.run('UPDATE Teams SET wins = 0, losses = 0, ties = 0 WHERE guild = ?', guild)
 
         // then, find all users whose contracts have expired
-        const expiredContracts = await db.all('SELECT team, role, discordid FROM Players WHERE contractlength = 0')
+        const expiredContracts = await db.all('SELECT team, role, discordid FROM Players WHERE contractlength = 0 AND guild = ?', guild)
 
         let contractStr = "";
 
