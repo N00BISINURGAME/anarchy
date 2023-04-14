@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
-const { SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandAttachmentOption, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ChannelSelectMenuBuilder, StringSelectMenuBuilder } = require('discord.js');
+const { SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandAttachmentOption, ChannelType, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ChannelSelectMenuBuilder, StringSelectMenuBuilder } = require('discord.js');
 const { getDBConnection } = require('../getDBConnection');
 const { teams } = require('./teams.json');
 
@@ -27,16 +27,19 @@ module.exports = {
         const transactionMenu = new ChannelSelectMenuBuilder()
             .setCustomId("transactionchannel")
             .setPlaceholder("Select a transaction channel")
+            .setChannelTypes(ChannelType.GuildText)
         const transactionRow = new ActionRowBuilder().addComponents(transactionMenu)
 
         const demandsMenu = new ChannelSelectMenuBuilder()
             .setCustomId("demandschannel")
             .setPlaceholder("Select a demands channel")
+            .setChannelTypes(ChannelType.GuildText)
         const demandsRow = new ActionRowBuilder().addComponents(demandsMenu)
 
         const resultsMenu = new ChannelSelectMenuBuilder()
             .setCustomId("resultschannel")
             .setPlaceholder("Select a game results channel")
+            .setChannelTypes(ChannelType.GuildText)
         const resultsRow = new ActionRowBuilder().addComponents(resultsMenu)
 
         const addTeamMenu = new StringSelectMenuBuilder()
