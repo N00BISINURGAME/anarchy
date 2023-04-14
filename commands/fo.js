@@ -80,9 +80,9 @@ module.exports = {
 
             await userChoice.roles.add(newRole);
         } else {
-            const role = await interaction.guild.roles.fetch(gmRole.roleid);
+            // const role = await interaction.guild.roles.fetch(gmRole.roleid);
 
-            await userChoice.roles.add(role);
+            await userChoice.roles.add(gmRole.roleid); // there is an error here, need to figure out what is going on
         }
 
         // update the playercount if necessary
