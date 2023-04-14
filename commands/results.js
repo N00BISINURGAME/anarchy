@@ -86,7 +86,7 @@ module.exports = {
             )
             await db.run('UPDATE Teams SET ties = ties + 1, ptdifferential = ptdifferential - 25 WHERE name = ? OR name = ? AND guild = ?', [team1Role.name, team2Role.name, guild])
             // then, get the transaction channel ID and send a transaction message
-            const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "results"')
+            const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "results" AND guild = ?', guild)
 
             const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
@@ -102,7 +102,7 @@ module.exports = {
             .setDescription(`Results posted by ${interaction.user}`);
 
         if (teamWon) {
-            const imageLink = await db.get("SELECT t.logo FROM Teams t, Roles r WHERE r.roleid = ? AND r.code = t.code", teamWon.id)
+            const imageLink = await db.get("SELECT t.logo FROM Teams t, Roles r WHERE r.roleid = ? AND r.code = t.code AND t.guild = ?", [teamWon.id, guild])
             embed.setThumbnail(imageLink.logo)
         }
             
@@ -125,14 +125,14 @@ module.exports = {
 
         // then, increment the point differential. two cases: one where there is no tie, and one where there is a tie
         if (teamWon) {
-            await db.run('UPDATE Teams SET wins = wins + 1, allwins = allwins + 1, ptdifferential = ptdifferential + ? WHERE name = ?', [firstTeamScore - secondTeamScore, firstTeamRole.name])
-            await db.run('UPDATE Teams SET losses = losses + 1, alllosses = alllosses + 1, ptdifferential = ptdifferential - ? WHERE name = ?', [firstTeamScore - secondTeamScore, secondteamRole.name])
+            await db.run('UPDATE Teams SET wins = wins + 1, allwins = allwins + 1, ptdifferential = ptdifferential + ? WHERE name = ? AND guild = ?', [firstTeamScore - secondTeamScore, firstTeamRole.name, guild])
+            await db.run('UPDATE Teams SET losses = losses + 1, alllosses = alllosses + 1, ptdifferential = ptdifferential - ? WHERE name = ? AND guild = ?', [firstTeamScore - secondTeamScore, secondteamRole.name, guild])
         } else {
-            await db.run('UPDATE Teams SET ties = ties + 1, allties = allties + 1 WHERE name = ? OR name = ?', [firstTeamRole.name, secondteamRole.name])
+            await db.run('UPDATE Teams SET ties = ties + 1, allties = allties + 1 WHERE (name = ? OR name = ?) AND guild = ?', [firstTeamRole.name, secondteamRole.name, guild])
         }
 
         // then, get the transaction channel ID and send a transaction message
-        const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "results"')
+        const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "results" AND guild = ?', guild)
 
         const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
