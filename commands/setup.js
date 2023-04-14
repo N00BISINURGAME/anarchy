@@ -106,6 +106,7 @@ module.exports = {
         if (teamOption !== "3") {
             const roles = await interaction.guild.roles.fetch()
             let clonedArray = [...teams]
+            let teamsThatExist = []
             for (const role of roles.values()) {
                 // first, check if the role is already in the DB
                 const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', role.id, guild)
@@ -117,10 +118,12 @@ module.exports = {
                             await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guild]);
                             await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [team.Abbreviation.toUpperCase(), role.id, guild]);
                             clonedArray.splice(i, 1)
+                            teamsThatExist.push(team.Name.toLowerCase())
                             break;
                         }
                     }
-                    
+                } else {
+                    teamsThatExist.push(roleExists.Name.toLowerCase())
                 }
             }
 
@@ -128,6 +131,9 @@ module.exports = {
 
             if (teamOption === "2") {
                 for (let team of clonedArray) {
+                    if (teamsThatExist.includes(team.name.toLowerCase())) {
+                        continue;
+                    }
                     const newRole = await interaction.guild.roles.create({
                         name: team.Name,
                         color: team.Color
