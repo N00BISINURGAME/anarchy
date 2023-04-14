@@ -110,13 +110,13 @@ module.exports = {
                 { name:"Player Promoted", value:`${userChoice}`},
                 { name:"Role", value: roleChoice === "GM" ? "General Manager" : "Head Coach" }
             )
-        
+
         // then, get the transaction channel ID and send a transaction message
         const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
         const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
         await transactionChannel.send({ embeds: [transactionEmbed] })
-        
+
         await interaction.editReply({ content:"Successfully promoted user!", ephemeral:true })
         // two branches: one for assigning FO and one for assigning GM/HC
         await db.close();
