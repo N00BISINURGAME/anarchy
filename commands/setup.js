@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
-const { SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandAttachmentOption, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ChannelSelectMenuBuilder } = require('discord.js');
+const { SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandAttachmentOption, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ChannelSelectMenuBuilder, StringSelectMenuBuilder } = require('discord.js');
 const { getDBConnection } = require('../getDBConnection');
 const { teams } = require('./teams.json');
 
@@ -39,20 +39,63 @@ module.exports = {
             .setPlaceholder("Select a game results channel")
         const resultsRow = new ActionRowBuilder().addComponents(resultsMenu)
 
+        const addTeamMenu = new StringSelectMenuBuilder()
+            .setCustomId("addteams")
+            .setPlaceholder("Select an option")
+            .addOptions(
+                {
+                    label:"Yes, scan for existing NFL teams but don't add anymore",
+                    value:"1"
+                },
+                {
+                    label:"Yes, scan for existing NFL teams and add NFL teams that don't exist",
+                    value:"2"
+                },
+                {
+                    label:"No, I will use /newteam to add them all myself",
+                    value:"3"
+                }
+            )
+        const addTeamRow = new ActionRowBuilder().addComponents(addTeamMenu)
+
         let message = await interaction.editReply({ embeds:[embed], components:[buttons], ephemeral:true})
         let messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 120000})
 
-        if (messageCollector.customId === "next") {
-            embed.setDescription("You will now be prompted to select your channels for transactions (signings, releases, promotions, etc). Note that you can change these channels at any time by running the /channel command.")
-            // only prompt for 3 channels; transactions, demands, results
-            message = await messageCollector.update({ embeds:[embed], components:[transactionRow], ephemeral:true})
-            messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
-        }
-        console.log(messageCollector.values[0])
-        embed.setDescription("You will now be prompted to select your options for importing teams or starting from scratch. Note that you can create new teams at any time by running the /newteam command.")
+        // prompt the user for the transaction channel
+        embed.setDescription("You will now be prompted to select your channels for transactions (signings, releases, promotions, etc). Note that you can change these channels at any time by running the /channel command.")
+        message = await messageCollector.update({ embeds:[embed], components:[transactionRow], ephemeral:true})
+        messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
+        const transactionChannelId = messageCollector.values[0]
+        
+        console.log(transactionChannelId)
+
+        embed.setDescription("You will now be prompted to select your channels for demand notifications. Note that you can change these channels at any time by running the /channel command.")
         // 3 options: scan for existing teams, add new teams, add teams later
-        message = await messageCollector.update({ embeds:[embed], components:[buttons], ephemeral:true})
-        messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 120000})
+        message = await messageCollector.update({ embeds:[embed], components:[demandsRow], ephemeral:true})
+        messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
+        const demandChannelId = messageCollector.values[0]
+
+        console.log(demandChannelId)
+
+        embed.setDescription("You will now be prompted to select your channels for game result notifications. Note that you can change these channels at any time by running the /channel command.")
+        // 3 options: scan for existing teams, add new teams, add teams later
+        message = await messageCollector.update({ embeds:[embed], components:[demandsRow], ephemeral:true})
+        messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
+        const resultsChannelId = messageCollector.values[0]
+
+        console.log(resultsChannelId)
+
+        embed.setDescription("You will now be prompted to select how you want to add teams. Note that you can change this at anytime by running /setup again.")
+        // 3 options: scan for existing teams, add new teams, add teams later
+        message = await messageCollector.update({ embeds:[embed], components:[addTeamRow], ephemeral:true})
+        messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
+        const teamOption = messageCollector.values[0]
+
+        console.log(teamOption)
+
+        embed.setDescription("You are done with setup! If you want to add a gametime and LFP channel, run /channel. Good luck with your league!")
+        // 3 options: scan for existing teams, add new teams, add teams later
+        message = await messageCollector.update({ embeds:[embed], components:[], ephemeral:true})
 
         await db.close()
     }
