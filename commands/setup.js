@@ -103,6 +103,7 @@ module.exports = {
             // first, check if the role is already in the DB
             const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', role.id, guild)
             if (!roleExists) {
+                console.log("role does not exist")
                 for (let i = 0; i < teams.length; i++) {
                     const team = teams[i]
                     if (team.Name.toLowerCase() === role.name.toLowerCase()) {
