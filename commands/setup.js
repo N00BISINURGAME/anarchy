@@ -11,9 +11,16 @@ module.exports = {
     async execute(interaction) {
         const db = await getDBConnection();
 
+        
+
         // first, get player stats
         const userid = interaction.user.id;
         const guild = interaction.guild.id;
+        const admins = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [userid, guild])
+        if (!admins) {
+            await db.close();
+            return interaction.editReply({ content:"You are not authorized to run setup!", ephemeral:true });
+        }
         const embed = new EmbedBuilder()
             .setTitle("Welcome to the Anarchy setup!")
             .setDescription(`You will now run through the server setup. To move on to the next step of the server setup, press the green button marked "next". Note that you will have 2 minutes per step.`)
