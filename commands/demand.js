@@ -15,6 +15,9 @@ module.exports = {
         const userid = interaction.user.id;
         const guild = interaction.guild.id
 
+        const maxPlayerQry = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
+        const maxPlayers = maxPlayerQry.maxplayers
+
         // first, check if the user is on a team (and also get the role id)
         const onTeam = await db.get('SELECT p.*, r.roleid, t.logo, t.playercount FROM Players p, Roles r, Teams t WHERE r.code = p.team AND p.team = t.code AND p.discordid = ? AND p.guild = ?', [userid, guild]);
         console.log(onTeam)
@@ -48,7 +51,7 @@ module.exports = {
         const demandEmbed = new EmbedBuilder()
                     .setTitle("Player demanded!")
                     .setThumbnail(onTeam.logo)
-                    .addFields(
+                    .setFields(
                         {name:"Player", value:`${interaction.user}\n${interaction.user.tag}`},
                         {name:"Team", value:`${role}`},
                     )
@@ -66,6 +69,12 @@ module.exports = {
             const specialRoleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [onTeam.role, guild])
             await interaction.member.roles.remove(specialRoleId.roleid)
         }
+
+        demandEmbed.setFields(
+            {name:"Player", value:`${interaction.user}\n${interaction.user.tag}`},
+            {name:"Team", value:`${role.name}`},
+            {name:"Guild", value:`${interaction.guild.name}`}
+        )
 
         // then, dm the franchise owner notifying them
         const foID = await db.get("SELECT discordid FROM Players WHERE team = ? AND role = 'FO' AND guild = ?", [onTeam.team, guild])
