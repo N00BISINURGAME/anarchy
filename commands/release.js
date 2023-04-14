@@ -61,7 +61,7 @@ module.exports = {
         // then, remove the role from the user
         // update this to remove gm/hc roles if necessary
         const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info.team, guild]);
-        const roleObj = await interaction.guild.roles.fetch(role.roleId)
+        const roleObj = await interaction.guild.roles.fetch(role.roleid)
         await user.roles.remove(role.roleid);
 
         if (userSigned.role !== "P") {
