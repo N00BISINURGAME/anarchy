@@ -32,14 +32,17 @@ module.exports = {
             const transactionMenu = new ChannelSelectMenuBuilder()
                 .setCustomId("transactionchannel")
                 .setPlaceholder("Select a transaction channel")
+            const transactionRow = new ActionRowBuilder().addComponents(transactionMenu)
             const demandsMenu = new ChannelSelectMenuBuilder()
                 .setCustomId("demandschannel")
                 .setPlaceholder("Select a demands channel")
+            const demandsRow = new ActionRowBuilder().addComponents(demandsMenu)
             const resultsMenu = new ChannelSelectMenuBuilder()
                 .setCustomId("resultschannel")
                 .setPlaceholder("Select a game results channel")
+            const resultsRow = new ActionRowBuilder().addComponents(resultsMenu)
             buttons.addComponents(transactionMenu, demandsMenu, resultsMenu)
-            message = await messageCollector.update({ embeds:[embed], components:[buttons], ephemeral:true})
+            message = await messageCollector.update({ embeds:[embed], components:[buttons, transactionRow, demandsRow, resultsRow], ephemeral:true})
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 180000})
         }
         if (messageCollector.customId === "next") {
