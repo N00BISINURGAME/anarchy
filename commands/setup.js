@@ -98,6 +98,7 @@ module.exports = {
         messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.StringSelect, time: 120000})
         const teamOption = messageCollector.values[0]
         const roles = await interaction.guild.roles.fetch()
+        let clonedArray = [...teams]
         for (const role of roles.values()) {
             console.log(role)
             // first, check if the role is already in the DB
@@ -109,14 +110,15 @@ module.exports = {
                         // we have a valid team! add it to db and break
                         await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guild]);
                         await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [team.Abbreviation.toUpperCase(), role.id, guild]);
-                        teams.splice(i, 1)
+                        clonedArray.splice(i, 1)
                         break;
                     }
                 }
                 
             }
         }
-        console.log(teams)
+        console.log(clonedArray)
+        console.log(clonedArray.length)
 
         console.log(teamOption)
 
