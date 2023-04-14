@@ -88,7 +88,7 @@ module.exports = {
         embed.setDescription("You will now be prompted to select how you want to add teams. Note that you can change this at anytime by running /setup again.")
         // 3 options: scan for existing teams, add new teams, add teams later
         message = await messageCollector.update({ embeds:[embed], components:[addTeamRow], ephemeral:true})
-        messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
+        messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.StringSelect, time: 120000})
         const teamOption = messageCollector.values[0]
 
         console.log(teamOption)
