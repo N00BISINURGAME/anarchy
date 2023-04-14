@@ -98,6 +98,11 @@ module.exports = {
         messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.StringSelect, time: 120000})
         const teamOption = messageCollector.values[0]
 
+        embed.setTitle("Thank you for choosing Anarchy!")
+        embed.setDescription("You are done with setup! If you want to add a gametime and LFP channel, run /channel. Good luck with your league!")
+        // 3 options: scan for existing teams, add new teams, add teams later
+        message = await messageCollector.update({ embeds:[embed], components:[], ephemeral:true})
+
         if (teamOption !== "3") {
             const roles = await interaction.guild.roles.fetch()
             let clonedArray = [...teams]
@@ -105,11 +110,9 @@ module.exports = {
                 // first, check if the role is already in the DB
                 const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', role.id, guild)
                 if (!roleExists) {
-                    console.log("role does not exist")
                     for (let i = 0; i < teams.length; i++) {
                         const team = teams[i]
                         if (team.Name.toLowerCase() === role.name.toLowerCase()) {
-                            console.log("matched!")
                             // we have a valid team! add it to db and break
                             await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guild]);
                             await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [team.Abbreviation.toUpperCase(), role.id, guild]);
@@ -121,10 +124,13 @@ module.exports = {
                 }
             }
 
+            console.log(clonedArray.length)
+
             if (teamOption === "2") {
                 for (let team of clonedArray) {
                     const newRole = await interaction.guild.roles.create({
-                        name: team.Name
+                        name: team.Name,
+                        color: team.Color
                     });
 
                     await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guild]);
@@ -135,11 +141,6 @@ module.exports = {
         
 
         console.log(teamOption)
-
-        embed.setTitle("Thank you for choosing Anarchy!")
-        embed.setDescription("You are done with setup! If you want to add a gametime and LFP channel, run /channel. Good luck with your league!")
-        // 3 options: scan for existing teams, add new teams, add teams later
-        message = await messageCollector.update({ embeds:[embed], components:[], ephemeral:true})
 
         await db.close()
     }
