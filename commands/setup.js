@@ -97,27 +97,42 @@ module.exports = {
         message = await messageCollector.update({ embeds:[embed], components:[addTeamRow], ephemeral:true})
         messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.StringSelect, time: 120000})
         const teamOption = messageCollector.values[0]
-        const roles = await interaction.guild.roles.fetch()
-        let clonedArray = [...teams]
-        for (const role of roles.values()) {
-            // first, check if the role is already in the DB
-            const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', role.id, guild)
-            if (!roleExists) {
-                console.log("role does not exist")
-                for (let i = 0; i < teams.length; i++) {
-                    const team = teams[i]
-                    if (team.Name.toLowerCase() === role.name.toLowerCase()) {
-                        console.log("matched!")
-                        // we have a valid team! add it to db and break
-                        await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guild]);
-                        await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [team.Abbreviation.toUpperCase(), role.id, guild]);
-                        clonedArray.splice(i, 1)
-                        break;
+
+        if (teamOption !== "3") {
+            const roles = await interaction.guild.roles.fetch()
+            let clonedArray = [...teams]
+            for (const role of roles.values()) {
+                // first, check if the role is already in the DB
+                const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', role.id, guild)
+                if (!roleExists) {
+                    console.log("role does not exist")
+                    for (let i = 0; i < teams.length; i++) {
+                        const team = teams[i]
+                        if (team.Name.toLowerCase() === role.name.toLowerCase()) {
+                            console.log("matched!")
+                            // we have a valid team! add it to db and break
+                            await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guild]);
+                            await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [team.Abbreviation.toUpperCase(), role.id, guild]);
+                            clonedArray.splice(i, 1)
+                            break;
+                        }
                     }
+                    
                 }
-                
+            }
+
+            if (teamOption === "2") {
+                for (let team of clonedArray) {
+                    const newRole = await interaction.guild.roles.create({
+                        name: team.Name
+                    });
+
+                    await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guild]);
+                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [team.Abbreviation.toUpperCase(), newRole.id, guild]);
+                }
             }
         }
+        
 
         console.log(teamOption)
 
