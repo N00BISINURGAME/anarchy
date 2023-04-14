@@ -118,8 +118,6 @@ module.exports = {
                 
             }
         }
-        console.log(clonedArray)
-        console.log(clonedArray.length)
 
         console.log(teamOption)
 
