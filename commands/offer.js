@@ -105,7 +105,7 @@ module.exports = {
                 .setThumbnail(logoStr)
                 .setDescription("To accept or decline, press the green or red button on this message. You have 15 minutes to accept.")
                 .addFields(
-                    {name:"Contract Details", value:`The ${roleObj.name} have offered you a ${contractLen} season contract.`}
+                    {name:"Contract Details", value:`The ${roleObj.name} in ${interaction.guild.name} have offered you a ${contractLen} season contract.`}
                 )
 
             const buttons = new ActionRowBuilder()
