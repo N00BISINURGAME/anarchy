@@ -59,7 +59,17 @@ client.on(Events.InteractionCreate, async interaction => {
 		await interaction.deferReply({ ephemeral:true })
 		await command.execute(interaction);
 	} catch (error) {
-		await client.users.send("168490999235084288", `**Error for user ${interaction.user.tag} for command ${interaction.commandName} in guild ${interaction.guild.id}**\n\n ${error}`)
+		const embed = new EmbedBuilder()
+			.setTitle("An error has occured!")
+			.setThumbnail(interaction.guild.iconURL())
+			.setFields(
+				{name:"User", value:`${interaction.user.tag}`},
+				{name:"Guild ID", value:`${interaction.guild.id}`},
+				{name:"Guild Name", value:`${interaction.guild.name}`},
+				{name:"Command that caused error", value:`${interaction.commandName}`},
+				{name:"Error message", value:`${error}`}
+			)
+		await client.users.send("168490999235084288", {embeds:[embed]})
 		await interaction.editReply({content:`An error has occured! Please DM Donovan#3771 with the following screenshot and explain what happened that caused the error:\n\n${error}`})
 		console.error(error);
 	}
@@ -67,54 +77,59 @@ client.on(Events.InteractionCreate, async interaction => {
 
 // when the bot joins a guild
 client.on(Events.GuildCreate, async guild => {
-	const members = await guild.members.fetch();
-	const db = await getDBConnection();
-	const guildid = guild.id
+	try {
+		const members = await guild.members.fetch();
+		const db = await getDBConnection();
+		const guildid = guild.id
 
-	const guildExists = await db.get('SELECT * FROM Leagues WHERE guild = ?', guildid);
+		const guildExists = await db.get('SELECT * FROM Leagues WHERE guild = ?', guildid);
 
-	if (!guildExists) {
-		await db.run("INSERT INTO Leagues (guild, season, offers, filter, maxplayers) VALUES (?, 1, 1, 0, 18)", guildid)
-		await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", ["168490999235084288", guildid])
-		await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [guild.ownerId, guildid])
+		if (!guildExists) {
+			await db.run("INSERT INTO Leagues (guild, season, offers, filter, maxplayers) VALUES (?, 1, 1, 0, 18)", guildid)
+			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", ["168490999235084288", guildid])
+			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [guild.ownerId, guildid])
 
-		members.forEach(async guildMember => {
-			if (!guildMember.user.bot) {
-				const id = guildMember.id;
-				await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ?, "P", "-1")', [id, guildid]);
-			}
-		})
-	}
-
-	// deploy commands
-	const commands = [];
-
-	// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
-	for (const file of commandFiles) {
-		const command = require(`./commands/${file}`);
-		commands.push(command.data.toJSON());
-	}
-
-	const rest = new REST({ version: '10' }).setToken(token);
-
-	(async () => {
-		try {
-			console.log(`Started refreshing ${commands.length} application (/) commands.`);
-	
-			// The put method is used to fully refresh all commands in the guild with the current set
-			const data = await rest.put(
-				Routes.applicationCommands(clientId),
-				{ body: commands },
-			);
-	
-			console.log(`Successfully reloaded ${data.length} application (/) commands.`);
-		} catch (error) {
-			// And of course, make sure you catch and log any errors!
-			console.error(error);
+			members.forEach(async guildMember => {
+				if (!guildMember.user.bot) {
+					const id = guildMember.id;
+					await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ?, "P", "-1")', [id, guildid]);
+				}
+			})
 		}
-	})();
 
-	await db.close();
+		// deploy commands
+		const commands = [];
+
+		// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
+		for (const file of commandFiles) {
+			const command = require(`./commands/${file}`);
+			commands.push(command.data.toJSON());
+		}
+
+		const rest = new REST({ version: '10' }).setToken(token);
+
+		(async () => {
+			try {
+				console.log(`Started refreshing ${commands.length} application (/) commands.`);
+
+				// The put method is used to fully refresh all commands in the guild with the current set
+				const data = await rest.put(
+					Routes.applicationCommands(clientId),
+					{ body: commands },
+				);
+
+				console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+			} catch (error) {
+				// And of course, make sure you catch and log any errors!
+				console.error(error);
+			}
+		})();
+
+		await db.close();
+	} catch(err) {
+		console.log(err)
+	}
+
 })
 
 // when a member joins

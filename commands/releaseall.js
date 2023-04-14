@@ -66,12 +66,14 @@ module.exports = {
             const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
             const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
+            const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
+
             // then, format the embed and send it to the transaction channel
             const transactionEmbed = new EmbedBuilder()
                 .setTitle("Team mass release!")
                 .setThumbnail(logoStr)
                 .setDescription(`**Team**\n${team}\n\n**Players**\n${userStr}`)
-                .setFooter({ text:`Roster size: ${playerCount} / ${maxPlayers} • This team was released by ${interaction.user.tag}`})
+                .setFooter({ text:`Roster size: ${playerCount} / ${maxPlayerCount.maxplayers} • This team was released by ${interaction.user.tag}`})
 
             await transactionChannel.send({ embeds: [transactionEmbed] });
 
