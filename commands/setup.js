@@ -2,7 +2,7 @@ const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 const { SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandAttachmentOption, ChannelType, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ChannelSelectMenuBuilder, StringSelectMenuBuilder } = require('discord.js');
 const { getDBConnection } = require('../getDBConnection');
-const { teams } = require('./teams.json');
+const { teamsJson } = require('./teams.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -105,7 +105,7 @@ module.exports = {
 
         if (teamOption !== "3") {
             const roles = await interaction.guild.roles.fetch()
-            let clonedArray = [...teams]
+            let clonedArray = [...teamsJson]
             let foExists = false
             let gmExists = false
             let hcExists = false
@@ -113,8 +113,8 @@ module.exports = {
                 // first, check if the role is already in the DB
                 const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', role.id, guild)
                 if (!roleExists) {
-                    for (let i = 0; i < teams.length; i++) {
-                        const team = teams[i]
+                    for (let i = 0; i < teamsJson.length; i++) {
+                        const team = teamsJson[i]
                         if (team.Name.toLowerCase() === role.name.toLowerCase()) {
                             // we have a valid team! add it to db and break
                             await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guild]);
