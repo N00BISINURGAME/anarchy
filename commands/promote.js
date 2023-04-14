@@ -66,24 +66,24 @@ module.exports = {
         }
 
         // then, check to see if they already have a role on the team
-        const hasRole = await db.get('SELECT role FROM Players WHERE discordid = ?', chosenUserId);
+        const hasRole = await db.get('SELECT role FROM Players WHERE discordid = ? AND guild = ?', [chosenUserId, guild]);
         if (hasRole.role === "GM" || hasRole.role === "HC") {
             await db.close();
             return interaction.editReply({ content:'This user already has a front office role!', ephemeral:true });
         }
 
         // then, change the role of the user
-        await db.run('UPDATE Players SET Role = ? WHERE discordid = ?', [roleChoice, chosenUserId]);
+        await db.run('UPDATE Players SET Role = ? WHERE discordid = ? AND guild = ?', [roleChoice, chosenUserId, guild]);
 
         // then, check if GM or HC role is created. if not, create it
-        const gmRole = await db.get('SELECT roleid FROM Roles WHERE code = ?', roleChoice);
+        const gmRole = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [roleChoice, guild]);
         if (!gmRole) {
             // this means the role doesn't exist. create the role and log it
             const newRole = await interaction.guild.roles.create({
                 name: roleChoice === "GM" ? "General Manager" : "Head Coach"
             });
 
-            await db.run('INSERT INTO Roles (code, roleid) VALUES (?, ?)', roleChoice, newRole.id);
+            await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [roleChoice, newRole.id, guild]);
 
             await userChoice.roles.add(newRole);
         } else {
@@ -93,11 +93,11 @@ module.exports = {
         }
 
         // then, get the team logo
-        const logo = await db.get('SELECT logo FROM Teams WHERE code = ?', userInfo.team);
+        const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [userInfo.team, guild]);
         const logoStr = logo.logo;
 
         // get team role
-        const role = await db.get('SELECT roleid FROM Roles WHERE code = ?', userInfo.team);
+        const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [userInfo.team, guild]);
         const roleObj = await interaction.guild.roles.fetch(role.roleid)
 
         // then, create the embed
@@ -112,7 +112,7 @@ module.exports = {
             )
         
         // then, get the transaction channel ID and send a transaction message
-        const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions"')
+        const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
         const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
         await transactionChannel.send({ embeds: [transactionEmbed] })

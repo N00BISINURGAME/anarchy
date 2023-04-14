@@ -163,7 +163,7 @@ module.exports = {
                     .setTitle("Player signed!")
                     .setThumbnail(logoStr)
                     .addFields(
-                        {name:"Player", value:`${user}\n${user.tag}`},
+                        {name:"Player", value:`${user}\n${user.user.tag}`},
                         {name:"Team", value:`${roleObj}`},
                         {name:"Length", value: contractLen === 1 ? "1 season" : `${contractLen} seasons`}
                     )

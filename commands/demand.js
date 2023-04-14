@@ -55,7 +55,7 @@ module.exports = {
                     .setFooter({ text:`Roster size: ${onTeam.playercount - 1} / ${maxPlayers} • ${demandStr}`})
 
         // then, send the message to demands channel
-        const demandChannelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "demands"');
+        const demandChannelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "demands" AND guild = ?', guild);
         const demandChannel = await interaction.guild.channels.fetch(demandChannelId.channelid);
         await demandChannel.send({ embeds:[demandEmbed] })
 
