@@ -105,7 +105,7 @@ module.exports = {
 
         if (teamOption !== "3") {
             const roles = await interaction.guild.roles.fetch()
-            let clonedArray = [...teamsJson]
+            let clonedArray = structuredClone(teamsJson)
             let foExists = false
             let gmExists = false
             let hcExists = false
