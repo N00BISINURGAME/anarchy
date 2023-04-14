@@ -106,6 +106,9 @@ module.exports = {
         if (teamOption !== "3") {
             const roles = await interaction.guild.roles.fetch()
             let clonedArray = [...teams]
+            let foExists = false
+            let gmExists = false
+            let hcExists = false
             for (const role of roles.values()) {
                 // first, check if the role is already in the DB
                 const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', role.id, guild)
@@ -121,9 +124,43 @@ module.exports = {
                         }
                     }
                 }
+                if (role.name.toLowerCase() === "franchise owner") {
+                    foExists = true
+                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", role.id, guild]);
+                }
+                if (role.name.toLowerCase() === "general manager") {
+                    gmExists = true
+                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", role.id, guild]);
+                }
+                if (role.name.toLowerCase() === "head coach") {
+                    hcExists = true
+                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", role.id, guild]);
+                }
             }
 
-            console.log(clonedArray.length)
+            if (!foExists) {
+                const newRole = await interaction.guild.roles.create({
+                    name: "Franchise Owner",
+                });
+
+                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", newRole.id, guild]);
+            }
+
+            if (!gmExists) {
+                const newRole = await interaction.guild.roles.create({
+                    name: "General Manager",
+                });
+
+                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", newRole.id, guild]);
+            }
+
+            if (!hcExists) {
+                const newRole = await interaction.guild.roles.create({
+                    name: "Head Coach",
+                });
+
+                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", newRole.id, guild]);
+            }
 
             if (teamOption === "2") {
                 for (let team of clonedArray) {
@@ -138,6 +175,78 @@ module.exports = {
                         await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [team.Abbreviation.toUpperCase(), newRole.id, guild]);
                     }
                 }
+            }
+
+            const members = await interaction.guild.members.fetch();
+
+            members.forEach(async guildMember => {
+                if (!guildMember.user.bot) {
+                    const id = guildMember.id;
+                    // const isInServer = await db.run("SELECT * FROM Players WHERE discordid = ?", id);
+                    // if (id === "1073414870365634711") {
+                    //     console.log("found 1073414870365634711")
+                    //     console.log(isInServer);
+                    // }
+                    // if (!isInServer || Object.keys(isInServer).length === 3) {
+                    //     console.log(`user with id ${id} does not exist!`)
+                    //     await db.run('INSERT INTO Players (team, discordid, role, contractlength) VALUES ("FA", ?, "P", "-1")', id);
+                    // }
+                    let roleCount = 0
+                    guildMember.roles.cache.forEach(async role => {
+                        const roleid = role.id;
+                        const roleExists = await db.get('SELECT code FROM Roles WHERE roleid = ?', roleid)
+                        if (roleExists && (roleExists.code !== "FO" && roleExists.code !== "GM" && roleExists.code !== "HC")) {
+                            roleCount++;
+                            await db.run("UPDATE Players SET role = 'P', contractlength = 1, team = ? WHERE discordid = ? AND guild = ?", [roleExists.code, id, guild])
+                        }
+                    })
+                    guildMember.roles.cache.forEach(async role => {
+                        const roleid = role.id;
+                        const roleExists = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [roleid, guild])
+                        // if (roleExists) {
+                        //     roleCount++;
+                        //     if (roleExists.code !== "FO" && roleExists.code !== "GM" && roleExists.code !== "HC") {
+                        //         await db.run("UPDATE Players SET role = 'P', contractlength = 1, team = ? WHERE discordid = ?", [roleExists.code, id])
+                        //     }
+                        //     if (roleExists.code === "GM" || roleExists.code === "HC") {
+                        //         await db.run("UPDATE Players SET role = ? WHERE discordid = ?", [roleExists.code, id])
+                        //     }
+                        //     if (roleExists.code === "FO") {
+                        //         await db.run("UPDATE Players SET role = 'FO', contractlength = 999 WHERE discordid = ?", [id])
+                        //     }
+                        // }
+                        if (roleExists && (roleExists.code === "GM" || roleExists.code === "HC")) {
+                            roleCount++;
+                            await db.run("UPDATE Players SET role = ? WHERE discordid = ? AND guild = ?", [roleExists.code, id, guild])
+                        }
+                    })
+                    guildMember.roles.cache.forEach(async role => {
+                        const roleid = role.id;
+                        const roleExists = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [roleid, guild])
+                        if (roleExists && (roleExists.code === "FO")) {
+                            roleCount++;
+                            await db.run("UPDATE Players SET role = 'FO', contractlength = 999 WHERE discordid = ? AND guild = ?", [id, guild])
+                        }
+                    })
+                    // if (roleCount === 0) {
+                    //     await db.run("UPDATE Players SET team = 'FA', role = 'P', contractlength = -1 WHERE discordid = ?", [id])
+                    // }
+                }
+            })
+
+            // update teams
+
+            // fetch members in db
+            const players = await db.all('SELECT discordid FROM Players');
+            for (let i = 0; i < players.length; i++) {
+                if (!members.has(players[i].discordid)) {
+                    await db.run("UPDATE Players SET team = 'FA', role = 'P', contractlength = -1 WHERE discordid = ? AND guild = ?", [players[i].discordid, guild])
+                }
+            }
+
+            const teams = await db.all("SELECT code FROM Teams");
+            for (let i = 0; i < teams.length; i++) {
+                await db.run('UPDATE Teams SET playercount = (SELECT COUNT(*) FROM Players WHERE team = ? AND guild = ?) WHERE code = ? AND guild = ?', [teams[i].code, guild, teams[i].code, guild])
             }
         }
         
