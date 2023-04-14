@@ -11,8 +11,6 @@ module.exports = {
     async execute(interaction) {
         const db = await getDBConnection();
 
-        
-
         // first, get player stats
         const userid = interaction.user.id;
         const guild = interaction.guild.id;

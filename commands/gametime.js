@@ -35,7 +35,7 @@ module.exports = {
 
         // then, check if a valid user ran the command
         const validUser = await db.get('SELECT * FROM Players WHERE role = "FO" OR role = "GM" AND discordid = ? AND guild = ?', [interaction.user.id, guild])
-        if (!admins.includes(interaction.user.id) && !managers.includes(interaction.user.id) && !validUser) {
+        if (!validUser) {
             return interaction.editReply({ content:"You are not permitted to run this command!", ephemeral:true })
         }
 
