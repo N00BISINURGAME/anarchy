@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
-const { SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandAttachmentOption, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+const { SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandAttachmentOption, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ChannelSelectMenuBuilder } = require('discord.js');
 const { getDBConnection } = require('../getDBConnection');
 const { teams } = require('./teams.json');
 
@@ -29,10 +29,21 @@ module.exports = {
         if (messageCollector.customId === "next") {
             embed.setDescription("You will now be prompted to select your channels for certain commands. Note that you can change these channels at any time by running the /channel command.")
             // only prompt for 3 channels; transactions, demands, results
+            const transactionMenu = new ChannelSelectMenuBuilder()
+                .setCustomId("transactionchannel")
+                .setPlaceholder("Select a transaction channel")
+            const demandsMenu = new ChannelSelectMenuBuilder()
+                .setCustomId("demandschannel")
+                .setPlaceholder("Select a demands channel")
+            const resultsMenu = new ChannelSelectMenuBuilder()
+                .setCustomId("resultschannel")
+                .setPlaceholder("Select a game results channel")
+            buttons.addComponents(transactionMenu, demandsMenu, resultsMenu)
             message = await messageCollector.update({ embeds:[embed], components:[buttons], ephemeral:true})
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 180000})
         }
         if (messageCollector.customId === "next") {
+            console.log(messageCollector.values)
             embed.setDescription("You will now be prompted to select your options for importing teams or starting from scratch. Note that you can create new teams at any time by running the /newteam command.")
             // 3 options: scan for existing teams, add new teams, add teams later
             message = await messageCollector.update({ embeds:[embed], components:[buttons], ephemeral:true})
