@@ -28,11 +28,13 @@ module.exports = {
         let messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 180000})
         if (messageCollector.customId === "next") {
             embed.setDescription("You will now be prompted to select your channels for certain commands. Note that you can change these channels at any time by running the /channel command.")
+            // only prompt for 3 channels; transactions, demands, results
             message = await messageCollector.update({ embeds:[embed], components:[buttons], ephemeral:true})
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 180000})
         }
         if (messageCollector.customId === "next") {
             embed.setDescription("You will now be prompted to select your options for importing teams or starting from scratch. Note that you can create new teams at any time by running the /newteam command.")
+            // 3 options: scan for existing teams, add new teams, add teams later
             message = await messageCollector.update({ embeds:[embed], components:[buttons], ephemeral:true})
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 180000})
         }
