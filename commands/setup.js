@@ -92,7 +92,7 @@ module.exports = {
         await db.run('INSERT INTO Channels (guild, channelid, purpose) VALUES (?, ?, "results")', [guild, resultsChannelId])
 
         embed.setTitle("Select how you want to add teams")
-        embed.setDescription("You will now be prompted to select how you want to add teams. Note that you can change this at anytime by running /setup again.")
+        embed.setDescription("You will now be prompted to select how you want to add teams. Things may not work as expected if role names are bolded. Note that you can change this at anytime by running /setup again.")
         // 3 options: scan for existing teams, add new teams, add teams later
         message = await messageCollector.update({ embeds:[embed], components:[addTeamRow], ephemeral:true})
         messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.StringSelect, time: 120000})
@@ -100,7 +100,23 @@ module.exports = {
         const roles = await interaction.guild.roles.fetch()
         for (const role of roles.values()) {
             console.log(role)
+            // first, check if the role is already in the DB
+            const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', role.id, guild)
+            if (!roleExists) {
+                for (let i = 0; i < teams.length; i++) {
+                    const team = teams[i]
+                    if (team.Name.toLowerCase() === role.name.toLowerCase()) {
+                        // we have a valid team! add it to db and break
+                        await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guild]);
+                        await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [team.Abbreviation.toUpperCase(), role.id, guild]);
+                        teams.splice(i, 1)
+                        break;
+                    }
+                }
+                
+            }
         }
+        console.log(teams)
 
         console.log(teamOption)
 
