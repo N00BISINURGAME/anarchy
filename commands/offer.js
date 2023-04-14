@@ -43,10 +43,10 @@ module.exports = {
             }
 
             // gets all information that the user sent
-            let user = interaction.options.getMember('player');
-            user = interaction.client.users.cache.get(user.id)
+            let userPing = interaction.options.getMember('player');
+            let user = interaction.guild.members.fetch(userPing.id)
             const contractLen = interaction.options.getInteger('contract-length');
-            userid = user.id;
+            let userid = user.id;
 
             if (user.id === interaction.user.id) {
                 return interaction.editReply({ content:"You are not allowed to release yourself!", ephemeral:true })

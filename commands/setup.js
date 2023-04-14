@@ -41,7 +41,6 @@ module.exports = {
                 .setCustomId("resultschannel")
                 .setPlaceholder("Select a game results channel")
             const resultsRow = new ActionRowBuilder().addComponents(resultsMenu)
-            buttons.addComponents(transactionMenu, demandsMenu, resultsMenu)
             message = await messageCollector.update({ embeds:[embed], components:[buttons, transactionRow, demandsRow, resultsRow], ephemeral:true})
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 180000})
         }
