@@ -32,6 +32,12 @@ module.exports = {
         console.log(userChoice)
         console.log(channel.id)
 
+        const uniqueChannel = await db.get('SELECT * FROM Channels WHERE channelid = ? AND guild = ?', [channel.id, guild])
+        if (uniqueChannel) {
+            await db.close()
+            return interaction.editReply({content:`This channel has already been linked for a specific purpose!`, ephemeral:true})
+        }
+
         // check if the channel exists
         const channelExists = await db.get('SELECT * FROM Channels WHERE purpose = ? AND guild = ?', userChoice, guild)
         if (channelExists) {
@@ -39,6 +45,7 @@ module.exports = {
         } else {
             await db.run('INSERT INTO Channels(guild, channelid, purpose) VALUES (?, ?, ?)', [guild, channel.id, userChoice])
         }
+        await db.close()
         return interaction.editReply({content:`Successfully linked ${channel} for ${userChoice}!`})
     }
 }
