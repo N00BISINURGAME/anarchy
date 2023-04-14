@@ -19,6 +19,7 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setTitle("Bot statistics for Anarchy")
+            .setThumbnail(`${interaction.client.user.displayAvatarURL()}`)
             .setFields(
                 {name:"Bot Creator", value:"Donovan#3771"},
                 {name:"Number of unique users", value:`${uniqueUsers.users}`},
