@@ -35,7 +35,7 @@ module.exports = {
         // check if the channel exists
         const channelExists = await db.get('SELECT * FROM Channels WHERE purpose = ? AND guild = ?', userChoice, guild)
         if (channelExists) {
-            await db.run('UPDATE Channels SET channelid = ? WHERE purpose = ? AND league = ?', [channel.id, userChoice, guild])
+            await db.run('UPDATE Channels SET channelid = ? WHERE purpose = ? AND guild = ?', [channel.id, userChoice, guild])
         } else {
             await db.run('INSERT INTO Channels(guild, channelid, purpose) VALUES (?, ?, ?)', [guild, channel.id, userChoice])
         }
