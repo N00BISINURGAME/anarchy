@@ -79,6 +79,8 @@ module.exports = {
         const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
         const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
+        const playerCountQry = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', [guild])
+
         const transactionEmbed = new EmbedBuilder()
             .setTitle("Player released!")
             .setThumbnail(logoStr)
@@ -86,7 +88,7 @@ module.exports = {
                 {name:"Player", value:`${user}\n${user.user.tag}`},
                 {name:"Team", value:`${roleObj}`}
             )
-            .setFooter({ text:`Roster size: ${playerCount} / ${maxPlayers} • This player was released by ${interaction.user.tag}`})
+            .setFooter({ text:`Roster size: ${playerCount} / ${playerCountQry.maxplayers} • This player was released by ${interaction.user.tag}`})
 
         await transactionChannel.send({ embeds: [transactionEmbed] });
         await interaction.editReply({ content:`${user} was successfully released!`, ephemeral:true})
