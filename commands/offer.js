@@ -44,7 +44,7 @@ module.exports = {
 
             // gets all information that the user sent
             let userPing = interaction.options.getMember('player');
-            let user = interaction.guild.members.fetch(userPing.id)
+            let user = await interaction.guild.members.fetch(userPing.id)
             const contractLen = interaction.options.getInteger('contract-length');
             let userid = user.id;
 
