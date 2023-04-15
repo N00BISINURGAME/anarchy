@@ -202,6 +202,7 @@ module.exports = {
                         const roleExists = await db.get('SELECT code FROM Roles WHERE roleid = ?', roleid)
                         if (roleExists && (roleExists.code !== "FO" && roleExists.code !== "GM" && roleExists.code !== "HC")) {
                             roleCount++;
+                            // make contract len a random number between 1 and 3 to prevent bot breaking
                             await db.run("UPDATE Players SET role = 'P', contractlength = 1, team = ? WHERE discordid = ? AND guild = ?", [roleExists.code, id, guild])
                         }
                     })
