@@ -243,14 +243,14 @@ module.exports = {
             // update teams
 
             // fetch members in db
-            const players = await db.all('SELECT discordid FROM Players');
+            const players = await db.all('SELECT discordid FROM Players WHERE guild = ?', guild);
             for (let i = 0; i < players.length; i++) {
                 if (!members.has(players[i].discordid)) {
                     await db.run("UPDATE Players SET team = 'FA', role = 'P', contractlength = -1 WHERE discordid = ? AND guild = ?", [players[i].discordid, guild])
                 }
             }
 
-            const teams = await db.all("SELECT code FROM Teams");
+            const teams = await db.all("SELECT code FROM Teams WHERE guild = ?", guild);
             for (let i = 0; i < teams.length; i++) {
                 await db.run('UPDATE Teams SET playercount = (SELECT COUNT(*) FROM Players WHERE team = ? AND guild = ?) WHERE code = ? AND guild = ?', [teams[i].code, guild, teams[i].code, guild])
             }
