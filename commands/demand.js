@@ -72,7 +72,7 @@ module.exports = {
 
         demandEmbed.setFields(
             {name:"Player", value:`${interaction.user}\n${interaction.user.tag}`},
-            {name:"Team", value:`${role.name}`},
+            {name:"Team", value:`${role}`},
             {name:"Guild", value:`${interaction.guild.name}`}
         )
 
