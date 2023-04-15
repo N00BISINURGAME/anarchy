@@ -153,46 +153,50 @@ client.on(Events.GuildMemberAdd, async member => {
 
 // when a member leaves
 client.on(Events.GuildMemberRemove, async member => {
-	const memberId = member.id;
-	const guildId = member.guild.id
-	const db = await getDBConnection();
+	try {
+		const memberId = member.id;
+		const guildId = member.guild.id
+		const db = await getDBConnection();
 
-	const maxPlayers = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', member.guild.id)
+		const maxPlayers = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', member.guild.id)
 
-	// if a member leaves, check to see if they are a player. if they are, remove them as a player.
-	const playerData = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [memberId, guildId]);
-	if (!playerData) {
-		return;
+		// if a member leaves, check to see if they are a player. if they are, remove them as a player.
+		const playerData = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [memberId, guildId]);
+		if (!playerData) {
+			return;
+		}
+		// rewrite this part
+		if (playerData && playerData.team !== "FA") {
+			// first, decrement the number of players on the team the player used to be on
+			query = "UPDATE Teams SET playercount = playercount - 1 WHERE code = ? AND guild = ?"
+			await db.run(query, [playerData.team, guildId]);
+			await db.run("UPDATE Players SET team = 'FA', role = 'P', contractlength = -1 WHERE discordid = ? AND guild = ?", [memberId, guildId])
+
+			// then, get relevant information to send a notification
+			const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [playerData.team, guildId])
+			const teamPlayers = await db.get('SELECT playercount FROM Teams WHERE code = ? AND guild = ?', [playerData.team, guildId])
+			const roleObj = await member.guild.roles.fetch(role.roleid)
+			const leaveChannel = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guildId);
+			// then, get the team logo
+			const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [playerData.team, guildId]);
+			const logoStr = logo.logo;
+			const transactionEmbed = new EmbedBuilder()
+									.setTitle("Player left!")
+									.setThumbnail(logoStr)
+									.addFields(
+											{name:"Player", value:`${member.user.tag}`},
+											{name:"Team", value:`${roleObj}`}
+									)
+									.setFooter({ text:`Roster size: ${teamPlayers.playercount} / ${maxPlayers.maxplayers}`})
+			const channel = await member.guild.channels.fetch(leaveChannel.channelid);
+			await channel.send(
+				{ embeds: [transactionEmbed]}
+			)
+		}
+		await db.close();
+	} catch(err) {
+		console.log(err)
 	}
-	// rewrite this part
-	if (playerData && playerData.team !== "FA") {
-		// first, decrement the number of players on the team the player used to be on
-		query = "UPDATE Teams SET playercount = playercount - 1 WHERE code = ? AND guild = ?"
-		await db.run(query, [playerData.team, guildId]);
-		await db.run("UPDATE Players SET team = 'FA', role = 'P', contractlength = -1 WHERE discordid = ? AND guild = ?", [memberId, guildId])
-
-		// then, get relevant information to send a notification
-		const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [playerData.team, guildId])
-		const teamPlayers = await db.get('SELECT playercount FROM Teams WHERE code = ? AND guild = ?', [playerData.team, guildId])
-		const roleObj = await member.guild.roles.fetch(role.roleid)
-		const leaveChannel = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guildId);
-		// then, get the team logo
-		const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [playerData.team, guildId]);
-		const logoStr = logo.logo;
-		const transactionEmbed = new EmbedBuilder()
-                .setTitle("Player left!")
-                .setThumbnail(logoStr)
-                .addFields(
-                    {name:"Player", value:`${member.user.tag}`},
-                    {name:"Team", value:`${roleObj}`}
-                )
-                .setFooter({ text:`Roster size: ${teamPlayers.playercount} / ${maxPlayers.maxplayers}`})
-		const channel = await member.guild.channels.fetch(leaveChannel.channelid);
-		channel.send(
-			{ embeds: [transactionEmbed]}
-		)
-	}
-	await db.close();
 })
 
 client.on(Events.MessageCreate, async message => {
