@@ -157,6 +157,8 @@ client.on(Events.GuildMemberRemove, async member => {
 	const guildId = member.guild.id
 	const db = await getDBConnection();
 
+	const maxPlayers = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', member.guild.id)
+
 	// if a member leaves, check to see if they are a player. if they are, remove them as a player.
 	const playerData = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [memberId, guildId]);
 	if (!playerData) {
@@ -184,7 +186,7 @@ client.on(Events.GuildMemberRemove, async member => {
                     {name:"Player", value:`${member.user.tag}`},
                     {name:"Team", value:`${roleObj}`}
                 )
-                .setFooter({ text:`Roster size: ${teamPlayers.playercount} / ${maxPlayers}`})
+                .setFooter({ text:`Roster size: ${teamPlayers.playercount} / ${maxPlayers.maxplayers}`})
 		const channel = await member.guild.channels.fetch(leaveChannel.channelid);
 		channel.send(
 			{ embeds: [transactionEmbed]}
