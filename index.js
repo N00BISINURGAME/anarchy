@@ -135,15 +135,20 @@ client.on(Events.GuildCreate, async guild => {
 // when a member joins
 client.on(Events.GuildMemberAdd, async member => {
 	// first, check if they are already in the database
-	const db = await getDBConnection();
-	const guild = member.guild.id;
-	const memberData = await db.get('SELECT discordid FROM Players WHERE discordid = ? AND guild = ?', [member.id, guild]);
+	try {
+		const db = await getDBConnection();
+		const guild = member.guild.id;
+		const memberData = await db.get('SELECT discordid FROM Players WHERE discordid = ? AND guild = ?', [member.id, guild]);
 
-	// if they are not in the database, add them
-	if (!memberData) {
-		await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ?, "P", "-1")', [member.id, member.guild.id]);
+		// if they are not in the database, add them
+		if (!memberData) {
+			await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ?, "P", "-1")', [member.id, member.guild.id]);
+		}
+		await db.close();
+	} catch(err) {
+		console.log(err)
 	}
-	await db.close();
+	
 })
 
 // when a member leaves
