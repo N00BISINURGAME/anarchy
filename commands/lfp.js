@@ -36,6 +36,8 @@ module.exports = {
           return interaction.editReply({ content:"You are not authorized to run this command!", ephemeral: true})
         }
 
+        const logoSql = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [authorized.team, guild])
+
         const channelSql = await db.get('SELECT channelid FROM Channels WHERE purpose = "lfp" AND guild = ?', guild)
         if (!channelSql) {
           await db.close()
@@ -50,6 +52,7 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setTitle("Looking for Players")
           .setDescription(`The ${role} are looking for players!`)
+          .setThumbnail(logoSql.logo)
           .addFields(
             { name:"Description", value:`${message}`}
           )
