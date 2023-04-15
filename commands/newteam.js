@@ -33,6 +33,14 @@ module.exports = {
         const shortName = interaction.options.getString('team-short-name')
         const logo = interaction.options.getString('team-logo')
 
+        const regex = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
+
+        const matches = link.match(regex)
+
+        if (!matches) {
+            return interaction.editReply({ content:"The logo you provided may not be valid! Ensure it is a valid image link. Feel free to DM Donovan#3771 with any questions.", ephemeral:true })
+        }
+
         // Checks to see if a team exists
         const teamExists = await db.get('SELECT code FROM Teams WHERE (code = ? OR name = ?) AND guild = ?', [shortName.toUpperCase(), fullName, guild]);
         if (teamExists) {

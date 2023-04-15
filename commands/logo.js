@@ -25,6 +25,14 @@ module.exports = {
         const team = interaction.options.getRole('team')
         const guild = interaction.guild.id
 
+        const regex = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
+
+        const matches = link.match(regex)
+
+        if (!matches) {
+            return interaction.editReply({ content:"The logo you provided may not be valid! Ensure it is a valid image link. Feel free to DM Donovan#3771 with any questions.", ephemeral:true })
+        }
+
         const code = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [team.id, guild])
 
         await db.run('UPDATE Teams SET logo = ? WHERE code = ? AND guild = ?', [link, code.code, guild])
