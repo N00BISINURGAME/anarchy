@@ -14,11 +14,11 @@ module.exports = {
         .addStringOption(linkOption)
         .setDescription('Changes the logo of the specified team'),
     async execute(interaction) {
+        const db = await getDBConnection();
         const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, interaction.guild.id])
         if (!authorized) {
           return interaction.editReply({ content:"You are not authorized to change the team's logo!", ephemeral:true })
         }
-        const db = await getDBConnection();
 
         // first, get player stats
         const link = interaction.options.getString('link')
