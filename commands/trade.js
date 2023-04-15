@@ -206,6 +206,7 @@ module.exports = {
                     await interaction.editReply({ content: "Trade has been sent. Awaiting decision...", ephemeral: true})
                     const dmInteraction = await userMessage.awaitMessageComponent({ componentType: ComponentType.Button, time: 890000})
                     offerCollector.stop()
+                    // this needs to be implemented
                 }
                 await db.close()
             } catch(err) {
