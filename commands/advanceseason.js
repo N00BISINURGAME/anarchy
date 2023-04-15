@@ -23,6 +23,8 @@ module.exports = {
         // then, advance the season
         await db.run("UPDATE Leagues SET season = season + 1 WHERE guild = ?", guild)
 
+        const season = await db.get('SELECT season FROM Leagues WHERE guild = ?', guild)
+
         // then, update everyone's contracts unless they're a FO
         await db.run('UPDATE Players SET contractlength = contractlength - 1 WHERE NOT role = "FO" AND NOT team = "FA" AND guild = ?', guild)
 
@@ -64,7 +66,7 @@ module.exports = {
 
         // change this to dm players who have been released
         const embed = new EmbedBuilder()
-            .setTitle(`Successfully advanced to season ${configJSON.season}!`)
+            .setTitle(`Successfully advanced to season ${season.season}!`)
             .setDescription(`**Expired Contracts:**\n${contractStr}`)
 
         await interaction.editReply({ embeds: [embed]});
