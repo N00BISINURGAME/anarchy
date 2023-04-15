@@ -55,6 +55,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	if (!command) return;
 
 	try {
+		const db = await getDBConnection()
 		await interaction.deferReply({ ephemeral:true })
 		await client.users.fetch(interaction.user.id) // fetch the user and cache them for future use
 
@@ -64,7 +65,9 @@ client.on(Events.InteractionCreate, async interaction => {
 		for (let i = 0; i < teams.length; i++) {
 				await db.run('UPDATE Teams SET playercount = (SELECT COUNT(*) FROM Players WHERE team = ? AND guild = ?) WHERE code = ? AND guild = ?', [teams[i].code, guild, teams[i].code, guild])
 		}
+		await db.close()
 		await command.execute(interaction);
+		
 	} catch (error) {
 		try {
 			const embed = new EmbedBuilder()
