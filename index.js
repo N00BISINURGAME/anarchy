@@ -59,7 +59,8 @@ client.on(Events.InteractionCreate, async interaction => {
 		await interaction.deferReply({ ephemeral:true })
 		await command.execute(interaction);
 	} catch (error) {
-		const embed = new EmbedBuilder()
+		try {
+			const embed = new EmbedBuilder()
 			.setTitle("An error has occured!")
 			.setThumbnail(interaction.guild.iconURL())
 			.setFields(
@@ -69,9 +70,12 @@ client.on(Events.InteractionCreate, async interaction => {
 				{name:"Command that caused error", value:`${interaction.commandName}`},
 				{name:"Error message", value:`${error}`}
 			)
-		await client.users.send("168490999235084288", {embeds:[embed]})
-		await interaction.editReply({content:`An error has occured! Please DM Donovan#3771 with the following screenshot and explain what happened that caused the error:\n\n${error}`})
-		console.error(error);
+			await client.users.send("168490999235084288", {embeds:[embed]})
+			await interaction.editReply({content:`An error has occured! Please DM Donovan#3771 with the following screenshot and explain what happened that caused the error:\n\n${error}`})
+			console.error(error);
+		} catch(err) {
+			console.log(err)
+		}
 	}
 });
 
@@ -148,7 +152,6 @@ client.on(Events.GuildMemberAdd, async member => {
 	} catch(err) {
 		console.log(err)
 	}
-	
 })
 
 // when a member leaves
