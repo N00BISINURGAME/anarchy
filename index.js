@@ -141,7 +141,7 @@ client.on(Events.GuildMemberAdd, async member => {
 
 	// if they are not in the database, add them
 	if (!memberData) {
-		await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ? "P", "-1")', [member.id, member.guild.id]);
+		await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ?, "P", "-1")', [member.id, member.guild.id]);
 	}
 	await db.close();
 })
