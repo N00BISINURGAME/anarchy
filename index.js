@@ -55,8 +55,8 @@ client.on(Events.InteractionCreate, async interaction => {
 	if (!command) return;
 
 	try {
-		await client.users.fetch(interaction.user.id) // fetch the user and cache them for future use
 		await interaction.deferReply({ ephemeral:true })
+		await client.users.fetch(interaction.user.id) // fetch the user and cache them for future use
 		await command.execute(interaction);
 	} catch (error) {
 		try {
