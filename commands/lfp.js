@@ -54,6 +54,7 @@ module.exports = {
           .setDescription(`The ${role} are looking for players!`)
           .setThumbnail(logoSql.logo)
           .addFields(
+            { name:"Coach", value:`${interaction.member}\n${interaction.user.tag}` }
             { name:"Description", value:`${message}`}
           )
 
