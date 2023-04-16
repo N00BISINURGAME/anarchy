@@ -11,12 +11,13 @@ module.exports = {
         .setDescription('Trade between two teams'),
     async execute(interaction) {
         let userid = interaction.user.id;
+        const guild = interaction.guild.id
         if (userid !== "168490999235084288") {
             return interaction.editReply({ content:"Not implemented yet!", ephemeral: true})
         }
         const db = await getDBConnection();
         // first, check if the user is allowed to sign people
-        const authorized = await db.get('SELECT * FROM Players WHERE discordid = ? AND (role = "FO" OR role = "GM")', userid)
+        const authorized = await db.get('SELECT * FROM Players WHERE discordid = ? AND (role = "FO" OR role = "GM") AND guild = ?', [userid, guild])
         if (!authorized) {
             return interaction.editReply({ content:"You are not authorized to trade players!", ephemeral: true})
         }
@@ -64,7 +65,7 @@ module.exports = {
                             return interaction.editReply({content:"Aborted! Ensure you are pinging valid users!", ephemeral:true})
                         }
                         // now, check to see if theyre on the same team as the person running the command
-                        const userInfo = await db.get('SELECT * FROM Players WHERE discordid = ?', userid)
+                        const userInfo = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [userid, guild])
                         if (!userInfo || !(userInfo.team === authorized.team)) {
                             await db.close()
                             m.delete()
@@ -89,7 +90,7 @@ module.exports = {
                             return interaction.editReply({content:"Aborted! Ensure you are pinging valid users!", ephemeral:true})
                         }
                         // now, check to see if theyre on the same team as the person running the command
-                        const userInfo = await db.get('SELECT * FROM Players WHERE discordid = ?', userid)
+                        const userInfo = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [userid, guild])
                         if (!userInfo) {
                             m.delete()
                             offerCollector.stop()
@@ -128,8 +129,8 @@ module.exports = {
                     // team 1 represents the team of the person initiating the trade, team 2 represents the team
                     // of the person who needs to accept/decline the trade
                     // use the offer table here to make sure that a trade is not pending
-                    const team1 = await db.get("SELECT * FROM Teams WHERE code = ?", authorized.team)
-                    const team2 = await db.get("SELECT * FROM Teams WHERE code = ?", team)
+                    const team1 = await db.get("SELECT * FROM Teams WHERE code = ? AND guild = ?", [authorized.team, guild])
+                    const team2 = await db.get("SELECT * FROM Teams WHERE code = ? AND guild = ?", [team, guild])
                     const team1Size = team1.playercount
                     const team2Size = team2.playercount
                     if (team1Size + team2Players.length - team1Players.length > maxPlayers) {
@@ -144,8 +145,8 @@ module.exports = {
                         offerCollector.stop()
                         return interaction.editReply({content:`Aborted! The other team would exceed the player cap by making this trade!`, ephemeral:true})
                     }
-                    const team1Roleid = await db.get('SELECT roleid FROM Roles WHERE code = ?', authorized.team)
-                    const team2Roleid = await db.get('SELECT roleid FROM Roles WHERE code = ?', team)
+                    const team1Roleid = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [authorized.team, guild])
+                    const team2Roleid = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [team, guild])
                     const team1Role = await interaction.guild.roles.fetch(team1Roleid.roleid)
                     const team2Role = await interaction.guild.roles.fetch(team2Roleid.roleid)
 
@@ -188,7 +189,7 @@ module.exports = {
                                 .setStyle(ButtonStyle.Danger)
                         )
 
-                    const otherFO = await db.get('SELECT discordid FROM Players WHERE role = "FO" AND team = ?', team)
+                    const otherFO = await db.get('SELECT discordid FROM Players WHERE role = "FO" AND team = ? AND guild = ?', [team, guild])
                     if (!otherFO) {
                         await db.close()
                         m.delete()
@@ -207,6 +208,15 @@ module.exports = {
                     const dmInteraction = await userMessage.awaitMessageComponent({ componentType: ComponentType.Button, time: 890000})
                     offerCollector.stop()
                     // this needs to be implemented
+                    if (dmInteraction.customId === "accept") {
+                        // first, check if all players remained on their teams
+                        for (let i = 0; i < team1Players.length; i++) {
+                            console.log(team1Players[i])
+                        }
+                        for (let i = 0; i < team2Players.length; i++) {
+                            console.log(team2Players[i])
+                        }
+                    }
                 }
                 await db.close()
             } catch(err) {

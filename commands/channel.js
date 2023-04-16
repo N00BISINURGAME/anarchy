@@ -11,7 +11,8 @@ const channelChoices = new SlashCommandStringOption().setName("channel-options")
                             { name:"Game Results", value: "results" },
                             { name:"Demands", value: "demands" },
                             { name:"Gametimes", value:"gametime" },
-                            { name:"Looking for Players", value:"lfp" }
+                            { name:"Looking for Players", value:"lfp" },
+                            { name:"Notices", value:"notices" }
                           )
 
 const channelMention = new SlashCommandChannelOption().setName("channel").setDescription("The channel you want to set").setRequired(true)
