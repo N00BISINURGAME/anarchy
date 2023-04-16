@@ -27,7 +27,8 @@ module.exports = {
         .addUserOption(userOption)
         .addIntegerOption(contractLengthOption),
     async execute(interaction) {
-        let userid;
+        let pingedUser = interaction.options.getMember('player')
+        let userid = pingedUser.id;
         const guild = interaction.guild.id
         try {
             const db = await getDBConnection();
