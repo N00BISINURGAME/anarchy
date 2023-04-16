@@ -30,7 +30,7 @@ module.exports = {
         const message = interaction.options.getString("description")
         const link = interaction.options.getString("link")
 
-        const authorized = await db.get('SELECT * FROM Players WHERE role != "P" AND guild = ?', guild)
+        const authorized = await db.get('SELECT * FROM Players WHERE role != "P" AND guild = ? AND discordid = ?',[guild, user])
         if (!authorized) {
           await db.close()
           return interaction.editReply({ content:"You are not authorized to run this command!", ephemeral: true})
