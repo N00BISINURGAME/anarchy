@@ -112,7 +112,6 @@ module.exports = {
         } catch(err) {
             await interaction.client.users.send("168490999235084288", `Error for user ${interaction.user.tag}\n\n ${err}`)
             console.log(err)
-            const db = await getDBConnection();
             await db.run("DELETE FROM Offers WHERE discordid = ?", userid);
             if (err.code === "InteractionCollectorError") {
                 embed.setTitle("Offer Expired!")
