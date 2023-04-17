@@ -19,7 +19,7 @@ module.exports = {
         const maxPlayers = maxPlayerQry.maxplayers
 
         // first, check if the user is on a team (and also get the role id)
-        const onTeam = await db.get('SELECT p.*, r.roleid, t.logo, t.playercount FROM Players p, Roles r, Teams t WHERE r.code = p.team AND p.team = t.code AND p.discordid = ? AND p.guild = ?', [userid, guild]);
+        const onTeam = await db.get('SELECT p.*, r.roleid, t.logo, t.playercount FROM Players p, Roles r, Teams t WHERE r.code = p.team AND p.team = t.code AND p.discordid = ? AND p.guild = ? AND r.guild = ?', [userid, guild, guild]);
         console.log(onTeam)
         if (!onTeam) {
             await db.close()

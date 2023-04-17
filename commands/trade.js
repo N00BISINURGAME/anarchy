@@ -5,226 +5,127 @@ const { getDBConnection } = require('../getDBConnection');
 const { maxPlayers } = require('../config.json');
 const { message } = require('noblox.js');
 
+const playerTradedOption = new SlashCommandUserOption()
+        .setRequired(true)
+        .setName("player-traded-away")
+        .setDescription("The player you want to trade to the other team")
+
+const playerWantedOption = new SlashCommandUserOption()
+        .setRequired(true)
+        .setName("player-you-want")
+        .setDescription("The player you want to trade for")
+
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('trade')
         .setDescription('Trade between two teams'),
     async execute(interaction) {
+        const db = await getDBConnection();
         let userid = interaction.user.id;
         const guild = interaction.guild.id
+        const player1 = interaction.options.getUser("player-traded-away")
+        const player2 = interaction.options.getUser("player-you-want")
         if (userid !== "168490999235084288") {
+            await db.close()
             return interaction.editReply({ content:"Not implemented yet!", ephemeral: true})
         }
-        const db = await getDBConnection();
+
         // first, check if the user is allowed to sign people
         const authorized = await db.get('SELECT * FROM Players WHERE discordid = ? AND (role = "FO" OR role = "GM") AND guild = ?', [userid, guild])
         if (!authorized) {
+            await db.close()
             return interaction.editReply({ content:"You are not authorized to trade players!", ephemeral: true})
         }
-        // then, prompt the user
-        await interaction.editReply({ content:"Ping up to 3 users you'd like to offer, or type 'cancel' to cancel this trade. You have 15 minutes to complete the whole trade.", ephemeral:true })
-        const filter = m => m.author.id = interaction.user.id
-        const offerCollector = interaction.channel.createMessageCollector({ filter, time: 899000})
 
-        // collect messages -- maybe change the way that trades are done by making it such that
-        // it entirely uses ephemeral messages
-        // process would be something like: user sends message -> message deleted / saved -> ephemeral
-        // message updated -> rinse and repeat
-        let team1Players
-        let team2Players
-        let userMessage
-        offerCollector.on("collect", async m => {
-            try {
-                const db = await getDBConnection();
-                let team;
-                // first, check if the user prompts for cancel
-                if (m.content.match(/[a-zA-Z]/)) {
-                    await db.close()
-                    offerCollector.stop()
-                    if (m.content === "cancel") {
-                        m.delete()
-                    }
-                    return interaction.editReply({content:"Trade has been canceled!", ephemeral:true})
-                }
-                // then, check how many players the user pinged
-                const userArr = m.content.split(/\s+/)
-                if (userArr.length > 3) {
-                    await db.close()
-                    m.delete()
-                    offerCollector.stop()
-                    return interaction.editReply({content:"Aborted! You have exceeded the maximum trade limit!", ephemeral:true})
-                }
-                if (!team1Players) {
-                    // then, get all users pinged
-                    for (let i = 0; i < userArr.length; i++) {
-                        const user = userArr[i]
-                        const userid = user.match(/\d{18}/)[0]
-                        if (!userid) {
-                            m.delete()
-                            offerCollector.stop()
-                            return interaction.editReply({content:"Aborted! Ensure you are pinging valid users!", ephemeral:true})
-                        }
-                        // now, check to see if theyre on the same team as the person running the command
-                        const userInfo = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [userid, guild])
-                        if (!userInfo || !(userInfo.team === authorized.team)) {
-                            await db.close()
-                            m.delete()
-                            offerCollector.stop()
-                            return interaction.editReply({content:`Aborted! ${user} is unable to be traded!`, ephemeral:true})
-                        }
-                        if (userInfo.role !== "P") {
-                            await db.close()
-                            m.delete()
-                            offerCollector.stop()
-                            return interaction.editReply({content:`Aborted! ${user} is unable to be traded!`, ephemeral:true})
-                        }
-                    }
-                } else {
-                    // then, get all users pinged
-                    for (let i = 0; i < userArr.length; i++) {
-                        const user = userArr[i]
-                        const userid = user.match(/\d{18}/)[0]
-                        if (!userid) {
-                            m.delete()
-                            offerCollector.stop()
-                            return interaction.editReply({content:"Aborted! Ensure you are pinging valid users!", ephemeral:true})
-                        }
-                        // now, check to see if theyre on the same team as the person running the command
-                        const userInfo = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [userid, guild])
-                        if (!userInfo) {
-                            m.delete()
-                            offerCollector.stop()
-                            return interaction.editReply({content:`Aborted! ${user} is unable to be traded!`, ephemeral:true})
-                        }
-                        // then, check if theyre on the same team as the other players
-                        if (!team) {
-                            team = userInfo.team;
-                        }
-                        if (team !== userInfo.team) {
-                            await db.close()
-                            m.delete()
-                            offerCollector.stop()
-                            return interaction.editReply({content:`Aborted! ${user} is unable to be traded!`, ephemeral:true})
-                        }
-                        if (userInfo.role !== "P") {
-                            await db.close()
-                            m.delete()
-                            offerCollector.stop()
-                            return interaction.editReply({content:`Aborted! ${user} is unable to be traded!`, ephemeral:true})
-                        }
-                    }
-                }
-                if (!team1Players) {
-                    team1Players = userArr
-                } else {
-                    team2Players = userArr
-                }
-                m.delete()
-                await interaction.editReply({content:`Now, ping 3 players that you want. They must all be on the same team.`, ephemeral:true})
-                if (team1Players && team2Players) {
-                    console.log("going into if branch for team players")
-                    console.log(team1Players)
-                    console.log(team2Players)
-                    // we need to check to see if trading any players would make teams exceed their player cap
-                    // team 1 represents the team of the person initiating the trade, team 2 represents the team
-                    // of the person who needs to accept/decline the trade
-                    // use the offer table here to make sure that a trade is not pending
-                    const team1 = await db.get("SELECT * FROM Teams WHERE code = ? AND guild = ?", [authorized.team, guild])
-                    const team2 = await db.get("SELECT * FROM Teams WHERE code = ? AND guild = ?", [team, guild])
-                    const team1Size = team1.playercount
-                    const team2Size = team2.playercount
-                    if (team1Size + team2Players.length - team1Players.length > maxPlayers) {
-                        await db.close()
-                        m.delete()
-                        offerCollector.stop()
-                        return interaction.editReply({content:`Aborted! Your team would exceed the player cap by making this trade!`, ephemeral:true})
-                    }
-                    if (team2Size + team1Players.length - team2Players.length > maxPlayers) {
-                        await db.close()
-                        m.delete()
-                        offerCollector.stop()
-                        return interaction.editReply({content:`Aborted! The other team would exceed the player cap by making this trade!`, ephemeral:true})
-                    }
-                    const team1Roleid = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [authorized.team, guild])
-                    const team2Roleid = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [team, guild])
-                    const team1Role = await interaction.guild.roles.fetch(team1Roleid.roleid)
-                    const team2Role = await interaction.guild.roles.fetch(team2Roleid.roleid)
+        // then, check that either of the players are not being traded. do this later
+        const playersTraded = await db.all('SELECT * FROM Offers WHERE (discordid = ? OR discordid = ?', [player1.id, player2.id])
+        if (playersTraded) {
 
-                    let team1Str = ""
-                    let team2Str = ""
-                    for (let i = 0; i < team1Players.length; i++) {
-                        const user = team1Players[i]
-                        const userid = user.match(/\d{18}/)[0]
-                        const userFetched = await interaction.guild.members.fetch(userid);
-                        team1Str += userFetched.user.tag + "\n"
-                    }
-                    for (let i = 0; i < team2Players.length; i++) {
-                        const user = team2Players[i]
-                        const userid = user.match(/\d{18}/)[0]
-                        const userFetched = await interaction.guild.members.fetch(userid);
-                        team2Str += userFetched.user.tag + "\n"
-                    }
+        }
+        
+        // then, check if the player pinged is on the same team as the player that started the command
+        const player1Authorized = await db.get('SELECT * FROM Players WHERE discordid = ? AND team = (SELECT team FROM Players WHERE discordid = ? AND guild = ?) AND guild = ?', [player1.id, userid, guild, guild])
+        if (!player1Authorized) {
+            await db.close()
+            return interaction.editReply({ content:"The player you want to trade to the other team is not on your team!", ephemeral: true})
+        }
 
-                    console.log(team1Str)
-                    console.log(team2Str)
-                    // then, format the embed that would be sent to the other team
-                    const embed = new EmbedBuilder()
-                        .setTitle("Incoming trade offer!")
-                        .setDescription(`The ${team1Role.name} have offered you a trade! You have 15 minutes to accept or decline.`)
-                        .setFields(
-                            {name:"Players you will receive:", value:`${team1Str}`},
-                            {name:"Players you will trade away:", value:`${team2Str}`}
-                        )
-                        .setFooter({text:`This trade was sent by ${interaction.user.tag}`})
+        if (player1Authorized.role !== "P") {
+            await db.close()
+            return interaction.editReply({ content:"You are unable to trade away front office players! Please demote them and try again!", ephemeral: true})
+        }
 
-                    const buttons = new ActionRowBuilder()
-                        .addComponents(
-                            new ButtonBuilder()
-                                .setCustomId('accept')
-                                .setLabel('Accept')
-                                .setStyle(ButtonStyle.Success),
-                            new ButtonBuilder()
-                                .setCustomId('decline')
-                                .setLabel('Decline')
-                                .setStyle(ButtonStyle.Danger)
-                        )
+        // then, get information on player 2
+        const player2Info = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [player2.id, guild]) // always assume player 2 exists
 
-                    const otherFO = await db.get('SELECT discordid FROM Players WHERE role = "FO" AND team = ? AND guild = ?', [team, guild])
-                    if (!otherFO) {
-                        await db.close()
-                        m.delete()
-                        offerCollector.stop()
-                        return interaction.editReply({content:`Aborted! This team does not have a franchise owner!`, ephemeral:true})
-                    }
+        // check if player 2 is a free agent
+        if (player2Info.team === "FA") {
+            await db.close()
+            return interaction.editReply({ content:"The player you want to trade for is a free agent!", ephemeral: true})
+        }
 
-                    const foUser = await interaction.guild.members.fetch(otherFO.discordid);
+        // then, check if they are front office
+        if (player2Info.role !== "P") {
+            await db.close()
+            return interaction.editReply({ content:"You are unable to trade for front office players! Please have them demoted and try again!", ephemeral: true})
+        }
 
-                    const dmChannel = await foUser.createDM()
+        // then, get the franchise owner of the team that 
+        const otherTeamFo = await db.get('SELECT * FROM Players WHERE role = "FO" AND team = ? AND guild = ?', [player2Info.team, guild])
+        if (!otherTeamFo) {
+            await db.close()
+            return interaction.editReply({ content:"The team of the player you want to trade for does not have a franchise owner!", ephemeral: true})
+        }
 
-                    // todo: create trades table or just use offers table
-                    userMessage = await dmChannel.send({embeds: [embed], components: [buttons]})
-                    // await db.run("INSERT INTO Offers (discordid) VALUES (?)", user.id);
-                    await interaction.editReply({ content: "Trade has been sent. Awaiting decision...", ephemeral: true})
-                    const dmInteraction = await userMessage.awaitMessageComponent({ componentType: ComponentType.Button, time: 890000})
-                    offerCollector.stop()
-                    // this needs to be implemented
-                    if (dmInteraction.customId === "accept") {
-                        // first, check if all players remained on their teams
-                        for (let i = 0; i < team1Players.length; i++) {
-                            console.log(team1Players[i])
-                        }
-                        for (let i = 0; i < team2Players.length; i++) {
-                            console.log(team2Players[i])
-                        }
-                    }
-                }
-                await db.close()
-            } catch(err) {
-                console.log(err)
-                await interaction.editReply({ content:`${err}`, ephemeral:true })
-                offerCollector.stop()
+        // then, construct the embed
+        const offeringTeam = await db.get('SELECT name, logo FROM Teams WHERE code = ? AND guild = ?', [authorized.team, guild])
+
+        const embed = new EmbedBuilder()
+            .setTitle("Incoming trade offer!")
+            .setDescription(`The ${offeringTeam.name} have offered you a trade! You have 15 minutes to accept or decline.`)
+            .setThumbnail(`${offeringTeam.logo}`)
+            .setFields(
+                { name:"Players you will receive", value:`${player1.tag}`},
+                { name:"Players you will trade away", value:`${player2.tag}`}
+            )
+            .setFooter({ text:`This trade was sent by ${interaction.user.tag}`})
+        
+        const buttons = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('accept')
+                    .setLabel('Accept')
+                    .setStyle(ButtonStyle.Success),
+                new ButtonBuilder()
+                    .setCustomId('decline')
+                    .setLabel('Decline')
+                    .setStyle(ButtonStyle.Danger)
+            )
+
+        const otherFo = await interaction.guild.members.fetch(otherTeamFo.discordid)
+        const dmChannel = await otherFo.createDm()
+        const message = await dmChannel.send({ embeds:[embed], compoenents:[buttons] })
+        await interaction.editReply({ content: "Trade has been sent. Awaiting decision...", ephemeral: true})
+        try {
+            const dmInteraction = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 890000})
+        } catch(err) {
+            await interaction.client.users.send("168490999235084288", `Error for user ${interaction.user.tag}\n\n ${err}`)
+            console.log(err)
+            const db = await getDBConnection();
+            await db.run("DELETE FROM Offers WHERE discordid = ?", userid);
+            if (err.code === "InteractionCollectorError") {
+                embed.setTitle("Offer Expired!")
+                await message.edit({ embeds: [dmMessage], components: []})
+             } else if (err.code === 50007) {
+                await interaction.editReply({ content: "This user does not have their DMs open to bots! Ensure that this user can be DMed by bots before sending them another trade!", ephemeral:true })
+            } else {
+                const errmsg = `There was an error while executing ${interaction.commandName}! Please DM Donovan#3771 with a screenshot of this error to report this bug.\n\n Attach this error message below:\`\`\`${err}\`\`\``
+                await interaction.editReply({ content:errmsg, ephemeral:true })
             }
-        })
+            await db.close();
+        }
+        
         await db.close();
     }
 }
