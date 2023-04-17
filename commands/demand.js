@@ -59,6 +59,10 @@ module.exports = {
 
         // then, send the message to demands channel
         const demandChannelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "demands" AND guild = ?', guild);
+        if (!demandChannelId) {
+            await db.close()
+            return interaction.editReply({ content:"A demand channel has not been set!", ephemeral:true})
+        }
         const demandChannel = await interaction.guild.channels.fetch(demandChannelId.channelid);
         await demandChannel.send({ embeds:[demandEmbed] })
 
