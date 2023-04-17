@@ -119,8 +119,7 @@ module.exports = {
              } else if (err.code === 50007) {
                 await interaction.editReply({ content: "This user does not have their DMs open to bots! Ensure that this user can be DMed by bots before sending them another trade!", ephemeral:true })
             } else {
-                const errmsg = `There was an error while executing ${interaction.commandName}! Please DM Donovan#3771 with a screenshot of this error to report this bug.\n\n Attach this error message below:\`\`\`${err}\`\`\``
-                await interaction.editReply({ content:errmsg, ephemeral:true })
+                throw new Error(err)
             }
             await db.close();
         }
