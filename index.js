@@ -101,6 +101,7 @@ client.on(Events.InteractionCreate, async interaction => {
 			}
 			if (specialRoleInfo && userInfo.role !== specialRoleInfo.role) {
 				if (specialRoleInfo.code === "FO") {
+					console.log(specialRoleInfo)
 					await db.run('UPDATE Players SET role = "FO", contractlength = 999 WHERE discordid = ? AND guild = ?', [user.id, guild])
 				} else {
 					await db.run('UPDATE Players SET role = ? WHERE discordid = ? AND guild = ?', [specialRoleInfo.code, user.id, guild])
