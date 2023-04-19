@@ -101,25 +101,25 @@ client.on(Events.InteractionCreate, async interaction => {
 			const userInfo = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [user.id, guild])
 			if (userInfo.team === "FA" || userInfo.team !== teamRoleInfo.code) {
 				// if a user's team in the db does not match their role, give them a random contract
-				await db.run('UPDATE Players SET team = ?, contractlen = ? WHERE discordid = ? AND guild = ?', [teamRoleInfo.code, contractLen, user.id, guild])
+				await db.run('UPDATE Players SET team = ?, contractlength = ? WHERE discordid = ? AND guild = ?', [teamRoleInfo.code, contractLen, user.id, guild])
 			}
 			if (specialRoleInfo && userInfo.role !== specialRoleInfo.role) {
 				if (specialRoleInfo.code === "FO") {
-					await db.run('UPDATE Players SET role = "FO", contractlen = 999 WHERE discordid = ? AND guild = ?', [user.id, guild])
+					await db.run('UPDATE Players SET role = "FO", contractlength = 999 WHERE discordid = ? AND guild = ?', [user.id, guild])
 				} else {
 					await db.run('UPDATE Players SET role = ? WHERE discordid = ? AND guild = ?', [specialRoleInfo.code, user.id, guild])
 				}
 			} else if (!specialRoleInfo && userInfo.role !== "P") {
 				// if special role info does not exist, get the current contract length
 				if (userInfo.role === "FO") {
-					await db.run('UPDATE Players SET role = "P", contractlen = ? WHERE discordid = ? AND guild = ?', [contractLen, user.id, guild])
+					await db.run('UPDATE Players SET role = "P", contractlength = ? WHERE discordid = ? AND guild = ?', [contractLen, user.id, guild])
 				} else {
 					await db.run('UPDATE Players SET role = "P" WHERE discordid = ? AND guild = ?', [user.id, guild])
 				}
 			}
 		} else {
 			// they had no team role, therefore they are a free agent
-			await db.run('UPDATE Players SET role = "FA", contractlen = -1 WHERE discordid = ? AND guild = ?', [user.id, guild])
+			await db.run('UPDATE Players SET role = "FA", contractlength = -1 WHERE discordid = ? AND guild = ?', [user.id, guild])
 		}
 
 		await db.close()
