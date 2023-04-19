@@ -61,10 +61,6 @@ client.on(Events.InteractionCreate, async interaction => {
 		const user = interaction.member
 		// temp fix for fixing team stuff
 		const guild = interaction.guild.id
-		const teams = await db.all("SELECT code FROM Teams WHERE guild = ?", guild);
-		for (let i = 0; i < teams.length; i++) {
-				await db.run('UPDATE Teams SET playercount = (SELECT COUNT(*) FROM Players WHERE team = ? AND guild = ?) WHERE code = ? AND guild = ?', [teams[i].code, guild, teams[i].code, guild])
-		}
 
 		// as a sanity check, ensure the user exists in the database
 		const userExists = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [user.id, guild])
@@ -120,6 +116,11 @@ client.on(Events.InteractionCreate, async interaction => {
 		} else {
 			// they had no team role, therefore they are a free agent
 			await db.run('UPDATE Players SET role = "FA", contractlength = -1 WHERE discordid = ? AND guild = ?', [user.id, guild])
+		}
+
+		const teams = await db.all("SELECT code FROM Teams WHERE guild = ?", guild);
+		for (let i = 0; i < teams.length; i++) {
+				await db.run('UPDATE Teams SET playercount = (SELECT COUNT(*) FROM Players WHERE team = ? AND guild = ?) WHERE code = ? AND guild = ?', [teams[i].code, guild, teams[i].code, guild])
 		}
 
 		await db.close()
