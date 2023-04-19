@@ -86,13 +86,9 @@ client.on(Events.InteractionCreate, async interaction => {
 			if (roleInfo) {
 				// first, set flags to indicate stuff
 				if (roleInfo.code === "FO" || roleInfo.code === "GM" || roleInfo.code === "HC") {
-					if (userInfo.role !== roleInfo.code) {
-						specialRoleInfo = roleInfo
-					}
+					specialRoleInfo = roleInfo
 				} else {
-					if (userInfo.team !== roleInfo.code) {
-						teamRoleInfo = roleInfo
-					}
+					teamRoleInfo = roleInfo
 				}
 			}
 		}

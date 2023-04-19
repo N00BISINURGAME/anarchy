@@ -108,6 +108,7 @@ module.exports = {
         // 3 options: scan for existing teams, add new teams, add teams later
         message = await messageCollector.update({ embeds:[embed], components:[], ephemeral:true})
 
+        // this needs to be made much better
         if (teamOption !== "3") {
             const roles = await interaction.guild.roles.fetch()
             let clonedArray = structuredClone(teamJson)
@@ -120,21 +121,24 @@ module.exports = {
                 if (!roleExists) {
                     if (role.name.toLowerCase() === "franchise owner") {
                         foExists = true
-                        continue
+                        await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", role.id, guild]);
                     }
                     if (role.name.toLowerCase() === "general manager") {
                         gmExists = true
-                        continue
+                        await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", role.id, guild]);
                     }
                     if (role.name.toLowerCase() === "head coach") {
                         hcExists = true
-                        continue
+                        await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", role.id, guild]);
                     }
                     for (let i = 0; i < teamJson.length; i++) {
                         const team = teamJson[i]
                         if (team.Name.toLowerCase() === role.name.toLowerCase()) {
                             // we have a valid team! add it to db and break
-                            await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guild]);
+                            const teamExists = await db.get('SELECT * FROM Roles WHERE code = ? AND guild = ?', team.Abbreviation.toUpperCase(), guild)
+                            if (!teamExists) {
+                                await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guild]);
+                            }
                             await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [team.Abbreviation.toUpperCase(), role.id, guild]);
                             clonedArray.splice(i, 1)
                             break;
@@ -175,7 +179,6 @@ module.exports = {
                             name: team.Name,
                             color: team.Color
                         });
-    
                         await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guild]);
                         await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [team.Abbreviation.toUpperCase(), newRole.id, guild]);
                     }
