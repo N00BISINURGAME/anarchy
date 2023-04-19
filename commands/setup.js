@@ -156,7 +156,7 @@ module.exports = {
                     name: "General Manager",
                 });
 
-                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", newRole.id, guild]);
+                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", newRole.id, guild]);
             }
 
             if (!hcExists) {
@@ -164,7 +164,7 @@ module.exports = {
                     name: "Head Coach",
                 });
 
-                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", newRole.id, guild]);
+                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", newRole.id, guild]);
             }
 
             if (teamOption === "2") {
