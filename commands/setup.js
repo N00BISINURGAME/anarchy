@@ -120,15 +120,15 @@ module.exports = {
                 if (!roleExists) {
                     if (role.name.toLowerCase() === "franchise owner") {
                         foExists = true
-                        await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", role.id, guild]);
+                        continue
                     }
                     if (role.name.toLowerCase() === "general manager") {
                         gmExists = true
-                        await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", role.id, guild]);
+                        continue
                     }
                     if (role.name.toLowerCase() === "head coach") {
                         hcExists = true
-                        await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", role.id, guild]);
+                        continue
                     }
                     for (let i = 0; i < teamJson.length; i++) {
                         const team = teamJson[i]
