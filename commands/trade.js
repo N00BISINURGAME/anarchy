@@ -39,11 +39,20 @@ module.exports = {
         }
 
         // then, check that either of the players are not being traded. do this later
-        const playersTraded = await db.all('SELECT * FROM Offers WHERE (discordid = ? OR discordid = ?', [player1.id, player2.id])
-        if (playersTraded) {
-
+        // need to create a trades table in our database
+        const player1Traded = await db.get('SELECT * FROM Trades WHERE discordid = ? AND guild = ?', [player1.id, guild])
+        const player2Traded = await db.all('SELECT * FROM Trades WHERE discordid = ? AND guild = ?', [player2.id, guild])
+        if (player1Traded && player2Traded) {
+            await db.close()
+            return interaction.editReply({ content:`${player1} and ${player2} are currently involved in other trades! Please try again later!`, ephemeral: true})
+        } else if (player1Traded) {
+            await db.close()
+            return interaction.editReply({ content:`${player1} is currently involved in another trade! Please try again later!`, ephemeral: true})
+        } else if (player2Traded) {
+            await db.close()
+            return interaction.editReply({ content:`${player2} is currently involved in another trade! Please try again later!`, ephemeral: true})
         }
-        
+
         // then, check if the player pinged is on the same team as the player that started the command
         const player1Authorized = await db.get('SELECT * FROM Players WHERE discordid = ? AND team = (SELECT team FROM Players WHERE discordid = ? AND guild = ?) AND guild = ?', [player1.id, userid, guild, guild])
         if (!player1Authorized) {
@@ -90,7 +99,7 @@ module.exports = {
                 { name:"Players you will trade away", value:`${player2.tag}`}
             )
             .setFooter({ text:`This trade was sent by ${interaction.user.tag}`})
-        
+
         const buttons = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
@@ -107,8 +116,16 @@ module.exports = {
         const dmChannel = await otherFo.createDm()
         const message = await dmChannel.send({ embeds:[embed], compoenents:[buttons] })
         await interaction.editReply({ content: "Trade has been sent. Awaiting decision...", ephemeral: true})
+        // put both players into the trade db
+        await db.run('INSERT INTO Trades(discordid, guild) VALUES(?, ?)', [player1.id, guild])
+        await db.run('INSERT INTO Trades(discordid, guild) VALUES(?, ?)', [player2.id, guild])
         try {
             const dmInteraction = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 890000})
+            if (dmInteraction.customId === "accept") {
+                // confirm that the players are still on their respective teams
+                const player1Confirm = await db.get('SELECT * FROM Players WHERE discordid = ? AND team = ? AND guild = ?', [player1.id, player1Authorized.team, guild])
+                const player2Confirm = await db.get('SELECT * FROM Players WHERE discordid = ? AND team = ? AND guild = ?', [player2.id, player2Info.team, guild])
+            }
         } catch(err) {
             await interaction.client.users.send("168490999235084288", `Error for user ${interaction.user.tag}\n\n ${err}`)
             console.log(err)

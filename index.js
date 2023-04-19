@@ -67,7 +67,6 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 		await db.close()
 		await command.execute(interaction);
-		
 	} catch (error) {
 		try {
 			const embed = new EmbedBuilder()
