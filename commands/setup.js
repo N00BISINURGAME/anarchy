@@ -111,23 +111,23 @@ module.exports = {
         if (teamOption !== "3") {
             const roles = await interaction.guild.roles.fetch()
             let clonedArray = structuredClone(teamJson)
-            let foExists = true
-            let gmExists = true
-            let hcExists = true
+            let foExists = false
+            let gmExists = false
+            let hcExists = false
             for (const role of roles.values()) {
                 // first, check if the role is already in the DB
                 const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', role.id, guild)
                 if (!roleExists) {
                     if (role.name.toLowerCase() === "franchise owner") {
-                        foExists = false
+                        foExists = true
                         await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", role.id, guild]);
                     }
                     if (role.name.toLowerCase() === "general manager") {
-                        gmExists = false
+                        gmExists = true
                         await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", role.id, guild]);
                     }
                     if (role.name.toLowerCase() === "head coach") {
-                        hcExists = false
+                        hcExists = true
                         await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", role.id, guild]);
                     }
                     for (let i = 0; i < teamJson.length; i++) {
@@ -147,18 +147,24 @@ module.exports = {
                 const newRole = await interaction.guild.roles.create({
                     name: "Franchise Owner",
                 });
+
+                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", newRole.id, guild]);
             }
 
             if (!gmExists) {
                 const newRole = await interaction.guild.roles.create({
                     name: "General Manager",
                 });
+
+                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", newRole.id, guild]);
             }
 
             if (!hcExists) {
                 const newRole = await interaction.guild.roles.create({
                     name: "Head Coach",
                 });
+
+                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", newRole.id, guild]);
             }
 
             if (teamOption === "2") {
