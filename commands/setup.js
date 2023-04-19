@@ -147,24 +147,18 @@ module.exports = {
                 const newRole = await interaction.guild.roles.create({
                     name: "Franchise Owner",
                 });
-
-                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", newRole.id, guild]);
             }
 
             if (!gmExists) {
                 const newRole = await interaction.guild.roles.create({
                     name: "General Manager",
                 });
-
-                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", newRole.id, guild]);
             }
 
             if (!hcExists) {
                 const newRole = await interaction.guild.roles.create({
                     name: "Head Coach",
                 });
-
-                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", newRole.id, guild]);
             }
 
             if (teamOption === "2") {
