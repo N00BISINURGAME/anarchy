@@ -118,6 +118,18 @@ module.exports = {
                 // first, check if the role is already in the DB
                 const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', role.id, guild)
                 if (!roleExists) {
+                    if (role.name.toLowerCase() === "franchise owner") {
+                        foExists = true
+                        await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", role.id, guild]);
+                    }
+                    if (role.name.toLowerCase() === "general manager") {
+                        gmExists = true
+                        await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", role.id, guild]);
+                    }
+                    if (role.name.toLowerCase() === "head coach") {
+                        hcExists = true
+                        await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", role.id, guild]);
+                    }
                     for (let i = 0; i < teamJson.length; i++) {
                         const team = teamJson[i]
                         if (team.Name.toLowerCase() === role.name.toLowerCase()) {
@@ -128,18 +140,6 @@ module.exports = {
                             break;
                         }
                     }
-                }
-                if (role.name.toLowerCase() === "franchise owner") {
-                    foExists = true
-                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", role.id, guild]);
-                }
-                if (role.name.toLowerCase() === "general manager") {
-                    gmExists = true
-                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", role.id, guild]);
-                }
-                if (role.name.toLowerCase() === "head coach") {
-                    hcExists = true
-                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", role.id, guild]);
                 }
             }
 
