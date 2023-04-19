@@ -58,13 +58,70 @@ client.on(Events.InteractionCreate, async interaction => {
 		const db = await getDBConnection()
 		await interaction.deferReply({ ephemeral:true })
 		await client.users.fetch(interaction.user.id) // fetch the user and cache them for future use
-
+		const user = interaction.member
 		// temp fix for fixing team stuff
 		const guild = interaction.guild.id
-		const teams = await db.all("SELECT code FROM Teams WHERE guild = ?", interaction.guild.id);
+		const teams = await db.all("SELECT code FROM Teams WHERE guild = ?", guild);
 		for (let i = 0; i < teams.length; i++) {
 				await db.run('UPDATE Teams SET playercount = (SELECT COUNT(*) FROM Players WHERE team = ? AND guild = ?) WHERE code = ? AND guild = ?', [teams[i].code, guild, teams[i].code, guild])
 		}
+
+		// as a sanity check, ensure the user exists in the database
+		const userExists = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [user.id, guild])
+		if (!userExists) {
+			await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ?, "P", "-1")', [user.id, guild]);
+		}
+
+		// get all roles, and also get the highest role of a guild
+		const userRoles = user.roles.cache
+		const highestRole = interaction.guild.roles.highest
+		if (userRoles.get(highestRole.id)) {
+			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [user.id, guild])
+		}
+
+		let specialRoleInfo = null
+		let teamRoleInfo = null
+
+		// also, check if they were manually given roles (sigh)
+		for (const roleid of userRoles.keys()) {
+			const roleInfo = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [roleid, guild])
+			if (roleInfo) {
+				// first, set flags to indicate stuff
+				if (roleInfo.code === "FO" || roleInfo.code === "GM" || roleInfo.code === "HC") {
+					specialRoleInfo = roleInfo
+				} else {
+					teamRoleInfo = roleInfo
+				}
+			}
+		}
+
+		// at this stage, check if teamRoleInfo is null, then check for specialRoleInfo afterwards.
+		if (teamRoleInfo) {
+			const contractLen = Math.floor(Math.random() * (3 - 1 + 1) + 1)
+			const userInfo = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [user.id, guild])
+			if (userInfo.team === "FA" || userInfo.team !== teamRoleInfo.code) {
+				// if a user's team in the db does not match their role, give them a random contract
+				await db.run('UPDATE Players SET team = ?, contractlen = ? WHERE discordid = ? AND guild = ?', [teamRoleInfo.code, contractLen, user.id, guild])
+			}
+			if (specialRoleInfo && userInfo.role !== specialRoleInfo.role) {
+				if (specialRoleInfo.code === "FO") {
+					await db.run('UPDATE Players SET role = "FO", contractlen = 999 WHERE discordid = ? AND guild = ?', [user.id, guild])
+				} else {
+					await db.run('UPDATE Players SET role = ? WHERE discordid = ? AND guild = ?', [specialRoleInfo.code, user.id, guild])
+				}
+			} else if (!specialRoleInfo && userInfo.role !== "P") {
+				// if special role info does not exist, get the current contract length
+				if (userInfo.role === "FO") {
+					await db.run('UPDATE Players SET role = "P", contractlen = ? WHERE discordid = ? AND guild = ?', [contractLen, user.id, guild])
+				} else {
+					await db.run('UPDATE Players SET role = "P" WHERE discordid = ? AND guild = ?', [user.id, guild])
+				}
+			}
+		} else {
+			// they had no team role, therefore they are a free agent
+			await db.run('UPDATE Players SET role = "FA", contractlen = -1 WHERE discordid = ? AND guild = ?', [user.id, guild])
+		}
+
 		await db.close()
 		await command.execute(interaction);
 	} catch (error) {
