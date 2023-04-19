@@ -143,6 +143,30 @@ module.exports = {
                 }
             }
 
+            if (!foExists) {
+                const newRole = await interaction.guild.roles.create({
+                    name: "Franchise Owner",
+                });
+
+                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", newRole.id, guild]);
+            }
+
+            if (!gmExists) {
+                const newRole = await interaction.guild.roles.create({
+                    name: "General Manager",
+                });
+
+                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", newRole.id, guild]);
+            }
+
+            if (!hcExists) {
+                const newRole = await interaction.guild.roles.create({
+                    name: "Head Coach",
+                });
+
+                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", newRole.id, guild]);
+            }
+
             if (teamOption === "2") {
                 for (let team of clonedArray) {
                     const teamExists = await db.get('SELECT * FROM Teams WHERE name = ? AND guild = ?', [team.Name, guild])
