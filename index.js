@@ -78,15 +78,21 @@ client.on(Events.InteractionCreate, async interaction => {
 		let specialRoleInfo = null
 		let teamRoleInfo = null
 
+		const userInfo = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [user.id, guild])
+
 		// also, check if they were manually given roles (sigh)
 		for (const roleid of userRoles.keys()) {
 			const roleInfo = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [roleid, guild])
 			if (roleInfo) {
 				// first, set flags to indicate stuff
 				if (roleInfo.code === "FO" || roleInfo.code === "GM" || roleInfo.code === "HC") {
-					specialRoleInfo = roleInfo
+					if (userInfo.role !== roleInfo.code) {
+						specialRoleInfo = roleInfo
+					}
 				} else {
-					teamRoleInfo = roleInfo
+					if (userInfo.team !== roleInfo.code) {
+						teamRoleInfo = roleInfo
+					}
 				}
 			}
 		}
@@ -94,7 +100,6 @@ client.on(Events.InteractionCreate, async interaction => {
 		// at this stage, check if teamRoleInfo is null, then check for specialRoleInfo afterwards.
 		if (teamRoleInfo) {
 			const contractLen = Math.floor(Math.random() * (3 - 1 + 1) + 1)
-			const userInfo = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [user.id, guild])
 			if (userInfo.team === "FA" || userInfo.team !== teamRoleInfo.code) {
 				// if a user's team in the db does not match their role, give them a random contract
 				await db.run('UPDATE Players SET team = ?, contractlength = ? WHERE discordid = ? AND guild = ?', [teamRoleInfo.code, contractLen, user.id, guild])
