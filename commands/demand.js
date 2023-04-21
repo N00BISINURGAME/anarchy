@@ -84,12 +84,10 @@ module.exports = {
         }
         // then, send the message to demands channel
         const demandChannelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "demands" AND guild = ?', guild);
-        if (!demandChannelId) {
-            await db.close()
-            return interaction.editReply({ content:"A demand channel has not been set!", ephemeral:true})
+        if (demandChannelId) {
+            const demandChannel = await interaction.guild.channels.fetch(demandChannelId.channelid);
+            await demandChannel.send({ embeds:[demandEmbed] })
         }
-        const demandChannel = await interaction.guild.channels.fetch(demandChannelId.channelid);
-        await demandChannel.send({ embeds:[demandEmbed] })
 
         demandEmbed.setDescription(
             `${interaction.user.tag} has demanded from the ${teamRole.name}! ${specialRole ? `This person was the ${specialRole.name}.` : ""}
@@ -104,5 +102,7 @@ module.exports = {
                 break
             }
         }
+        await db.close()
+        await interaction.editReply( {content:`Successfully demanded! You have ${(maxPlayerQry.demands - currentPlayer.demands) - 1} demands left!`, ephemeral:true})
     }
 }
