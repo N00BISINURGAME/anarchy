@@ -74,7 +74,7 @@ module.exports = {
         // then, construct the embed
         const demandEmbed = new EmbedBuilder()
                     .setTitle("Player demanded!")
-                    .setAuthor(interaction.member)
+                    .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
                     .setThumbnail(team.logo)
                     .setColor(teamRole.color)
                     .setDescription(`${interaction.member} (${interaction.user.tag}) has demanded from the ${teamRole}! ${specialRole ? `This person was the ${specialRole}.` : ""}
