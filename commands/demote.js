@@ -102,7 +102,8 @@ module.exports = {
             .setTitle('Player demoted!')
             .setThumbnail(logoStr)
             .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
-            .setDescription(`The ${teamRole}'s Franchise Owner has demoted ${userChoice} (${userChoice.user.tag}) from ${specialRoleObj}!\n>>> **Franchise Owner:** ${interaction.member} (${interaction.user.tag})`)
+            .setDescription(`The ${teamRole}'s Franchise Owner has demoted ${userChoice} (${userChoice.user.tag}) from ${specialRoleObj}!
+            \n>>> **Franchise Owner:** ${interaction.member} (${interaction.user.tag})`)
             .setColor(teamRole.color)
 
         const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
