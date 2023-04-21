@@ -96,15 +96,14 @@ module.exports = {
         const logo = await db.get('SELECT logo FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND r.guild = ?', [teamRole.id, guild]);
         const logoStr = logo.logo;
 
+        const specialRoleObj = await interaction.guild.roles.fetch(specialRole)
+
         const transactionEmbed = new EmbedBuilder()
             .setTitle('Player demoted!')
             .setThumbnail(logoStr)
-            .addFields(
-                { name:"Team", value:`${teamRole}` },
-                { name:"Franchise Owner", value:`${interaction.user}\n${interaction.user.tag}` },
-                { name:"Player Demoted", value:`${userChoice}`},
-                { name:"Role", value: `${specialRole}` }
-            )
+            .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+            .setDescription(`The ${teamRole}'s Franchise Owner has demoted ${userChoice} from ${specialRoleObj}!\n>>> **Franchise Owner:** ${interaction.member}`)
+            .setColor(teamRole.color)
 
         const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
         const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
