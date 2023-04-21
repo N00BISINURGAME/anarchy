@@ -74,10 +74,11 @@ module.exports = {
         // then, construct the embed
         const demandEmbed = new EmbedBuilder()
                     .setTitle("Player demanded!")
+                    .setAuthor(interaction.member)
                     .setThumbnail(team.logo)
                     .setColor(teamRole.color)
                     .setDescription(`${interaction.member} (${interaction.user.tag}) has demanded from the ${teamRole}! ${specialRole ? `This person was the ${specialRole}.` : ""}
-                    \n>>>**Roster:** ${teamRole.members.size} / ${maxPlayerQry.maxplayers}`)
+                    \n>>> **Roster:** ${teamRole.members.size} / ${maxPlayerQry.maxplayers}`)
 
         if (specialRole) {
             demandEmbed.addFields({name:"Special Roles"})
@@ -91,7 +92,7 @@ module.exports = {
 
         demandEmbed.setDescription(
             `${interaction.user.tag} has demanded from the ${teamRole.name}! ${specialRole ? `This person was the ${specialRole.name}.` : ""}
-                    \n>>>**Roster:** ${teamRole.members.size} / ${maxPlayerQry.maxplayers}\nGuild: ${interaction.guild.name}`
+                    \n>>> **Roster:** ${teamRole.members.size} / ${maxPlayerQry.maxplayers}\nGuild: ${interaction.guild.name}`
         )
 
         // then, dm the franchise owner notifying them
