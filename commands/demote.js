@@ -25,8 +25,25 @@ module.exports = {
 
         if (userId === userChoice.id) return interaction.editReply({ content:'You are unable to demote yourself!', ephemeral:true });
 
-        // first, check to see if the player is an FO
-        const isFO = await db.get('SELECT * FROM Players WHERE discordid = ? AND role = "FO" AND guild = ?', [userChoice.id, guild]);
+        // first, check to see if the pinged player is an FO
+        let specialRole;
+        let isFO = false;
+        const roles = userChoice.roles.cache
+        // go thru all roles and see if the person pinged has a special role
+        for (const role of roles.keys()) {
+            const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
+            if (roleExists) {
+                if (roleExists.code === "FO") {
+                    isFO = true;
+                    specialRole = role;
+                    break;
+                } else if (roleExists.code === "GM" || roleExists.code === "HC") {
+                    specialRole = role;
+                    break;
+                }
+            }
+        }
+
         if (isFO) {
             // then, check if the user running the command is an admin
             const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [userId, guild])
@@ -34,62 +51,59 @@ module.exports = {
                 await db.close()
                 return interaction.editReply({ content:"You are not authorized to demote franchise owners!", ephemeral:true })
             }
-            await db.run('UPDATE Players SET team = "FA", role = "P", contractlength = -1 WHERE discordid = ? AND guild = ?', [userChoice.id, guild])
-            await db.run('UPDATE Teams SET playercount = playercount - 1 WHERE code = ? AND guild = ?', [isFO.team, guild])
+            await userChoice.roles.remove(role);
             await db.close()
             return interaction.editReply({ content:"Successfully demoted franchise owner down!", ephemeral:true })
         }
 
-        // if the choice is to assign a general manager or head coach, check if they are authorized.
-        // this means the person must be a franchise owner.
-        const userInfo = await db.get('SELECT team FROM Players WHERE discordid = ? AND role = "FO" AND guild = ?', [userId, guild]);
-        if (!userInfo) {
-            await db.close();
-            return interaction.editReply({ content:`You are not authorized to demote a player! To do so you must be a franchise owner.`, ephemeral:true });
+        const demoterRoles = interaction.member.roles.cache
+        const foRoleid = await db.get('SELECT roleid FROM Roles WHERE code = "FO" AND guild = ?', guild)
+        if (!(demoterRoles.containsKey(foRoleid.roleid))) {
+            await db.close()
+            return interaction.editReply({ content:"You are not authorized to demote individuals, as you are not a franchise owner!", ephemeral:true })
+        }
+
+        // check and see if theyre actually a member of the front office
+        if (!specialRole) {
+            await db.close()
+            return interaction.editReply({ content:"This person is not a member of your front office!", ephemeral:true })
         }
 
         // then, check to see if the user pinged is on the same team as the user who ran the command
-        const chosenUserId = userChoice.id;
-        const userOnTeam = await db.get('SELECT * FROM Players WHERE discordid = ? AND team = ? AND guild = ?', [chosenUserId, userInfo.team, guild]);
-        if (!userOnTeam) {
-            await db.close();
-            return interaction.editReply({ content:'This user is not signed to your team!', ephemeral:true });
-        }
-
-        if (userOnTeam.role === "P") {
-            await db.close()
-            return interaction.editReply({ content:'This user is not a member of your front office!', ephemeral:true });
+        // need to do this part -- get team role for franchise owner and get team role for player pinged
+        let teamRole;
+        for (const role of demoterRoles.values()) {
+            const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guild])
+            // we have a valid role in the database!
+            if (roleExists) {
+                if (!(roleExists.code === "FO" || roleExists.code === "GM" || roleExists.code === "HC")) {
+                    // and it's a valid team role! we can now compare against the cache of the
+                    // person that was pinged
+                    if (!(roles.containsKey(role.id))) {
+                        await db.close()
+                        return interaction.editReply({ content:"This person is not on your team!", ephemeral:true })
+                    }
+                    teamRole = role
+                    break;
+                }
+            }
         }
 
         // then, take away the role from the person
-        const currentRole = await db.get("SELECT role FROM Players WHERE discordid = ? AND guild = ?", [chosenUserId, guild]);
-        if (currentRole.role === "GM") {
-            const roleId = await db.get("SELECT roleid FROM Roles WHERE code = 'GM' AND guild = ?", guild);
-            await userChoice.roles.remove(roleId.roleid);
-        } else {
-            const roleId = await db.get("SELECT roleid FROM Roles WHERE code = 'HC' AND guild = ?", guild);
-            await userChoice.roles.remove(roleId.roleid);
-        }
-
-        // then, change the role of the user
-        await db.run('UPDATE Players SET role = "P" WHERE discordid = ? AND guild = ?', [chosenUserId, guild]);
+        await userChoice.roles.remove(specialRole);
 
         // then, get the team logo
-        const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [userInfo.team, guild]);
+        const logo = await db.get('SELECT logo FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND guild = ?', [teamRole.id, guild]);
         const logoStr = logo.logo;
-
-        // get role
-        const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [userInfo.team, guild]);
-        const roleObj = await interaction.guild.roles.fetch(role.roleid)
 
         const transactionEmbed = new EmbedBuilder()
             .setTitle('Player demoted!')
             .setThumbnail(logoStr)
             .addFields(
-                { name:"Team", value:`${roleObj}` },
+                { name:"Team", value:`${teamRole}` },
                 { name:"Franchise Owner", value:`${interaction.user}\n${interaction.user.tag}` },
                 { name:"Player Demoted", value:`${userChoice}`},
-                { name:"Role", value: userOnTeam.role === "GM" ? "General Manager" : "Head Coach" }
+                { name:"Role", value: `${specialRole}` }
             )
 
         const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
