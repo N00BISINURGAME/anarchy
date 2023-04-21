@@ -22,7 +22,7 @@ module.exports = {
         let teamRole;
         let specialRole;
         let isFo = false
-        for (const role of interaction.user.roles.cache.values()) {
+        for (const role of interaction.member.roles.cache.values()) {
             if (teamRole && specialRole) {
                 break;
             }
