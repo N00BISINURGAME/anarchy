@@ -26,7 +26,7 @@ module.exports = {
             if (teamRole && specialRole) {
                 break;
             }
-            const roleInDb = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guildId])
+            const roleInDb = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guild])
             if (roleInDb) {
                 if (!specialRole && (roleInDb.code === "FO" || roleInDb.code === "GM" ||roleInDb.code === "HC")) {
                     specialRole = role;
