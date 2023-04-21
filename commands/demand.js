@@ -77,11 +77,7 @@ module.exports = {
                     .setThumbnail(team.logo)
                     .setColor(teamRole.color)
                     .setDescription(`${interaction.member} (${interaction.user.tag}) has demanded from the ${teamRole}! ${specialRole ? `This person was the ${specialRole}.` : ""}
-                    \n>>> Roster: ${teamRole.members.size} / ${maxPlayerQry.maxplayers}`)
-                    .setFields(
-                        {name:"Player", value:`${interaction.user}\n${interaction.user.tag}`},
-                        {name:"Team", value:`${teamRole}`},
-                    )
+                    \n>>>**Roster:** ${teamRole.members.size} / ${maxPlayerQry.maxplayers}`)
 
         if (specialRole) {
             demandEmbed.addFields({name:"Special Roles"})
@@ -95,17 +91,9 @@ module.exports = {
         const demandChannel = await interaction.guild.channels.fetch(demandChannelId.channelid);
         await demandChannel.send({ embeds:[demandEmbed] })
 
-        // then, remove the player's roles
-        const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [onTeam.team, guild])
-        await interaction.member.roles.remove(roleId.roleid)
-        if (onTeam.role === "HC" || onTeam.role === "GM") {
-            const specialRoleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [onTeam.role, guild])
-            await interaction.member.roles.remove(specialRoleId.roleid)
-        }
-
         demandEmbed.setDescription(
             `${interaction.user.tag} has demanded from the ${teamRole.name}! ${specialRole ? `This person was the ${specialRole.name}.` : ""}
-                    \n>>> Roster: ${teamRole.members.size} / ${maxPlayerQry.maxplayers}\nGuild: ${interaction.guild.name}`
+                    \n>>>**Roster:** ${teamRole.members.size} / ${maxPlayerQry.maxplayers}\nGuild: ${interaction.guild.name}`
         )
 
         // then, dm the franchise owner notifying them
