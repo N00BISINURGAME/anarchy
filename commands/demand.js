@@ -69,10 +69,12 @@ module.exports = {
             await interaction.member.roles.remove(teamRole)
         }
 
+        const team = await db.get('SELECT t.logo FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND r.guild = ?', [teamRole.id, guild])
+
         // then, construct the embed
         const demandEmbed = new EmbedBuilder()
                     .setTitle("Player demanded!")
-                    .setThumbnail(onTeam.logo)
+                    .setThumbnail(team.logo)
                     .setColor(teamRole.color)
                     .setDescription(`${interaction.member} (${interaction.user.tag}) has demanded from the ${teamRole}! ${specialRole ? `This person was the ${specialRole}.` : ""}
                     \n>>> Roster: ${teamRole.members.size()} / ${maxPlayerQry.maxplayers}`)
