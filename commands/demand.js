@@ -78,11 +78,7 @@ module.exports = {
                     .setThumbnail(team.logo)
                     .setColor(teamRole.color)
                     .setDescription(`${interaction.member} (${interaction.user.tag}) has demanded from the ${teamRole}! ${specialRole ? `This person was the ${specialRole}.` : ""}
-                    \n>>> **Roster:** ${teamRole.members.size} / ${maxPlayerQry.maxplayers}`)
-
-        if (specialRole) {
-            demandEmbed.addFields({name:"Special Roles"})
-        }
+                    \n>>> **Roster:** ${teamRole.members.size}/${maxPlayerQry.maxplayers}`)
         // then, send the message to demands channel
         const demandChannelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "demands" AND guild = ?', guild);
         if (demandChannelId) {
@@ -92,7 +88,7 @@ module.exports = {
 
         demandEmbed.setDescription(
             `${interaction.user.tag} has demanded from the ${teamRole.name}! ${specialRole ? `This person was the ${specialRole.name}.` : ""}
-                    \n>>> **Roster:** ${teamRole.members.size} / ${maxPlayerQry.maxplayers}\nGuild: ${interaction.guild.name}`
+                    \n>>> **Roster:** ${teamRole.members.size}/${maxPlayerQry.maxplayers}\n**Guild:** ${interaction.guild.name}`
         )
 
         // then, dm the franchise owner notifying them
