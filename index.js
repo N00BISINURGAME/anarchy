@@ -199,7 +199,7 @@ client.on(Events.GuildMemberRemove, async member => {
 						await channel.send({ embeds:[embed] })
 					}
 					// then, check for FO existence
-					for (const roleMember of roleMembers) {
+					for (const roleMember of roleMembers.values()) {
 						const roleMemberRoles = roleMember.roles.cache
 						if (roleMemberRoles.has(foRole)) {
 							await guildMember.send( {embeds:[embed]})

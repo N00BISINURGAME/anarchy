@@ -77,6 +77,7 @@ module.exports = {
 
         const embed = new EmbedBuilder()
           .setTitle("Incoming Referee Decision!")
+          .setColor(challenging.color)
           .setDescription(`The ${challenging} are challenging the ${offending}!`)
           .setThumbnail(interaction.guild.iconURL())
           .addFields(
