@@ -125,6 +125,8 @@ module.exports = {
                 // confirm that the players are still on their respective teams
                 const player1Confirm = await db.get('SELECT * FROM Players WHERE discordid = ? AND team = ? AND guild = ?', [player1.id, player1Authorized.team, guild])
                 const player2Confirm = await db.get('SELECT * FROM Players WHERE discordid = ? AND team = ? AND guild = ?', [player2.id, player2Info.team, guild])
+
+                //ìf (!(player1Cònfirm.team === player1Authorized.team))
             }
         } catch(err) {
             await interaction.client.users.send("168490999235084288", `Error for user ${interaction.user.tag}\n\n ${err}`)

@@ -50,44 +50,24 @@ module.exports = {
             return interaction.editReply({ content:'The specified team is not a valid team! Ensure the team exists before assigning a player to be an FO.', ephemeral:true })
         }
 
-        // then, check to see if the role is taken or not
-        const roleTaken = await db.get('SELECT * FROM Players WHERE role = "FO" AND team = ? AND guild = ?', [teamExists.code, guild]);
-
-        if (roleTaken) {
-            await db.close();
-            return interaction.editReply({ content:'This role has already been filled!', ephemeral:true });
+        // check if fo role exists
+        const foRole = await db.get('SELECT roleid FROM Roles WHERE code = "FO" AND guild = ?', guild);
+        if (!foRole) {
+            await db.close()
+            return interaction.editReply({ content:'The franchise owner role does not exist in the database! You may need to run /setup.', ephemeral:true })
         }
 
-        // delete from the database as a safeguard
-        await db.run('DELETE FROM Players WHERE discordid = ? AND guild = ?', [chosenUserId, guild])
-
-        // then, change the role if the user is on a team and the user calling this command
-        // is authorized
-        await db.run('INSERT INTO Players (team, guild, discordid, role, contractlength) VALUES (?, ?, ?, ?, ?)', [teamExists.code, guild, chosenUserId, "FO", 999]);
+        // then, check if team pinged has a fo
+        const teamMembers = teamChoice.members
+        for (const member of teamMembers.values()) {
+            if (member.roles.cache.get(foRole.roleid)) {
+                await db.close();
+                return interaction.editReply({ content:'This role has already been filled!', ephemeral:true });
+            }
+        }
 
         // then, add the team role to the player
-        userChoice.roles.add(teamChoice)
-
-        // then, check to see if the franchise owner role exists
-        const gmRole = await db.get('SELECT roleid FROM Roles WHERE code = "FO" AND guild = ?', guild);
-        if (!gmRole) {
-            // this means the role doesn't exist. create the role and log it
-            const newRole = await interaction.guild.roles.create({
-                name: "Franchise Owner"
-            });
-
-            await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", newRole.id, guild]);
-
-            await userChoice.roles.add(newRole);
-        } else {
-            // const role = await interaction.guild.roles.fetch(gmRole.roleid);
-            console.log(gmRole.roleid)
-
-            await userChoice.roles.add(gmRole.roleid); // there is an error here, need to figure out what is going on
-        }
-
-        // update the playercount if necessary
-        await db.run('UPDATE Teams SET playercount = (SELECT COUNT(*) FROM Players WHERE team = ? AND guild = ?) WHERE code = ? AND guild = ?', [teamExists.code, guild, teamExists.code, guild])
+        userChoice.roles.add(foRole.roleid)
 
         // then, send a message back to the user
         await interaction.editReply({ content:'Successfully promoted the specified user to franchise owner!', ephemeral:true });
