@@ -58,7 +58,7 @@ module.exports = {
 
         const demoterRoles = interaction.member.roles.cache
         const foRoleid = await db.get('SELECT roleid FROM Roles WHERE code = "FO" AND guild = ?', guild)
-        if (!(demoterRoles.containsKey(foRoleid.roleid))) {
+        if (!(demoterRoles.get(foRoleid.roleid))) {
             await db.close()
             return interaction.editReply({ content:"You are not authorized to demote individuals, as you are not a franchise owner!", ephemeral:true })
         }
@@ -79,7 +79,7 @@ module.exports = {
                 if (!(roleExists.code === "FO" || roleExists.code === "GM" || roleExists.code === "HC")) {
                     // and it's a valid team role! we can now compare against the cache of the
                     // person that was pinged
-                    if (!(roles.containsKey(role.id))) {
+                    if (!(roles.get(role.id))) {
                         await db.close()
                         return interaction.editReply({ content:"This person is not on your team!", ephemeral:true })
                     }
