@@ -31,14 +31,6 @@ client.once(Events.ClientReady, async () => {
 			await guildFetched.members.fetch()
 		})
 
-		// first, fix the playercounts as a sanity check
-		const teamCodes = await db.all('SELECT code FROM Teams');
-
-		for (let i = 0; i < teamCodes.length; i++) {
-				const team = teamCodes[i].code;
-				await db.run('UPDATE Teams SET playercount = (SELECT COUNT(*) FROM Players WHERE team = ?) WHERE code = ?', [team, team])
-		}
-
 		await db.close()
 	} catch(err) {
 		console.log(err)
@@ -65,7 +57,7 @@ client.on(Events.InteractionCreate, async interaction => {
 		// as a sanity check, ensure the user exists in the database
 		const userExists = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [user.id, guild])
 		if (!userExists) {
-			await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ?, "P", "-1")', [user.id, guild]);
+			await db.run('INSERT INTO Players (discordid, guild) VALUES (?, ?)', [user.id, guild]);
 		}
 
 		// get all roles, and also get the highest role of a guild
@@ -73,59 +65,6 @@ client.on(Events.InteractionCreate, async interaction => {
 		const highestRole = interaction.guild.roles.highest
 		if (userRoles.get(highestRole.id)) {
 			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [user.id, guild])
-		}
-
-		let specialRoleInfo = null
-		let teamRoleInfo = null
-
-		const userInfo = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [user.id, guild])
-
-		// also, check if they were manually given roles (sigh)
-		for (const roleid of userRoles.keys()) {
-			const roleInfo = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [roleid, guild])
-			if (roleInfo) {
-				// first, set flags to indicate stuff
-				if (roleInfo.code === "FO" || roleInfo.code === "GM" || roleInfo.code === "HC") {
-					specialRoleInfo = roleInfo
-				} else {
-					teamRoleInfo = roleInfo
-				}
-			}
-		}
-
-		// at this stage, check if teamRoleInfo is null, then check for specialRoleInfo afterwards.
-		if (teamRoleInfo) {
-			const contractLen = Math.floor(Math.random() * (3 - 1 + 1) + 1)
-			if (userInfo.team === "FA" || userInfo.team !== teamRoleInfo.code) {
-				// if a user's team in the db does not match their role, give them a random contract
-				await db.run('UPDATE Players SET team = ?, contractlength = ? WHERE discordid = ? AND guild = ?', [teamRoleInfo.code, contractLen, user.id, guild])
-			}
-			if (specialRoleInfo && userInfo.role !== specialRoleInfo.role) {
-				if (specialRoleInfo.code === "FO") {
-					console.log(specialRoleInfo)
-					await db.run('UPDATE Players SET role = "FO", contractlength = 999 WHERE discordid = ? AND guild = ?', [user.id, guild])
-				} else {
-					if (userInfo.role === "FO") {
-						await db.run('UPDATE Players SET role = ?, contractlength = ? WHERE discordid = ? AND guild = ?', [specialRoleInfo.code, contractLen, user.id, guild])
-					}
-					await db.run('UPDATE Players SET role = ? WHERE discordid = ? AND guild = ?', [specialRoleInfo.code, user.id, guild])
-				}
-			} else if (!specialRoleInfo && userInfo.role !== "P") {
-				// if special role info does not exist, get the current contract length
-				if (userInfo.role === "FO") {
-					await db.run('UPDATE Players SET role = "P", contractlength = ? WHERE discordid = ? AND guild = ?', [contractLen, user.id, guild])
-				} else {
-					await db.run('UPDATE Players SET role = "P" WHERE discordid = ? AND guild = ?', [user.id, guild])
-				}
-			}
-		} else {
-			// they had no team role, therefore they are a free agent
-			await db.run('UPDATE Players SET role = "FA", contractlength = -1 WHERE discordid = ? AND guild = ?', [user.id, guild])
-		}
-
-		const teams = await db.all("SELECT code FROM Teams WHERE guild = ?", guild);
-		for (let i = 0; i < teams.length; i++) {
-				await db.run('UPDATE Teams SET playercount = (SELECT COUNT(*) FROM Players WHERE team = ? AND guild = ?) WHERE code = ? AND guild = ?', [teams[i].code, guild, teams[i].code, guild])
 		}
 
 		await db.close()
@@ -161,14 +100,14 @@ client.on(Events.GuildCreate, async guild => {
 		const guildExists = await db.get('SELECT * FROM Leagues WHERE guild = ?', guildid);
 
 		if (!guildExists) {
-			await db.run("INSERT INTO Leagues (guild, season, offers, filter, maxplayers) VALUES (?, 1, 1, 0, 18)", guildid)
+			await db.run("INSERT INTO Leagues (guild) VALUES (?)", guildid)
 			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", ["168490999235084288", guildid])
 			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [guild.ownerId, guildid])
 
 			members.forEach(async guildMember => {
 				if (!guildMember.user.bot) {
 					const id = guildMember.id;
-					await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ?, "P", "-1")', [id, guildid]);
+					await db.run('INSERT INTO Players (discordid, guild) VALUES (?, ?)', [id, guildid]);
 				}
 			})
 		}
@@ -218,7 +157,7 @@ client.on(Events.GuildMemberAdd, async member => {
 
 		// if they are not in the database, add them
 		if (!memberData) {
-			await db.run('INSERT INTO Players (team, discordid, guild, role, contractlength) VALUES ("FA", ?, ?, "P", "-1")', [member.id, member.guild.id]);
+			await db.run('INSERT INTO Players (discordid, guild) VALUES (?, ?)', [member.id, guild]);
 		}
 		await db.close();
 	} catch(err) {
@@ -233,40 +172,43 @@ client.on(Events.GuildMemberRemove, async member => {
 		const guildId = member.guild.id
 		const db = await getDBConnection();
 
-		const maxPlayers = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', member.guild.id)
+		const roles = member.roles.cache
 
-		// if a member leaves, check to see if they are a player. if they are, remove them as a player.
-		const playerData = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [memberId, guildId]);
-		if (!playerData) {
-			return;
-		}
-		// rewrite this part
-		if (playerData && playerData.team !== "FA") {
-			// first, decrement the number of players on the team the player used to be on
-			query = "UPDATE Teams SET playercount = playercount - 1 WHERE code = ? AND guild = ?"
-			await db.run(query, [playerData.team, guildId]);
-			await db.run("UPDATE Players SET team = 'FA', role = 'P', contractlength = -1 WHERE discordid = ? AND guild = ?", [memberId, guildId])
+		const embed = new EmbedBuilder()
 
-			// then, get relevant information to send a notification
-			const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [playerData.team, guildId])
-			const teamPlayers = await db.get('SELECT playercount FROM Teams WHERE code = ? AND guild = ?', [playerData.team, guildId])
-			const roleObj = await member.guild.roles.fetch(role.roleid)
-			const leaveChannel = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guildId);
-			// then, get the team logo
-			const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [playerData.team, guildId]);
-			const logoStr = logo.logo;
-			const transactionEmbed = new EmbedBuilder()
-									.setTitle("Player left!")
-									.setThumbnail(logoStr)
-									.addFields(
-											{name:"Player", value:`${member.user.tag}`},
-											{name:"Team", value:`${roleObj}`}
-									)
-									.setFooter({ text:`Roster size: ${teamPlayers.playercount} / ${maxPlayers.maxplayers}`})
-			const channel = await member.guild.channels.fetch(leaveChannel.channelid);
-			await channel.send(
-				{ embeds: [transactionEmbed]}
-			)
+		// loop thru every role of the member who left
+		for (const role of roles.keys()) {
+			// then, check to see if the role exists in the db; this usually means we have a team
+			const roleInDb = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guildId])
+			if (roleInDb) {
+				// verify that the role we found is actually a team role
+				const isTeam = await db.get('SELECT * FROM Teams WHERE code = ? AND guild = ?', [roleInDb.code, guildId])
+				const maxPlayers = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guildId)
+				if (isTeam) {
+					// this means a player left, uh oh!
+					// need to find out if the franchise owner was the person who left
+					const roleMembers = role.members
+					const foRole = await db.get('SELECT * FROM Roles WHERE code = "FO" AND guild = ?', [guildId])
+					embed
+						.setTitle("Player left!")
+						.setColor(role.color)
+						.setDescription(`${member.user.tag} has left the ${role}!\n>>> Roster: ${roleMembers.size()} / ${maxPlayers.maxplayers}`)
+					const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guildId);
+					if (channel) {
+						const channel = await member.guild.channels.fetch(channelId.channelid);
+						await channel.send({ embeds:[embed] })
+					}
+					// then, check for FO existence
+					for (const roleMember of roleMembers) {
+						const roleMemberRoles = roleMember.roles.cache
+						if (roleMemberRoles.has(foRole)) {
+							await guildMember.send( {embeds:[embed]})
+							break
+						}
+					}
+					break
+				}
+			}
 		}
 		await db.close();
 	} catch(err) {
