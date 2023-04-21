@@ -192,7 +192,7 @@ client.on(Events.GuildMemberRemove, async member => {
 					embed
 						.setTitle("Player left!")
 						.setColor(role.color)
-						.setDescription(`${member.user.tag} has left the ${role}!\n>>> Roster: ${roleMembers.size()} / ${maxPlayers.maxplayers}`)
+						.setDescription(`${member.user.tag} has left the ${role}!\n>>> Roster: ${roleMembers.size} / ${maxPlayers.maxplayers}`)
 					const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guildId);
 					if (channel) {
 						const channel = await member.guild.channels.fetch(channelId.channelid);
@@ -202,7 +202,7 @@ client.on(Events.GuildMemberRemove, async member => {
 					for (const roleMember of roleMembers.values()) {
 						const roleMemberRoles = roleMember.roles.cache
 						if (roleMemberRoles.has(foRole)) {
-							await guildMember.send( {embeds:[embed]})
+							await roleMember.send( {embeds:[embed]})
 							break
 						}
 					}

@@ -77,7 +77,7 @@ module.exports = {
                     .setThumbnail(team.logo)
                     .setColor(teamRole.color)
                     .setDescription(`${interaction.member} (${interaction.user.tag}) has demanded from the ${teamRole}! ${specialRole ? `This person was the ${specialRole}.` : ""}
-                    \n>>> Roster: ${teamRole.members.size()} / ${maxPlayerQry.maxplayers}`)
+                    \n>>> Roster: ${teamRole.members.size} / ${maxPlayerQry.maxplayers}`)
                     .setFields(
                         {name:"Player", value:`${interaction.user}\n${interaction.user.tag}`},
                         {name:"Team", value:`${teamRole}`},
@@ -105,7 +105,7 @@ module.exports = {
 
         demandEmbed.setDescription(
             `${interaction.user.tag} has demanded from the ${teamRole.name}! ${specialRole ? `This person was the ${specialRole.name}.` : ""}
-                    \n>>> Roster: ${teamRole.members.size()} / ${maxPlayerQry.maxplayers}\nGuild: ${interaction.guild.name}`
+                    \n>>> Roster: ${teamRole.members.size} / ${maxPlayerQry.maxplayers}\nGuild: ${interaction.guild.name}`
         )
 
         // then, dm the franchise owner notifying them
