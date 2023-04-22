@@ -34,8 +34,9 @@ module.exports = {
         }
 
         // then, check if a valid user ran the command
-        const validUser = await db.get('SELECT * FROM Players WHERE role = "FO" OR role = "GM" AND discordid = ? AND guild = ?', [interaction.user.id, guild])
-        if (!validUser) {
+        const foRole = await db.get('SELECT * FROM Roles WHERE code = "FO" AND guild = ?', [guild])
+        const gmRole = await db.get('SELECT * FROM Roles WHERE code = "GM" AND guild = ?', [guild])
+        if (!(interaction.member.roles.cache.get(foRole.roleid) || interaction.member.roles.cache.get(gmRole.roleid))) {
             return interaction.editReply({ content:"You are not permitted to run this command!", ephemeral:true })
         }
 
@@ -47,13 +48,15 @@ module.exports = {
 
         // then, construct the embed
         const embed = new EmbedBuilder()
-                        .setTitle("Gametime!")
-                        .setDescription(`${team1} vs ${team2} @ ${time}`)
+                        .setTitle("Gametime scheduled!")
+                        .setColor(team1.color)
+                        .setDescription(`The ${team1} are going against the ${team2}!
+                        \n>>> **Time:** ${time}\n**Referee:** None\n**Coach:** ${interaction.member} (${interaction.user.tag})`)
                         .setThumbnail(interaction.guild.iconURL())
                         .setFields({
                             name:"Referee", value:"None!"
                         })
-                        .setFooter({text:`Gametime posted by ${interaction.user.tag}`})
+                        .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
 
         const buttons = new ActionRowBuilder()
 
@@ -71,7 +74,12 @@ module.exports = {
 
 
         const channel = await interaction.guild.channels.fetch(gametimeChannel.channelid)
-        const filter = i => admins.includes(i.user.id) || managers.includes(i.user.id) || i.user.id === interaction.user.id
+        const filter = async i => {
+            const db = await getDBConnection()
+            const admin = await db.get('SELECT * from Admins WHERE discordid = ? AND guild = ?', [i.user.id, guild])
+            const manager = await db.get('SELECT * from Managers WHERE discordid = ? AND guild = ?', [i.user.id, guild])
+            return admin !== undefined || manager !== undefined || i.user.id === interaction.user.id
+        }
         const message = await channel.send({ embeds:[embed], components:[buttons]})
         const collector = message.createMessageComponentCollector({ filter, componentType: ComponentType.Button, time: 7e8 });
 
@@ -85,9 +93,8 @@ module.exports = {
             const managerAuthorized = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
             await db.close()
             if (i.customId === "ref" && (adminAuthorized || managerAuthorized)) {
-                embed.setFields({
-                    name:"Referee", value:`${i.user}`
-                })
+                embed.setDescription(`The ${team1} are going against the ${team2}!
+                \n>>> **Time:** ${time}\n**Referee:** ${i.member} (${i.user.tag})\n**Coach:** ${interaction.member} (${interaction.user.tag})`)
                 refButton.setDisabled(true);
                 await i.update({ embeds:[embed], components:[buttons]})
             } else if (i.customId === "cancel") {
