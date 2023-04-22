@@ -99,21 +99,13 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setTitle("Incoming game results!")
-            .setDescription(`Results posted by ${interaction.user}`);
+            .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
 
         if (teamWon) {
             const imageLink = await db.get("SELECT t.logo FROM Teams t, Roles r WHERE r.roleid = ? AND r.code = t.code AND t.guild = ?", [teamWon.id, guild])
             embed.setThumbnail(imageLink.logo)
-        }
-            
-            
-
-        // two cases: teams tie, or one team loses (and implicitly one team wins)
-        if (teamWon) {
-            // the case where a team lost
-            embed.addFields({name:"Winner", value:`${teamWon}`})
         } else {
-            embed.addFields({name:"Winner", value:"Tie!"})
+            embed.setThumbnail(interaction.guild.iconURL())
         }
 
         // first team is always winner, second team is always loser
@@ -121,7 +113,6 @@ module.exports = {
         const firstTeamScore = team1ScoreInt > team2ScoreInt ? team1ScoreInt : team2ScoreInt
         const secondteamRole = team1Role === firstTeamRole ? team2Role : team1Role
         const secondTeamScore = team1ScoreInt === firstTeamScore ? team2ScoreInt : team1ScoreInt
-        embed.addFields({name:"Final Score", value:`${firstTeamRole} ${firstTeamScore} - ${secondTeamScore} ${secondteamRole}`})
 
         // then, increment the point differential. two cases: one where there is no tie, and one where there is a tie
         if (teamWon) {
@@ -129,6 +120,15 @@ module.exports = {
             await db.run('UPDATE Teams SET losses = losses + 1, alllosses = alllosses + 1, ptdifferential = ptdifferential - ? WHERE name = ? AND guild = ?', [firstTeamScore - secondTeamScore, secondteamRole.name, guild])
         } else {
             await db.run('UPDATE Teams SET ties = ties + 1, allties = allties + 1 WHERE (name = ? OR name = ?) AND guild = ?', [firstTeamRole.name, secondteamRole.name, guild])
+        }
+
+        const firstTeamStandings = await db.get('SELECT wins, losses, ties, ptdifferential FROM Teams WHERE name = ? AND guild = ?', [firstTeamRole.name, guild])
+        const secondTeamStandings = await db.get('SELECT wins, losses, ties, ptdifferential FROM Teams WHERE name = ? AND guild = ?', [secondteamRole.name, guild])
+
+        if (teamWon) {
+            embed.setDescription(`The ${firstTeamRole} have won against the ${secondteamRole}!\n>>> **Score:** ${firstTeamRole} ${firstTeamScore}-${secondTeamScore} ${secondteamRole}\n**${firstTeamRole.name} Record:** ${firstTeamStandings.wins}-${firstTeamStandings.losses}-${firstTeamStandings.ties}, ${firstTeamStandings.ptdifferential} point differential\n**${secondteamRole.name} Record:** ${secondTeamStandings.wins}-${secondTeamStandings.losses}-${secondTeamStandings.ties}, ${secondTeamStandings.ptdifferential} point differential\n**Staff:** ${interaction.member} (${interaction.user.tag})`)
+        } else {
+            embed.setDescription(`The ${firstTeamRole} have tied against the ${secondteamRole}!\n>>> **Score:** ${firstTeamRole} ${firstTeamScore}-${secondTeamScore} ${secondteamRole}\n**${firstTeamRole.name} Record:** ${firstTeamStandings.wins}-${firstTeamStandings.losses}-${firstTeamStandings.ties}, ${firstTeamStandings.ptdifferential} point differential\n**${secondteamRole.name} Record:** ${secondTeamStandings.wins}-${secondTeamStandings.losses}-${secondTeamStandings.ties}, ${secondTeamStandings.ptdifferential} point differential\n**Staff:** ${interaction.member} (${interaction.user.tag})`)
         }
 
         // then, get the transaction channel ID and send a transaction message

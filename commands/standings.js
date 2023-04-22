@@ -74,7 +74,6 @@ module.exports = {
             if (standingsString === "") standingsString = "There are no teams in this league!"
             
             embed.setFields({name:"Standings", value:standingsString})
-            embed.setFooter({ text:`Page ${page} / ${Math.floor((teamStandings.length / 8))}` })
             await i.update({ embeds:[embed], components: [buttons], ephemeral:true })
             await db.close()
         });
