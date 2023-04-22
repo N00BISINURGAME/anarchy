@@ -78,6 +78,8 @@ module.exports = {
                 return interaction.editReply({ content:"This user already has an outgoing offer. Please try again later.", ephemeral:true })
             }
 
+            console.log(info)
+
             // then, get the team logo
             const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [info, guild]);
             const logoStr = logo.logo;
