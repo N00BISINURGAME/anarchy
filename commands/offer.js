@@ -24,8 +24,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('offer')
         .setDescription('Offer to sign a player to a team.')
-        .addUserOption(userOption)
-        .addIntegerOption(contractLengthOption),
+        .addUserOption(userOption),
     async execute(interaction) {
         let pingedUser = interaction.options.getMember('player')
         let userid = pingedUser.id;
@@ -46,23 +45,27 @@ module.exports = {
             // gets all information that the user sent
             let userPing = interaction.options.getMember('player');
             let user = await interaction.guild.members.fetch(userPing.id)
-            const contractLen = interaction.options.getInteger('contract-length');
             let userid = user.id;
 
             if (user.id === interaction.user.id) {
-                return interaction.editReply({ content:"You are not allowed to release yourself!", ephemeral:true })
-            }
-
-            // first, check to see if the user is in the database
-            const inDB = await db.get("SELECT * FROM Players WHERE discordid = ? AND guild = ?", [userid, guild]);
-            if (!inDB) {
-                await db.run("INSERT INTO Players (team, discordid, role, contractlength, rings, guild) VALUES ('FA', ?, 'P', -1, 0, ?)", [userid, guild]);
+                return interaction.editReply({ content:"You are not allowed to offer yourself!", ephemeral:true })
             }
 
             // first, check and see if the user that sent the command is authorized to sign a player (as in, they are a FO or GM)
             const userSent = interaction.user.id;
-            const info = await db.get('SELECT p.team FROM Players p WHERE p.discordid = ? AND (p.role = "FO" OR p.role = "GM") AND guild = ?', [userSent, guild]);
-            if (!info) {
+            const allTeams = await db.all('SELECT roleid, code FROM Teams WHERE guild = ?', guild)
+            let authorized = false
+            let info
+            for (const team of allTeams) {
+                if (interaction.member.roles.cache.get(team.roleid)) {
+                    if (team.code === "FO" || team.code === "GM") {
+                        authorized = true
+                    } else if (team.code !== "HC") {
+                        info = team.code
+                    }
+                }
+            }
+            if (!authorized) {
                 await db.close();
                 return interaction.editReply({ content:'You are not authorized to sign a player!', ephemeral:true});
             }
