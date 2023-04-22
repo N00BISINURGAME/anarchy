@@ -36,7 +36,6 @@ module.exports = {
             for (const member of team.members.keys()) {
                 await db.run('UPDATE Players SET rings = rings + 1 WHERE discordid = ? AND guild = ?', [member, guild]);
             }
-            const userInfo = await db.run('UPDATE Players SET rings = rings + 1 WHERE team = ? AND guild = ?', [teamExists.code, guild]);
             await db.run("UPDATE Teams SET rings = rings + 1 WHERE code = ? AND guild = ?", [teamExists.code, guild]);
 
             await interaction.editReply(`The ${team} have been awarded with a ring!`);
