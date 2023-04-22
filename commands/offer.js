@@ -113,16 +113,14 @@ module.exports = {
 
             // then, get channel information and send an ephemeral reply to the command saying a user has been offered
             // also create the dm message, format it properly, and send it to the user and listen for a button click
-            const userObj = interaction.client.users.cache.get(user.id)
-            dmChannel = await userObj.createDM()
+            dmChannel = await userPing.createDM()
 
             dmMessage = new EmbedBuilder()
                 .setTitle("Incoming Offer!")
+                .setColor(teamRole)
                 .setThumbnail(logoStr)
-                .setDescription("To accept or decline, press the green or red button on this message. You have 15 minutes to accept.")
-                .addFields(
-                    {name:"Contract Details", value:`The ${roleObj.name} in ${interaction.guild.name} have offered you a ${contractLen} season contract.`}
-                )
+                .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+                .setDescription(`The ${teamRole.name} have sent you an offer! To accept or decline, press the green or red button on this message. You have 15 minutes to accept.`)
 
             const buttons = new ActionRowBuilder()
                     .addComponents(
