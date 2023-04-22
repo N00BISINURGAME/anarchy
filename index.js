@@ -47,8 +47,8 @@ client.on(Events.InteractionCreate, async interaction => {
 	if (!command) return;
 
 	try {
-		const db = await getDBConnection()
 		await interaction.deferReply({ ephemeral:true })
+		const db = await getDBConnection()
 		await client.users.fetch(interaction.user.id) // fetch the user and cache them for future use
 		const user = interaction.member
 		// temp fix for fixing team stuff
