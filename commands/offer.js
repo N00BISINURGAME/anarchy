@@ -22,7 +22,6 @@ module.exports = {
         let pingedUser = interaction.options.getMember('player')
         let userid = pingedUser.id;
         const guild = interaction.guild.id
-        let contractLen = 0
         try {
             const db = await getDBConnection();
             const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
@@ -88,6 +87,7 @@ module.exports = {
                     if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
                         userSigned = true
                         teamSigned = team.code
+                        break
                     }
                     
                 }
@@ -136,8 +136,8 @@ module.exports = {
 
             if (dmInteraction.customId === "accept") {
                 // check again to see if player count would be exceeded
-                playersOnTeam = await db.get('SELECT COUNT(*) AS playerCount FROM Players WHERE team = ? AND guild = ?', [info.team, guild]);
-                if (playersOnTeam.playerCount + 1 > maxPlayers) {
+                const newMaxPlayers = await interaction.guild.roles.fetch(memberTeamRole.roleid)
+                if (newMaxPlayers.members.size + 1 > maxPlayers) {
                     const failEmbed = new EmbedBuilder()
                         .setTitle("Signing failed")
                         .setDescription(`${info.team} has signed too many players, and can no longer sign you without going over the maximum player cap.`)
@@ -145,7 +145,16 @@ module.exports = {
                 }
 
                 // check if the player signed to another team
-                const playerResigned = await db.get('SELECT team FROM Players WHERE discordid = ? AND NOT team = "FA" AND guild = ?', [user.id, guild]);
+                let playerResigned = false
+                for (const role of userPing.roles.cache.keys()) {
+                    const roleExists = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
+                    if (roleExists) {
+                        if (!(roleExists.code === "FO" || roleExists.code === "GM" || roleExists.code === "HC")) {
+                            playerResigned = true
+                            break
+                        }
+                    }
+                }
                 if (playerResigned) {
                     const failEmbed = new EmbedBuilder()
                         .setTitle("Signing failed")
@@ -153,30 +162,20 @@ module.exports = {
                     return dmInteraction.update({ embeds: failEmbed, components: [] })
                 }
 
-                // then, sign the user and give them the role they need
-                await db.run('UPDATE Players SET team = ?, contractlength = ? WHERE discordid = ? AND guild = ?', [info.team, contractLen, userid, guild]);
-
-                // then, increment the team's player count by 1
-                await db.run('UPDATE Teams SET playercount = playercount + 1 WHERE code = ? AND guild = ?', [info.team, guild])
-                const guildUser = await interaction.guild.members.fetch(user)
-                await guildUser.roles.add(roleObj);
+                await userPing.roles.add(roleObj);
 
                 // then, get the transaction channel ID and send a transaction message
                 const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
 
                 const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
-                let contractLenStr = contractLen === 1 ? "1 season" : `${contractLen} seasons`
-
                 const transactionEmbed = new EmbedBuilder()
                     .setTitle("Player signed!")
+                    .setColor(roleObj.color)
                     .setThumbnail(logoStr)
-                    .addFields(
-                        {name:"Player", value:`${user}\n${user.user.tag}`},
-                        {name:"Team", value:`${roleObj}`},
-                        {name:"Length", value: contractLen === 1 ? "1 season" : `${contractLen} seasons`}
-                    )
-                    .setFooter({ text:`Roster size: ${playersOnTeam.playerCount + 1} / ${maxPlayers} • This player was signed by ${interaction.user.tag}`})
+                    .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+                    .setDescription(`The ${roleObj} have successfully signed ${userPing} (${userPing.user.tag})!
+                    \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})}\n**Roster:** ${roleObj.members}/${maxPlayers}`)
 
                 dmMessage.setTitle("Successfully signed!")
 
