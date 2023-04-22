@@ -68,6 +68,7 @@ module.exports = {
 
         // then, add the team role to the player
         userChoice.roles.add(foRole.roleid)
+        userChoice.roles.add(teamChoice.id)
 
         // then, send a message back to the user
         await interaction.editReply({ content:'Successfully promoted the specified user to franchise owner!', ephemeral:true });
