@@ -42,6 +42,7 @@ module.exports = {
                         else if (roleExists.code === "GM") gm = `${member}\n${member.user.tag}`;
                         else if (roleExists.code === "HC") hc = `${member}\n${member.user.tag}`;
                         else players += `${member}\n${member.user.tag}\n`;
+                        break
                     }
                 }
                 
