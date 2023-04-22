@@ -33,33 +33,25 @@ module.exports = {
                 return interaction.editReply({ content:"This team does not exist! Ensure you're pinging a team that exists.", ephemeral:true });
             }
 
+            const frontOfficeRoles = await db.all('SELECT * FROM Roles WHERE (code = "FO" OR code = "GM" OR code = "HC") AND guild = ?', guild)
+
             // then, remove roles from players
-            const users = await db.all("SELECT p.discordid, r.roleid FROM Players p, Roles r WHERE r.roleid = ? AND p.team = r.code AND NOT p.role = 'FO' AND r.guild = ?", [team.id, guild]);
-            const guildMembers = interaction.guild.members;
             let userStr = ""
             // this needs to be updated to remove gm/hc roles too
-            for (let i = 0; i < users.length; i++) {
-                let user = await interaction.client.users.cache.get(users[i].discordid);
-                try {
-                    let userObj = await guildMembers.fetch(user)
-                    userStr += `${user}\n${user.tag}\n`
-                    await userObj.roles.remove(users[i].roleid);
-                } catch(err) {
-                    continue
+            for (const member of team.members.values()) {
+                userStr += `${member} (${member.user.tag})\n`
+                await member.roles.remove(team)
+                for (const role of frontOfficeRoles) {
+                    if (member.roles.cache.get(role.roleid)) {
+                        await member.roles.remove(role.roleid)
+                    }
                 }
             }
 
             if (userStr === "") userStr = "None"
 
-            // then, remove all players from the team
-            await db.run('UPDATE Players SET team = "FA", role = "P" WHERE team = ? AND NOT role = "FO" AND guild = ?', [teamExists.code, guild]);
-
-            // then, set player count to 1
-            await db.run('UPDATE Teams SET playercount = (SELECT COUNT(*) FROM Players WHERE team = ? AND guild = ?) WHERE code = ? AND guild = ?', [teamExists.code,guild,teamExists.code,guild])
-
             // then, get the team logo and player count
-            const logo = await db.get('SELECT logo, playercount FROM Teams WHERE code = ? AND guild = ?', [teamExists.code, guild]);
-            const playerCount = logo.playercount
+            const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [teamExists.code, guild]);
             const logoStr = logo.logo;
 
             // then, get the transaction channel ID and send a transaction message
@@ -72,8 +64,10 @@ module.exports = {
             const transactionEmbed = new EmbedBuilder()
                 .setTitle("Team mass release!")
                 .setThumbnail(logoStr)
-                .setDescription(`**Team**\n${team}\n\n**Players**\n${userStr}`)
-                .setFooter({ text:`Roster size: ${playerCount} / ${maxPlayerCount.maxplayers} • This team was released by ${interaction.user.tag}`})
+                setColor(roleObj.color)
+                .setDescription(`All members of the ${team} have been released!
+                \n**Affected users:** ${userStr}>>> **Staff:** ${interaction.member} (${interaction.user.tag})`)
+                .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
 
             await transactionChannel.send({ embeds: [transactionEmbed] });
 
