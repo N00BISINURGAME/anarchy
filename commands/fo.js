@@ -66,6 +66,14 @@ module.exports = {
             }
         }
 
+        // clear any roles that the user may have from another team
+        for (const role of userChoice.roles.cache.keys()) {
+            const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [role, guild]);
+            if (roleExists) {
+                await userChoice.roles.remove(role);
+            }
+        }
+
         // then, add the team role to the player
         userChoice.roles.add(foRole.roleid)
         userChoice.roles.add(teamChoice.id)
