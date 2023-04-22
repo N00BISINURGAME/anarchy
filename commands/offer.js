@@ -114,7 +114,8 @@ module.exports = {
                 .setColor(teamRole.color)
                 .setThumbnail(logoStr)
                 .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
-                .setDescription(`The ${teamRole.name} have sent you an offer! To accept or decline, press the green or red button on this message. You have 15 minutes to accept.`)
+                .setDescription(`The ${teamRole.name} have sent you an offer! To accept or decline, press the green or red button on this message. You have 15 minutes to accept.
+                \n>>> **Coach:** ${interaction.user.tag}`)
 
             const buttons = new ActionRowBuilder()
                     .addComponents(
