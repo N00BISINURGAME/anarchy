@@ -35,6 +35,7 @@ module.exports = {
         // check if a transaction channel has been set
         const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
         if (!transactionExists) {
+            await db.close()
             return interaction.editReply({ content: "A transaction channel has not been set!", ephemeral: true})
         }
 
@@ -43,73 +44,77 @@ module.exports = {
 
         // if the choice is to assign a general manager or head coach, check if they are authorized.
         // this means the person must be a franchise owner.
-        const userInfo = await db.get('SELECT team FROM Players WHERE discordid = ? AND role = "FO" AND guild = ?', [userId, guild]);
-        if (!userInfo) {
+        const foRole = await db.get('SELECT * FROM Roles WHERE code = "FO" AND guild = ?', [guild])
+        if (!foRole) {
+            await db.close()
+            return interaction.editReply({ content: "A franchise owner role has not been detected! You may need to run /setup", ephemeral: true})
+        }
+
+        
+        if (!(interaction.member.roles.cache.get(foRole.roleid))) {
             await db.close();
             return interaction.editReply({ content:`You are not authorized to assign a ${roleChoice}! To do so you must be a franchise owner.`, ephemeral:true });
         }
 
         // then, check to see if the user pinged is on the same team as the user who ran the command
         const chosenUserId = userChoice.id;
-        const userOnTeam = await db.get('SELECT * FROM Players WHERE discordid = ? AND team = ? AND guild = ?', [chosenUserId, userInfo.team, guild]);
-        if (!userOnTeam) {
-            await db.close();
-            return interaction.editReply({ content:'This user is not signed to your team!', ephemeral:true });
+        let teamRole;
+        for (const role of interaction.member.roles.cache.values()) {
+            const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guild])
+            // we have a valid role in the database!
+            if (roleExists) {
+                if (!(roleExists.code === "FO" || roleExists.code === "GM" || roleExists.code === "HC")) {
+                    // and it's a valid team role! we can now compare against the cache of the
+                    // person that was pinged
+                    if (!(userChoice.roles.cache.get(role.id))) {
+                        await db.close()
+                        return interaction.editReply({ content:"This person is not on your team!", ephemeral:true })
+                    }
+                    teamRole = role
+                    break;
+                }
+            }
         }
 
         // then, check to see if the role is taken or not
-        const roleTaken = await db.get('SELECT * FROM Players WHERE role = ? AND team = ? AND guild = ?', [roleChoice, userInfo.team, guild]);
-
-        if (roleTaken) {
+        const promoteRoleCode = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [roleChoice, guild])
+        if (!promoteRoleCode) {
             await db.close();
-            return interaction.editReply({ content:'This role has already been filled!', ephemeral:true });
+            return interaction.editReply({ content:`The ${roleChoice} role has not been detected! You may need to run /setup`, ephemeral:true });
+        }
+        for (const member of teamRole.members.values()) {
+            if (member.roles.cache.get(promoteRoleCode.roleid)) {
+                await db.close();
+                return interaction.editReply({ content:'This role has already been filled!', ephemeral:true });
+            }
         }
 
         // then, check to see if they already have a role on the team
-        const hasRole = await db.get('SELECT role FROM Players WHERE discordid = ? AND guild = ?', [chosenUserId, guild]);
-        if (hasRole.role === "GM" || hasRole.role === "HC") {
-            await db.close();
-            return interaction.editReply({ content:'This user already has a front office role!', ephemeral:true });
+        const frontOfficeRoles = await db.all('SELECT roleid FROM Roles WHERE (code = "FO" OR code = "GM" OR code = "HC") AND guild = ?', guild)
+        for (const role of frontOfficeRoles) {
+            if (userChoice.roles.cache.get(role.roleid)) {
+                await db.close();
+                return interaction.editReply({ content:'This user already has a front office role!', ephemeral:true });
+            }
         }
 
-        // then, change the role of the user
-        await db.run('UPDATE Players SET Role = ? WHERE discordid = ? AND guild = ?', [roleChoice, chosenUserId, guild]);
-
-        // then, check if GM or HC role is created. if not, create it
-        const gmRole = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [roleChoice, guild]);
-        if (!gmRole) {
-            // this means the role doesn't exist. create the role and log it
-            const newRole = await interaction.guild.roles.create({
-                name: roleChoice === "GM" ? "General Manager" : "Head Coach"
-            });
-
-            await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [roleChoice, newRole.id, guild]);
-
-            await userChoice.roles.add(newRole);
-        } else {
-            const role = await interaction.guild.roles.fetch(gmRole.roleid);
-
-            await userChoice.roles.add(role);
-        }
+        // then, give the role to the player
+        await userChoice.roles.add(promoteRoleCode.roleid)
 
         // then, get the team logo
-        const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [userInfo.team, guild]);
+        const logo = await db.get('SELECT t.logo FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND r.guild = ?', [teamRole.id, guild]);
         const logoStr = logo.logo;
 
-        // get team role
-        const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [userInfo.team, guild]);
-        const roleObj = await interaction.guild.roles.fetch(role.roleid)
+        const roleObj = await interaction.guild.roles.fetch(promoteRoleCode.roleid)
 
         // then, create the embed
         const transactionEmbed = new EmbedBuilder()
             .setTitle('Player promoted!')
             .setThumbnail(logoStr)
-            .addFields(
-                { name:"Team", value:`${roleObj}` },
-                { name:"Franchise Owner", value:`${interaction.user}` },
-                { name:"Player Promoted", value:`${userChoice}`},
-                { name:"Role", value: roleChoice === "GM" ? "General Manager" : "Head Coach" }
-            )
+            .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+            .setColor(teamRole.color)
+            .setDescription(`The ${teamRole} have promoted ${userChoice} (${userChoice.user.tag}) to ${roleObj}!
+            \n>>> **Franchise Owner:** ${interaction.member} (${interaction.user.tag})`)
 
         // then, get the transaction channel ID and send a transaction message
         const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)

@@ -84,6 +84,7 @@ module.exports = {
         const transactionEmbed = new EmbedBuilder()
             .setTitle("Player released!")
             .setThumbnail(logoStr)
+            .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
             .addFields(
                 {name:"Player", value:`${user}\n${user.user.tag}`},
                 {name:"Team", value:`${roleObj}`}

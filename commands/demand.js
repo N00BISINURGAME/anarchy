@@ -16,7 +16,6 @@ module.exports = {
         const guild = interaction.guild.id
 
         const maxPlayerQry = await db.get('SELECT maxplayers, demands FROM Leagues WHERE guild = ?', guild)
-        const maxPlayers = maxPlayerQry.maxplayers
 
         // first, get special roles and get team role
         let teamRole;

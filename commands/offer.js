@@ -175,7 +175,7 @@ module.exports = {
                     .setThumbnail(logoStr)
                     .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
                     .setDescription(`The ${roleObj} have successfully signed ${userPing} (${userPing.user.tag})!
-                    \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})}\n**Roster:** ${roleObj.members.size}/${maxPlayers}`)
+                    \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})\n**Roster:** ${roleObj.members.size}/${maxPlayers}`)
 
                 dmMessage.setTitle("Successfully signed!")
 
