@@ -26,7 +26,7 @@ module.exports = {
             let foStr = "Vacant";
             for (const member of teamRole.members.values()) {
                 if (member.roles.cache.get(foRole.roleid)) {
-                    foStr = member
+                    foStr = `${member} (${member.user.tag})`
                     break
                 }
             }
