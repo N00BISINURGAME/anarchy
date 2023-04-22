@@ -62,7 +62,7 @@ module.exports = {
         for (const member of teamMembers.values()) {
             if (member.roles.cache.get(foRole.roleid)) {
                 await db.close();
-                return interaction.editReply({ content:'This role has already been filled!', ephemeral:true });
+                return interaction.editReply({ content:`This role has already been filled by ${member}!`, ephemeral:true });
             }
         }
 
@@ -77,6 +77,29 @@ module.exports = {
         // then, add the team role to the player
         userChoice.roles.add(foRole.roleid)
         userChoice.roles.add(teamChoice.id)
+
+        const teamMemberCount = teamChoice.members.size
+
+        // then, get the team logo
+        const logo = await db.get('SELECT logo FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND r.guild = ?', [teamChoice.id, guild]);
+        const logoStr = logo.logo;
+
+        const specialRoleObj = await interaction.guild.roles.fetch(foRole.roleid)
+
+        const maxPlayerQry = await db.get('SELECT maxplayers, demands FROM Leagues WHERE guild = ?', guild)
+
+        const transactionEmbed = new EmbedBuilder()
+            .setTitle('Franchise Owner promoted!')
+            .setThumbnail(logoStr)
+            .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+            .setDescription(`${userChoice} (${userChoice.user.tag}) has been promoted to ${specialRoleObj} of the ${teamChoice}!
+            \n>>> **Roster Size:** ${teamMemberCount}/${maxPlayerQry.maxplayers}`)
+            .setColor(teamRole.color)
+
+        const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
+        const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
+
+        await transactionChannel.send({ embeds: [transactionEmbed] })
 
         // then, send a message back to the user
         await interaction.editReply({ content:'Successfully promoted the specified user to franchise owner!', ephemeral:true });
