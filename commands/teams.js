@@ -13,7 +13,8 @@ module.exports = {
         const db = await getDBConnection();
         const guild = interaction.guild.id
         // first, get all teams
-        const teams = await db.all('SELECT playercount, code FROM Teams WHERE guild = ? ORDER BY playercount DESC', guild)
+        const teams = await db.all('SELECT code FROM Teams WHERE guild = ?', guild)
+        const foRole = await db.get('SELECT roleid FROM Roles WHERE code = "FO" AND guild = ?', guild)
 
         let page = 1;
         let lower = 0;
@@ -21,10 +22,16 @@ module.exports = {
         let teamStr = ""
         for (let i = lower; i < upper && i < teams.length; i++) {
             const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teams[i].code, guild]);
-            const fo = await db.get('SELECT discordid FROM Players WHERE role = "FO" AND team = ? AND guild = ?', [teams[i].code, guild])
-            const foStr = fo ? `<@${fo.discordid}>` : "Vacant"
+            const teamRole = await interaction.guild.roles.fetch(roleId.roleid)
+            let foStr = "Vacant";
+            for (const member of teamRole.members.values()) {
+                if (member.roles.cache.get(foRole.roleid)) {
+                    foStr = member
+                    break
+                }
+            }
             const role = await interaction.guild.roles.fetch(roleId.roleid);
-            teamStr += `${role} - ${teams[i].playercount} members\nFranchise Owner:${foStr}\n\n`
+            teamStr += `${role} - ${teamRole.members.size} members\nFranchise Owner:${foStr}\n\n`
         }
 
         if (teamStr === "") teamStr = "None";
@@ -66,9 +73,16 @@ module.exports = {
 
             for (let i = lower; i < upper && i < teams.length; i++) {
                 const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teams[i].code, guild]);
-                const fo = await db.get('SELECT discordid FROM Players WHERE role = "FO" AND team = ? AND guild = ?', [teams[i].code, guild])
-                const foStr = fo ? `<@${fo.discordid}>` : "Vacant"
-                teamStr += `<@&${roleId.roleid}> - ${teams[i].playercount} members\nFranchise Owner:${foStr}\n\n`
+                const teamRole = await interaction.guild.roles.fetch(roleId.roleid)
+                let foStr = "Vacant";
+                for (const member of teamRole.members.values()) {
+                    if (member.roles.cache.get(foRole.roleid)) {
+                        foStr = member
+                        break
+                    }
+                }
+                const role = await interaction.guild.roles.fetch(roleId.roleid);
+                teamStr += `${role} - ${teamRole.members.size} members\nFranchise Owner:${foStr}\n\n`
             }
             if (teamStr === "") teamStr = "None"
             embed.setFields({name:"Teams", value:teamStr})
