@@ -51,7 +51,7 @@ module.exports = {
                 await db.close()
                 return interaction.editReply({ content:"You are not authorized to demote franchise owners!", ephemeral:true })
             }
-            await userChoice.roles.remove(role);
+            await userChoice.roles.remove(specialRole);
             await db.close()
             return interaction.editReply({ content:"Successfully demoted franchise owner down!", ephemeral:true })
         }
