@@ -35,7 +35,7 @@ module.exports = {
 
         for (const member of teamMembers.values()) {
             try {
-                for (const role of member.roles.keys()) {
+                for (const role of member.roles.cache.keys()) {
                     const roleExists = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
                     if (roleExists) {
                         if (userInfo[i].role === "FO") fo = `${member}\n${member.user.tag}`;
@@ -47,7 +47,6 @@ module.exports = {
                 
             } catch(err) {
                 console.log(err)
-                console.log(userInfo[i].discordid)
                 continue;
             }
         }
