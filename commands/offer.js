@@ -95,7 +95,7 @@ module.exports = {
                 if (userPing.roles.cache.get(team.roleid)) {
                     if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
                         userSigned = true
-                        teamSigned = team
+                        teamSigned = team.code
                     }
                     
                 }
