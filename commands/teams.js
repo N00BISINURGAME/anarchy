@@ -41,8 +41,6 @@ module.exports = {
             .addFields(
                 {name:"Teams", value:teamStr}
             )
-
-        embed.setFooter({ text:`Page ${page} / ${Math.floor((teams.length / 8))}` })
         const buttons = new ActionRowBuilder()
                     .addComponents(
                         new ButtonBuilder()
@@ -86,7 +84,6 @@ module.exports = {
             }
             if (teamStr === "") teamStr = "None"
             embed.setFields({name:"Teams", value:teamStr})
-            embed.setFooter({ text:`Page ${page} / ${Math.floor((teams.length / 8))}` })
             await i.update({ embeds:[embed], components: [buttons], ephemeral:true })
             await db.close()
         });
