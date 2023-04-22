@@ -53,7 +53,7 @@ module.exports = {
 
             // first, check and see if the user that sent the command is authorized to sign a player (as in, they are a FO or GM)
             const userSent = interaction.user.id;
-            const allTeams = await db.all('SELECT roleid, code FROM Teams WHERE guild = ?', guild)
+            const allTeams = await db.all('SELECT roleid, code FROM Roles WHERE guild = ?', guild)
             let authorized = false
             let info
             for (const team of allTeams) {
