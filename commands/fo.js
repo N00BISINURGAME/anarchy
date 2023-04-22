@@ -78,7 +78,8 @@ module.exports = {
         userChoice.roles.add(foRole.roleid)
         userChoice.roles.add(teamChoice.id)
 
-        const teamMemberCount = teamChoice.members.size
+        const newRole = await interaction.guild.roles.fetch(teamChoice.id)
+        const teamMemberCount = newRole.members.size
 
         // then, get the team logo
         const logo = await db.get('SELECT logo FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND r.guild = ?', [teamChoice.id, guild]);
