@@ -64,10 +64,6 @@ module.exports = {
           \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})\n**Description:** ${message}`)
           .setThumbnail(logoSql.logo)
           .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
-          .addFields(
-            { name:"Coach", value:`${interaction.member}\n${interaction.user.tag}` },
-            { name:"Description", value:`${message}`}
-          )
 
         await interaction.editReply({ content:"Successfully posted LFP!", ephemeral: true})
 
