@@ -93,7 +93,7 @@ module.exports = {
             .setThumbnail(logoStr)
             .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
             .setDescription(`${userChoice} (${userChoice.user.tag}) has been promoted to ${specialRoleObj} of the ${teamChoice}!
-            \n>>> **Roster Size:** ${teamMemberCount}/${maxPlayerQry.maxplayers}`)
+            \n>>> **Roster Size:** ${teamMemberCount}/${maxPlayerQry.maxplayers}\n**Staff Member:** ${interaction.member} (${interaction.user.tag})`)
             .setColor(teamChoice.color)
 
         const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
