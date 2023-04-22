@@ -26,20 +26,25 @@ module.exports = {
         }
 
         // then, get all players from the specified team
-        const userInfo = await db.all('SELECT discordid, role, contractlength FROM Players WHERE team = ? AND guild = ?', [teamExists.code, guild]);
+        const teamMembers = team.members
 
         let fo = "Vacant";
         let gm = "Vacant";
         let hc = "Vacant";
         let players = "";
 
-        for (let i = 0; i < userInfo.length; i++) {
+        for (const member of teamMembers.values()) {
             try {
-                const user = await interaction.client.users.fetch(userInfo[i].discordid)
-                if (userInfo[i].role === "FO") fo = `${user}\n${user.tag}`;
-                if (userInfo[i].role === "GM") gm = `${user} - ${userInfo[i].contractlength} season contract\n${user.tag}`;
-                if (userInfo[i].role === "HC") hc = `${user} - ${userInfo[i].contractlength} season contract\n${user.tag}`;
-                if (userInfo[i].role === "P") players += `${user} - ${userInfo[i].contractlength} season contract\n${user.tag}\n`;
+                for (const role of member.roles.keys()) {
+                    const roleExists = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
+                    if (roleExists) {
+                        if (userInfo[i].role === "FO") fo = `${member}\n${member.user.tag}`;
+                        else if (userInfo[i].role === "GM") gm = `${member}\n${member.user.tag}`;
+                        else if (userInfo[i].role === "HC") hc = `${member}\n${member.user.tag}`;
+                        else players += `${member}\n${member.user.tag}\n`;
+                    }
+                }
+                
             } catch(err) {
                 console.log(err)
                 console.log(userInfo[i].discordid)
@@ -54,6 +59,8 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setTitle(`${team.name} Roster`)
+            .setColor(team.color)
+            .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
             .setDescription(`${desc}`)
             .setThumbnail(logo.logo)
             // .addFields(
