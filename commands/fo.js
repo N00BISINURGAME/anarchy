@@ -75,8 +75,8 @@ module.exports = {
         }
 
         // then, add the team role to the player
-        userChoice.roles.add(foRole.roleid)
-        userChoice.roles.add(teamChoice.id)
+        await userChoice.roles.add(foRole.roleid)
+        await userChoice.roles.add(teamChoice.id)
 
         const newRole = await interaction.guild.roles.fetch(teamChoice.id)
         const teamMemberCount = newRole.members.size
