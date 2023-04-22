@@ -33,6 +33,9 @@ module.exports = {
             }
 
             // then, get all players from the specified team
+            for (const member of team.members.keys()) {
+                await db.run('UPDATE Players SET rings = rings + 1 WHERE discordid = ? AND guild = ?', [member, guild]);
+            }
             const userInfo = await db.run('UPDATE Players SET rings = rings + 1 WHERE team = ? AND guild = ?', [teamExists.code, guild]);
             await db.run("UPDATE Teams SET rings = rings + 1 WHERE code = ? AND guild = ?", [teamExists.code, guild]);
 
