@@ -60,7 +60,8 @@ module.exports = {
                 if (interaction.member.roles.cache.get(team.roleid)) {
                     if (team.code === "FO" || team.code === "GM") {
                         authorized = true
-                    } else if (team.code !== "HC") {
+                    }
+                    if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
                         info = team.code
                     }
                 }
