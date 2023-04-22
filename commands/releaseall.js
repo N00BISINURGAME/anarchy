@@ -64,7 +64,7 @@ module.exports = {
             const transactionEmbed = new EmbedBuilder()
                 .setTitle("Team mass release!")
                 .setThumbnail(logoStr)
-                setColor(roleObj.color)
+                .setColor(roleObj.color)
                 .setDescription(`All members of the ${team} have been released!
                 \n**Affected users:** ${userStr}>>> **Staff:** ${interaction.member} (${interaction.user.tag})`)
                 .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
