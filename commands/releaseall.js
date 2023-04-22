@@ -48,7 +48,7 @@ module.exports = {
                 }
             }
 
-            if (userStr === "") userStr = "None"
+            if (userStr === "") userStr = "None\n"
 
             // then, get the team logo and player count
             const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [teamExists.code, guild]);
