@@ -13,13 +13,6 @@ userOption.setRequired(true);
 userOption.setName('player');
 userOption.setDescription('The player to sign');
 
-const contractLengthOption = new SlashCommandIntegerOption()
-                                .setRequired(true)
-                                .setName('contract-length')
-                                .setDescription('The length of the contract')
-                                .setMinValue(1)
-                                .setMaxValue(3);
-
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('offer')
@@ -29,6 +22,7 @@ module.exports = {
         let pingedUser = interaction.options.getMember('player')
         let userid = pingedUser.id;
         const guild = interaction.guild.id
+        let contractLen = 0
         try {
             const db = await getDBConnection();
             const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
