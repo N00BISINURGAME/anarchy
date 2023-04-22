@@ -78,18 +78,28 @@ module.exports = {
             }
 
             // then, get the team logo
-            const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [info.team, guild]);
+            const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [info, guild]);
             const logoStr = logo.logo;
 
             // get role id
-            const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info.team, guild]);
+            const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info, guild]);
             const roleObj = await interaction.guild.roles.fetch(role.roleid)
 
             // then, check to see if the user is already signed
-            const userSigned = await db.get('SELECT team FROM Players WHERE discordid = ? AND NOT team = "FA" AND guild = ?', [user.id, guild]);
+            let userSigned = false
+            let teamSigned
+            for (const team of allTeams) {
+                if (userPing.roles.cache.get(team.roleid)) {
+                    if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
+                        userSigned = true
+                        teamSigned = team
+                    }
+                    
+                }
+            }
             if (userSigned) {
                 // then, get the team that the player is signed on
-                const team = await db.get('SELECT roleid FROM roles WHERE code = ? AND guild = ?', [userSigned.team, guild]);
+                const team = await db.get('SELECT roleid FROM roles WHERE code = ? AND guild = ?', [teamSigned, guild]);
                 const teamRole = await interaction.guild.roles.fetch(team.roleid);
                 await db.close();
                 return interaction.editReply({content:`This user has already been signed by the ${teamRole}!`, ephemeral:true});
