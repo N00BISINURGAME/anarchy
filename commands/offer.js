@@ -78,8 +78,6 @@ module.exports = {
                 return interaction.editReply({ content:"This user already has an outgoing offer. Please try again later.", ephemeral:true })
             }
 
-            console.log(info)
-
             // then, get the team logo
             const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [info, guild]);
             const logoStr = logo.logo;
@@ -108,9 +106,10 @@ module.exports = {
                 return interaction.editReply({content:`This user has already been signed by the ${teamRole}!`, ephemeral:true});
             }
 
-            // then, check to see if signing the player would lead to exceeding the maximum player count
-            let playersOnTeam = await db.get('SELECT COUNT(*) AS playerCount FROM Players WHERE team = ? AND guild = ?', [info.team, guild]);
-            if (playersOnTeam.playerCount + 1 > maxPlayers) return interaction.editReply({content:'Signing this player would lead to your team exceeding the maximum player count!', ephemeral:true});
+            const memberTeamRole = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info, guild])
+            const teamRole = await interaction.guild.roles.fetch(memberTeamRole.roleid)
+
+            if (teamRole.members.size + 1 > maxPlayers) return interaction.editReply({content:'Signing this player would lead to your team exceeding the maximum player count!', ephemeral:true});
 
             // then, get channel information and send an ephemeral reply to the command saying a user has been offered
             // also create the dm message, format it properly, and send it to the user and listen for a button click
