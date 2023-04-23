@@ -5,6 +5,10 @@
       "description":"Advances the season by 1 and sets teams' season records to 0."
     },
     {
+      "name":"/bold <text> <bold-type>",
+      "description":"Allows you to generate custom bolded text."
+    },
+    {
       "name":"/botstats",
       "description":"Shows some fun statistics about the bot, including the number of unique users, leagues, and uptime."
     },
