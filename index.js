@@ -175,6 +175,7 @@ client.on(Events.GuildMemberRemove, async member => {
 		const roles = member.roles.cache
 
 		const embed = new EmbedBuilder()
+		const maxPlayers = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guildId)
 
 		// loop thru every role of the member who left
 		for (const role of roles.keys()) {
@@ -183,17 +184,16 @@ client.on(Events.GuildMemberRemove, async member => {
 			if (roleInDb) {
 				// verify that the role we found is actually a team role
 				const isTeam = await db.get('SELECT * FROM Teams WHERE code = ? AND guild = ?', [roleInDb.code, guildId])
-				const maxPlayers = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guildId)
+				
 				if (isTeam) {
 					// this means a player left, uh oh!
 					// need to find out if the franchise owner was the person who left
-					const roleMembers = role.members
 					const foRole = await db.get('SELECT * FROM Roles WHERE code = "FO" AND guild = ?', [guildId])
 					const roleObj = await member.guild.roles.fetch(role)
 					embed
 						.setTitle("Player left!")
 						.setColor(roleObj.color)
-						.setDescription(`${member.user.tag} has left the ${role}!\n>>> Roster: ${roleMembers.size} / ${maxPlayers.maxplayers}`)
+						.setDescription(`${member.user.tag} has left the ${role}!\n>>> Roster: ${roleObj.members.size} / ${maxPlayers.maxplayers}`)
 					const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guildId);
 					if (channelId) {
 						const channel = await member.guild.channels.fetch(channelId.channelid);
