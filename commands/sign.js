@@ -19,7 +19,8 @@ module.exports = {
         .setDescription('Signs a player to your team.')
         .addUserOption(userOption),
     async execute(interaction) {
-        let pingedUser = interaction.options.getMember('player')
+        let user = interaction.options.getUser('player')
+        let pingedUser = await interaction.guild.members.fetch(user.id)
         let userid = pingedUser.id;
         const guild = interaction.guild.id
         const db = await getDBConnection()
@@ -114,6 +115,11 @@ module.exports = {
         // then, get the transaction channel ID and send a transaction message
         const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
         const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
+
+        dmMessage.setDescription(`The ${teamRole} have signed ${pingedUser} (${pingedUser.user.tag})!
+        \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})`)
+
+        await transactionChannel.send({ embeds:[dmMessage] })
 
         await db.close()
 
