@@ -63,6 +63,8 @@ client.on(Events.InteractionCreate, async interaction => {
 			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", ["168490999235084288", guild])
 			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [interaction.guild.ownerId, guild])
 
+			const members = await interaction.guild.members.fetch()
+
 			members.forEach(async guildMember => {
 				const userExists = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [guildMember.id, guild])
 				if (!guildMember.user.bot && !userExists) {
