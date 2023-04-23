@@ -78,13 +78,15 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setTitle("Incoming Referee Decision!")
           .setColor(challenging.color)
-          .setDescription(`The ${challenging} are challenging the ${offending}!`)
+          .setDescription(`The ${challenging} are challenging the ${offending}!
+          \n>>> **Referee:** ${interaction.member} (${interaction.user.tag})\n**Rule Violated:** ${rule}\n**Ruling:** ${ruling}`)
           .setThumbnail(interaction.guild.iconURL())
-          .addFields(
-            { name:"Referee", value:`${interaction.member}\n${interaction.user.tag}`},
-            { name:"Rule", value:`${rule}`},
-            { name:"Ruling", value:`${ruling}`}
-          )
+        
+        if (interaction.user.avatarURL()) {
+          embed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+        } else {
+          embed.setFooter({ text: `${interaction.user.tag}` })
+        }
 
         await interaction.editReply({ content:"Successfully posted decision!", ephemeral: true})
 
