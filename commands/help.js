@@ -14,11 +14,8 @@ const timeOption = new SlashCommandStringOption().setRequired(true).setName("tim
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('gametime')
-        .setDescription('Records a gametime.')
-        .addRoleOption(team1Option)
-        .addRoleOption(team2Option)
-        .addStringOption(timeOption),
+        .setName('help')
+        .setDescription('Shows all commands for Anarchy.'),
     async execute(interaction) {
         let helpStr;
 
