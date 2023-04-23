@@ -121,6 +121,10 @@
       "description":"Runs you through the setup prompt for Anarchy. May only be run by admins."
     },
     {
+      "name":"/sign <user>",
+      "description":"Allows you to sign a player to your team. This is commonly referred to as 'force signing', and can only be done by franchise owners and general managers."
+    },
+    {
       "name":"/standings",
       "description":"Allows you to view team standings for that season. **This command should be used in conjunction with /results, as /results keeps track of scores for one game.**"
     },
