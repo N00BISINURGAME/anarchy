@@ -194,7 +194,7 @@ client.on(Events.GuildMemberRemove, async member => {
 						.setColor(role.color)
 						.setDescription(`${member.user.tag} has left the ${role}!\n>>> Roster: ${roleMembers.size} / ${maxPlayers.maxplayers}`)
 					const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guildId);
-					if (channel) {
+					if (channelId) {
 						const channel = await member.guild.channels.fetch(channelId.channelid);
 						await channel.send({ embeds:[embed] })
 					}
