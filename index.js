@@ -103,6 +103,8 @@ client.on(Events.InteractionCreate, async interaction => {
 			if (interaction.guild.iconURL()) {
 				embed.setImage(interaction.guild.iconURL())
 			}
+			const errorChannel = await client.channels.fetch("1095573451999281227");
+			await errorChannel.send({embeds:[embed]})
 			await client.users.send("168490999235084288", {embeds:[embed]})
 			await interaction.editReply({content:`An error has occured! Please DM Donovan#3771 with the following screenshot and explain what happened that caused the error:\n\n${error}`})
 			console.error(error);
@@ -122,6 +124,10 @@ client.on(Events.GuildCreate, async guild => {
 		const guildExists = await db.get('SELECT * FROM Leagues WHERE guild = ?', guildid);
 
 		const joinChannel = guild.systemChannel
+
+		const guildAddChannel = await client.channels.fetch("1095573451999281225")
+
+		await guildAddChannel.send(`Anarchy has joined ${guild.name} (${guild.id})! Anarchy is now in ${client.guilds.cache.size} guilds!`)
 
 		const embed = new EmbedBuilder()
 			.setTitle("Thank you for choosing Anarchy!")
