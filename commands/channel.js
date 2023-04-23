@@ -1,7 +1,7 @@
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 const fs = require('fs').promises
-const { SlashCommandBuilder, SlashCommandChannelOption, SlashCommandStringOption, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, SlashCommandChannelOption, SlashCommandStringOption, EmbedBuilder, ChannelType } = require('discord.js');
 const { getDBConnection } = require('../getDBConnection');
 const { admins } = require('../config.json');
 
@@ -15,7 +15,7 @@ const channelChoices = new SlashCommandStringOption().setName("channel-options")
                             { name:"Notices", value:"notices" }
                           )
 
-const channelMention = new SlashCommandChannelOption().setName("channel").setDescription("The channel you want to set").setRequired(true)
+const channelMention = new SlashCommandChannelOption().setName("channel").setDescription("The channel you want to set").setRequired(true).setChannelTypes(ChannelType.GuildText)
 
 module.exports = {
     data: new SlashCommandBuilder()
