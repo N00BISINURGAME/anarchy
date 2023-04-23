@@ -25,17 +25,37 @@ module.exports = {
         let userid = interaction.user.id;
         const guild = interaction.guild.id
         const player1 = interaction.options.getUser("player-traded-away")
+        const player1Member = await interaction.guild.members.fetch(player1.id)
         const player2 = interaction.options.getUser("player-you-want")
+        const player2Member = await interaction.guild.members.fetch(player2.id)
         if (userid !== "168490999235084288") {
             await db.close()
             return interaction.editReply({ content:"Not implemented yet!", ephemeral: true})
         }
 
-        // first, check if the user is allowed to sign people
-        const authorized = await db.get('SELECT * FROM Players WHERE discordid = ? AND (role = "FO" OR role = "GM") AND guild = ?', [userid, guild])
+        // first, check if the user is allowed to trade people
+        const allTeams = await db.all('SELECT roleid, code FROM Roles WHERE guild = ?', guild)
+        let authorized = false
+        let info
+        let infoRoleid
+        for (const team of allTeams) {
+            if (interaction.member.roles.cache.get(team.roleid)) {
+                if (team.code === "FO" || team.code === "GM") {
+                    authorized = true
+                }
+                if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
+                    info = team.code
+                    infoRoleid = team.roleid
+                }
+            }
+        }
         if (!authorized) {
+            await db.close();
+            return interaction.editReply({ content:'You are not authorized to trade players!', ephemeral:true});
+        }
+        if (!info) {
             await db.close()
-            return interaction.editReply({ content:"You are not authorized to trade players!", ephemeral: true})
+            return interaction.editReply({ content:"You are not on a team! If you believe this is a mistake, you may need to run /setup.", ephemeral: true})
         }
 
         // then, check that either of the players are not being traded. do this later
@@ -54,51 +74,83 @@ module.exports = {
         }
 
         // then, check if the player pinged is on the same team as the player that started the command
-        const player1Authorized = await db.get('SELECT * FROM Players WHERE discordid = ? AND team = (SELECT team FROM Players WHERE discordid = ? AND guild = ?) AND guild = ?', [player1.id, userid, guild, guild])
-        if (!player1Authorized) {
+        const player1Authorized = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info, guild])
+        if (!player1Member.roles.cache.get(player1Authorized.roleid)) {
             await db.close()
             return interaction.editReply({ content:"The player you want to trade to the other team is not on your team!", ephemeral: true})
         }
-
-        if (player1Authorized.role !== "P") {
-            await db.close()
-            return interaction.editReply({ content:"You are unable to trade away front office players! Please demote them and try again!", ephemeral: true})
+        for (const team of allTeams) {
+            if (player1Member.roles.cache.get(team.roleid)) {
+                if (team.code === "FO" || team.code === "GM" || team.code === "HC") {
+                    await db.close()
+                    return interaction.editReply({ content:"You are unable to trade away front office players! Please demote them and try again!", ephemeral: true})
+                }
+            }
         }
 
         // then, get information on player 2
-        const player2Info = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [player2.id, guild]) // always assume player 2 exists
+        let player2FrontOffice = false
+        let player2Info;
+        let player2Roleid;
+        for (const team of allTeams) {
+            if (interaction.member.roles.cache.get(team.roleid)) {
+                if (team.code === "FO" || team.code === "GM") {
+                    player2FrontOffice = true
+                }
+                if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
+                    player2Info = team.code
+                    player2Roleid = team.roleid
+                }
+            }
+        }
 
         // check if player 2 is a free agent
-        if (player2Info.team === "FA") {
+        if (!player2Info) {
             await db.close()
             return interaction.editReply({ content:"The player you want to trade for is a free agent!", ephemeral: true})
         }
 
         // then, check if they are front office
-        if (player2Info.role !== "P") {
+        if (player2FrontOffice) {
             await db.close()
             return interaction.editReply({ content:"You are unable to trade for front office players! Please have them demoted and try again!", ephemeral: true})
         }
 
         // then, get the franchise owner of the team that 
-        const otherTeamFo = await db.get('SELECT * FROM Players WHERE role = "FO" AND team = ? AND guild = ?', [player2Info.team, guild])
+        const guildFoCode = await db.get('SELECT roleid FROM Roles WHERE code = "FO" AND guild = ?', guild)
+        const foRole = await interaction.guild.roles.fetch(guildFoCode.roleid)
+        let otherTeamFo;
+        for (const member of foRole.members.values()) {
+            if (member.roles.cache.contains(player2Roleid)) {
+                otherTeamFo = member
+                break
+            }
+        }
         if (!otherTeamFo) {
             await db.close()
             return interaction.editReply({ content:"The team of the player you want to trade for does not have a franchise owner!", ephemeral: true})
         }
 
         // then, construct the embed
-        const offeringTeam = await db.get('SELECT name, logo FROM Teams WHERE code = ? AND guild = ?', [authorized.team, guild])
+        const offeringTeam = await db.get('SELECT name, logo, roleid FROM Teams WHERE code = ? AND guild = ?', [info, guild])
+
+        const offeringTeamRole = await interaction.guild.roles.fetch(offeringTeam.roleid)
 
         const embed = new EmbedBuilder()
             .setTitle("Incoming trade offer!")
-            .setDescription(`The ${offeringTeam.name} have offered you a trade! You have 15 minutes to accept or decline.`)
+            .setColor(offeringTeamRole.color)
+            .setDescription(`The ${offeringTeam.name} have offered you a trade! You have 15 minutes to accept or decline.
+            \n>>> **Players you will receive:** ${player1.tag}\n**Players you will trade away:** ${player2.tag}`)
             .setThumbnail(`${offeringTeam.logo}`)
             .setFields(
                 { name:"Players you will receive", value:`${player1.tag}`},
                 { name:"Players you will trade away", value:`${player2.tag}`}
             )
-            .setFooter({ text:`This trade was sent by ${interaction.user.tag}`})
+        if (interaction.user.avatarURL()) {
+            embed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+        } else {
+            embed.setFooter({ text: `${interaction.user.tag}` })
+        }
 
         const buttons = new ActionRowBuilder()
             .addComponents(
@@ -112,8 +164,7 @@ module.exports = {
                     .setStyle(ButtonStyle.Danger)
             )
 
-        const otherFo = await interaction.guild.members.fetch(otherTeamFo.discordid)
-        const dmChannel = await otherFo.createDm()
+        const dmChannel = await otherTeamFo.createDm()
         const message = await dmChannel.send({ embeds:[embed], compoenents:[buttons] })
         await interaction.editReply({ content: "Trade has been sent. Awaiting decision...", ephemeral: true})
         // put both players into the trade db
