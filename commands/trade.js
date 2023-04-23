@@ -95,7 +95,7 @@ module.exports = {
         let player2Info;
         let player2Roleid;
         for (const team of allTeams) {
-            if (interaction.member.roles.cache.get(team.roleid)) {
+            if (player2Member.roles.cache.get(team.roleid)) {
                 if (team.code === "FO" || team.code === "GM") {
                     player2FrontOffice = true
                 }
