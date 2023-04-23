@@ -115,6 +115,9 @@ module.exports = {
         const secondteamRole = team1Role === firstTeamRole ? team2Role : team1Role
         const secondTeamScore = team1ScoreInt === firstTeamScore ? team2ScoreInt : team1ScoreInt
 
+        const id = Date.now()
+        await db.run('INSERT INTO Results (winner, winnerscore, loser, loserscore, guild, id) VALUES (?, ?, ?, ?, ?, ?)', [firstTeamRole.name, firstTeamScore, secondteamRole.name, secondTeamScore, guild, id])
+
         // then, increment the point differential. two cases: one where there is no tie, and one where there is a tie
         if (teamWon) {
             await db.run('UPDATE Teams SET wins = wins + 1, allwins = allwins + 1, ptdifferential = ptdifferential + ? WHERE name = ? AND guild = ?', [firstTeamScore - secondTeamScore, firstTeamRole.name, guild])

@@ -100,7 +100,7 @@ client.on(Events.GuildCreate, async guild => {
 		const guildExists = await db.get('SELECT * FROM Leagues WHERE guild = ?', guildid);
 
 		if (!guildExists) {
-			await db.run("INSERT INTO Leagues (guild) VALUES (?)", guildid)
+			await db.run("INSERT INTO Leagues (guild, season, offers, filter, maxplayers, demands) VALUES (?, ?, ?, ?, ?, ?)", [guildid, 1, 1, 0, 18, 2])
 			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", ["168490999235084288", guildid])
 			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [guild.ownerId, guildid])
 

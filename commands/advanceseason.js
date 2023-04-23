@@ -23,6 +23,8 @@ module.exports = {
         // then, advance the season
         await db.run("UPDATE Leagues SET season = season + 1 WHERE guild = ?", guild)
 
+        await db.run('DELETE FROM Results WHERE guild = ?', guild)
+
         const season = await db.get('SELECT season FROM Leagues WHERE guild = ?', guild)
 
         // then, change demands
