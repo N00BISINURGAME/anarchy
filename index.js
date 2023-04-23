@@ -179,7 +179,7 @@ client.on(Events.GuildMemberRemove, async member => {
 		// loop thru every role of the member who left
 		for (const role of roles.keys()) {
 			// then, check to see if the role exists in the db; this usually means we have a team
-			const roleInDb = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guildId])
+			const roleInDb = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [role, guildId])
 			if (roleInDb) {
 				// verify that the role we found is actually a team role
 				const isTeam = await db.get('SELECT * FROM Teams WHERE code = ? AND guild = ?', [roleInDb.code, guildId])
