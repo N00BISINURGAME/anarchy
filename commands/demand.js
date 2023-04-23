@@ -100,7 +100,9 @@ module.exports = {
             for (const roleMember of teamRole.members.values()) {
                 const roleMemberRoles = roleMember.roles.cache
                 if (roleMemberRoles.get(foRole.roleid)) {
-                    await roleMember.send( {embeds:[embed]})
+                    demandEmbed.setDescription(`${interaction.member} (${interaction.user.tag}) has demanded from the ${teamRole.name} in ${interaction.guild.name}! ${specialRole ? `This person was the ${specialRole.name}.` : ""}
+                    \n>>> **Roster:** ${teamRole.members.size}/${maxPlayerQry.maxplayers}`)
+                    await roleMember.send( {embeds:[demandEmbed]})
                     break
                 }
             }
