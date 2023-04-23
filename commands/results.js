@@ -99,7 +99,6 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setTitle("Incoming game results!")
-            .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
 
         if (teamWon) {
             const imageLink = await db.get("SELECT t.logo FROM Teams t, Roles r WHERE r.roleid = ? AND r.code = t.code AND t.guild = ?", [teamWon.id, guild])
@@ -116,6 +115,7 @@ module.exports = {
         const secondTeamScore = team1ScoreInt === firstTeamScore ? team2ScoreInt : team1ScoreInt
 
         const id = Date.now()
+        embed.setFooter({ text: `${interaction.user.tag} | This game has a unique ID of ${id}`, iconURL: `${interaction.user.avatarURL()}` })
         await db.run('INSERT INTO Results (winner, winnerscore, loser, loserscore, guild, id) VALUES (?, ?, ?, ?, ?, ?)', [firstTeamRole.name, firstTeamScore, secondteamRole.name, secondTeamScore, guild, id])
 
         // then, increment the point differential. two cases: one where there is no tie, and one where there is a tie
