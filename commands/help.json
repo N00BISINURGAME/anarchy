@@ -134,7 +134,7 @@
     },
     {
       "name":"/toggle <command> <state>",
-      "description":"Allows you to view all teams and their franchise owners. Similar to 'focheck' for other bots."
+      "description":"Allows you to toggle a command on and off. Currently, you may only toggle offers and signings. May only be run by admins."
     },
     {
       "name":"/trade <player1> <player2>",
