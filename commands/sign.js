@@ -101,7 +101,7 @@ module.exports = {
                 .setColor(teamRole.color)
                 .setThumbnail(logoStr)
                 .setDescription(`The ${teamRole.name} have signed you!
-                \n>>> **Coach:** ${interaction.user.tag}`)
+                \n>>> **Coach:** ${interaction.user.tag}\n**League:** ${interaction.guild.name}`)
             if (interaction.user.avatarURL()) {
                 dmMessage.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
             } else {
