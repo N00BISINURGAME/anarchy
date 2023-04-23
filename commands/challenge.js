@@ -27,7 +27,7 @@ const rulingOption = new SlashCommandStringOption()
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('decision')
+        .setName('challenge')
         .setDescription('Posts a referee decision.')
         .addRoleOption(challengingOption)
         .addRoleOption(offendingOption)
