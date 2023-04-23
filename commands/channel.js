@@ -29,9 +29,12 @@ module.exports = {
         const channel = interaction.options.getChannel("channel")
         const guild = interaction.guild.id
 
-        // write this later
-        console.log(userChoice)
-        console.log(channel.id)
+        const user = interaction.user.id;
+        const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [user, guild])
+        if (!authorized) {
+            await db.close();
+            return interaction.editReply({ content:"You are not authorized to switch channels!", ephemeral:true });
+        }
 
         const uniqueChannel = await db.get('SELECT * FROM Channels WHERE channelid = ? AND guild = ?', [channel.id, guild])
         if (uniqueChannel) {

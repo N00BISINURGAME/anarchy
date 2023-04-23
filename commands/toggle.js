@@ -29,6 +29,13 @@ module.exports = {
         const state = interaction.options.getInteger("state")
         const guild = interaction.guild.id
 
+        const user = interaction.user.id;
+          const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [user, guild])
+          if (!authorized) {
+              await db.close();
+              return interaction.editReply({ content:"You are not authorized to toggle commands!", ephemeral:true });
+          }
+
         await db.run(`UPDATE Leagues SET ${userChoice} = ? WHERE guild = ?`, [state, guild])
         await db.close()
         return interaction.editReply({content:`Successfully toggled ${userChoice} ${state === 1 ? "on" : "off"}!`})

@@ -133,6 +133,10 @@
       "description":"Allows you to view all teams and their franchise owners. Similar to 'focheck' for other bots."
     },
     {
+      "name":"/toggle <command> <state>",
+      "description":"Allows you to view all teams and their franchise owners. Similar to 'focheck' for other bots."
+    },
+    {
       "name":"/trade <player1> <player2>",
       "description":"Allows trade one player for another player. May only be run by franchise owners and general managers."
     },
