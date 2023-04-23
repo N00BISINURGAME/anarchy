@@ -135,8 +135,8 @@ module.exports = {
         }
 
         // rewrite this
-        const firstTeamStandings = await db.get('SELECT t.wins, t.losses, t.ties, t.ptdifferential FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND guild = ?', [firstTeamRole.id, guild])
-        const secondTeamStandings = await db.get('SELECT t.wins, t.losses, t.ties, t.ptdifferential FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND guild = ?', [secondteamRole.id, guild])
+        const firstTeamStandings = await db.get('SELECT t.wins, t.losses, t.ties, t.ptdifferential FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND r.guild = ?', [firstTeamRole.id, guild])
+        const secondTeamStandings = await db.get('SELECT t.wins, t.losses, t.ties, t.ptdifferential FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND r.guild = ?', [secondteamRole.id, guild])
 
         if (!firstTeamStandings || !secondTeamStandings) {
             await db.close()
