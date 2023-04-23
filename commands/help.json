@@ -1,0 +1,76 @@
+{
+  "commands":[
+    {
+      "name":"/advanceseason",
+      "description":"Advances the season by 1 and sets teams' season records to 0."
+    },
+    {
+      "name":"/botstats",
+      "description":"Shows some fun statistics about the bot, including the number of unique users, leagues, and uptime."
+    },
+    {
+      "name":"/challenge <challenging-team> <offending-team> <rule-violated> <ruling>",
+      "description":"Posts a ruling by a referee regarding a challenge that a team makes against another team."
+    },
+    {
+      "name":"/channel <channel-mention> <purpose>",
+      "description":"Links the channel you mentioned for a specific purpose, like for transactions or demands."
+    },
+    {
+      "name":"/defensestats <tackles> <ints> <touchdowns> <sacks> <safeties> <fumble-recoveries>",
+      "description":"Logs your defensive stats, as shown on the FF2 'Defense' server stats."
+    },
+    {
+      "name":"/demand",
+      "description":"Allows you to demand from your team as long as you are under the demand limit for the league."
+    },
+    {
+      "name":"/demote <user>",
+      "description":"Allows you to demote a player from their role. To demote franchise owners, you must be an admin. Otherwise, you must be a franchise owner."
+    },
+    {
+      "name":"/fo <user> <team>",
+      "description":"Allows admins to promote an individual to be the franchise owner of a team, if the position is vacant."
+    },
+    {
+      "name":"/gametime <team1> <team2> <time>",
+      "description":"Posts the gametime between one team and another team. Gametimes may be posted by franchise owners or general managers."
+    },
+    {
+      "name":"/help",
+      "description":"Displays helpful information about Anarchy commands."
+    },
+    {
+      "name":"/kstats <attempts> <good-attempts>",
+      "description":"Logs your kicker stats, as shown on the FF2 'Kicker' server stats."
+    },
+    {
+      "name":"/lfp <message>",
+      "description":"Posts a 'looking for players' message if the proper channel is set."
+    },
+    {
+      "name":"/logo <team> <link>",
+      "description":"Changes the logo of a team to the specified link. Valid links must direct to an image."
+    },
+    {
+      "name":"/maxplayers <number>",
+      "description":"Sets the player cap for all teams in the league to the specified number. May only be ran by admins."
+    },
+    {
+      "name":"/newteam <full-name> <abbreviation> <logo>",
+      "description":"Creates a new team and its associated role. May only be ran by admins. The logo must be a valid link directing to an image."
+    },
+    {
+      "name":"/offer <player>",
+      "description":"Allows a franchise owner or general manager to send a signing offer to a player, who can choose to accept or decline."
+    },
+    {
+      "name":"/presence <type> <value>",
+      "description":"Allows the bot owner (Donovan#3771) to change the bot's status."
+    },
+    {
+      "name":"/promote <player> <role>",
+      "description":"Allows a franchise owner to promote a specific player to either head coach or general manager."
+    }
+  ]
+}
