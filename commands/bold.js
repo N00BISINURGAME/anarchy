@@ -5,9 +5,9 @@ const textOption = new SlashCommandStringOption().setName("text").setDescription
 
 const typeChoices = new SlashCommandStringOption().setName("type").setDescription("The typeface you want to use").setRequired(true)
                           .addChoices(
-                            { name:"𝗦𝗮𝗻𝘀 𝗦𝗲𝗿𝗶𝗳 𝗕𝗼𝗹𝗱", value: "serif-bold" },
-                            { name:"𝙎𝙖𝙣𝙨 𝙎𝙚𝙧𝙞𝙛 𝘽𝙤𝙡𝙙", value: "serif-bold-italic" },
-                            { name:"𝓢𝓪𝓷𝓼 𝓢𝓮𝓻𝓲𝓯 𝓑𝓸𝓵𝓭", value: "script-bold" },
+                            { name:"𝗦𝗮𝗻𝘀 𝗦𝗲𝗿𝗶𝗳 𝗕𝗼𝗹𝗱", value: "serif bold" },
+                            { name:"𝙎𝙖𝙣𝙨 𝙎𝙚𝙧𝙞𝙛 𝘽𝙤𝙡𝙙", value: "serif bold-italic" },
+                            { name:"𝓢𝓪𝓷𝓼 𝓢𝓮𝓻𝓲𝓯 𝓑𝓸𝓵𝓭", value: "script bold" },
                             { name:"𝐁𝐨𝐥𝐝", value:"bold" }
                           )
 
