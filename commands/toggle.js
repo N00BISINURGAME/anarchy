@@ -20,8 +20,8 @@ const toggleChoices = new SlashCommandIntegerOption().setName("state").setDescri
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('toggle')
-        .addChannelOption(commandChoices)
-        .addStringOption(channelChoices)
+        .addStringOption(commandChoices)
+        .addIntegerOption(toggleChoices)
         .setDescription('Allows you to toggle offers and signings on and off.'),
     async execute(interaction) {
         const db = await getDBConnection();
