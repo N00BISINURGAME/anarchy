@@ -59,15 +59,15 @@ client.on(Events.InteractionCreate, async interaction => {
 		const guildExists = await db.get('SELECT * FROM Leagues WHERE guild = ?', guild)
 		console.log(guildExists)
 		if (!guildExists) {
-			await db.run("INSERT INTO Leagues (guild, season, offers, filter, maxplayers, demands) VALUES (?, ?, ?, ?, ?, ?)", [guildid, 1, 1, 0, 18, 2])
-			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", ["168490999235084288", guildid])
-			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [guild.ownerId, guildid])
+			await db.run("INSERT INTO Leagues (guild, season, offers, filter, maxplayers, demands) VALUES (?, ?, ?, ?, ?, ?)", [guild, 1, 1, 0, 18, 2])
+			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", ["168490999235084288", guild])
+			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [guild.ownerId, guild])
 
 			members.forEach(async guildMember => {
 				const userExists = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [guildMember.id, guild])
 				if (!guildMember.user.bot && !userExists) {
 					const id = guildMember.id;
-					await db.run('INSERT INTO Players (discordid, guild) VALUES (?, ?)', [id, guildid]);
+					await db.run('INSERT INTO Players (discordid, guild) VALUES (?, ?)', [id, guild]);
 				}
 			})
 		}
