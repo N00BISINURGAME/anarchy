@@ -20,7 +20,7 @@ module.exports = {
         .addUserOption(userOption),
     async execute(interaction) {
         let user = interaction.options.getUser('player')
-        let pingedUser = await interaction.guild.members.fetch(user.id)
+        let userPing = await interaction.guild.members.fetch(user.id)
         let userid = pingedUser.id;
         const guild = interaction.guild.id
         const db = await getDBConnection()
@@ -116,7 +116,7 @@ module.exports = {
         const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
         const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
-        dmMessage.setDescription(`The ${teamRole} have signed ${pingedUser} (${pingedUser.user.tag})!
+        dmMessage.setDescription(`The ${teamRole} have signed ${userPing} (${userPing.user.tag})!
         \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})`)
 
         await transactionChannel.send({ embeds:[dmMessage] })
