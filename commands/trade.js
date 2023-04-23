@@ -123,7 +123,7 @@ module.exports = {
         const foRole = await interaction.guild.roles.fetch(guildFoCode.roleid)
         let otherTeamFo;
         for (const member of foRole.members.values()) {
-            if (member.roles.cache.contains(player2Roleid)) {
+            if (member.roles.cache.get(player2Roleid)) {
                 otherTeamFo = member
                 break
             }
