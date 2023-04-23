@@ -19,7 +19,9 @@ const playerWantedOption = new SlashCommandUserOption()
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('trade')
-        .setDescription('Trade between two teams'),
+        .setDescription('Trade between two teams')
+        .addUserOption(playerTradedOption)
+        .addUserOption(playerWantedOption),
     async execute(interaction) {
         const db = await getDBConnection();
         let userid = interaction.user.id;
