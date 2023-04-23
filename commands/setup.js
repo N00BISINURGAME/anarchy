@@ -67,13 +67,24 @@ module.exports = {
         const addTeamRow = new ActionRowBuilder().addComponents(addTeamMenu)
 
         let message = await interaction.editReply({ embeds:[embed], components:[buttons], ephemeral:true})
-        let messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 120000})
+        let messageCollector
+
+        try {
+            messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 120000})
+        } catch(err) {
+            return messageCollector.update({ content:"Setup expired! Remember that you have 2 minutes per step."})
+        }
 
         // prompt the user for the transaction channel
         embed.setTitle("Select a transaction channel")
         embed.setDescription("You will now be prompted to select your channels for transactions (signings, releases, promotions, etc). Note that you can change these channels at any time by running the /channel command.")
         message = await messageCollector.update({ embeds:[embed], components:[transactionRow], ephemeral:true})
-        messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
+        
+        try {
+            messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
+        } catch(err) {
+            return messageCollector.update({ content:"Setup expired! Remember that you have 2 minutes per step."})
+        }
         const transactionChannelId = messageCollector.values[0]
         await db.run('DELETE FROM Channels WHERE channelid = ?', transactionChannelId)
         await db.run('INSERT INTO Channels (guild, channelid, purpose) VALUES (?, ?, "transactions")', [guild, transactionChannelId])
@@ -82,7 +93,12 @@ module.exports = {
         embed.setDescription("You will now be prompted to select your channels for demand notifications. Note that you can change these channels at any time by running the /channel command.")
         // 3 options: scan for existing teams, add new teams, add teams later
         message = await messageCollector.update({ embeds:[embed], components:[demandsRow], ephemeral:true})
-        messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
+        try {
+            messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
+        } catch(err) {
+            return messageCollector.update({ content:"Setup expired! Remember that you have 2 minutes per step."})
+        }
+        
         const demandChannelId = messageCollector.values[0]
         await db.run('DELETE FROM Channels WHERE channelid = ?', demandChannelId)
         await db.run('INSERT INTO Channels (guild, channelid, purpose) VALUES (?, ?, "demands")', [guild, demandChannelId])
@@ -91,7 +107,11 @@ module.exports = {
         embed.setDescription("You will now be prompted to select your channels for game result notifications. Note that you can change these channels at any time by running the /channel command.")
         // 3 options: scan for existing teams, add new teams, add teams later
         message = await messageCollector.update({ embeds:[embed], components:[demandsRow], ephemeral:true})
-        messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
+        try {
+            messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
+        } catch(err) {
+            return messageCollector.update({ content:"Setup expired! Remember that you have 2 minutes per step."})
+        }
         const resultsChannelId = messageCollector.values[0]
         await db.run('DELETE FROM Channels WHERE channelid = ?', resultsChannelId)
         await db.run('INSERT INTO Channels (guild, channelid, purpose) VALUES (?, ?, "results")', [guild, resultsChannelId])
@@ -100,7 +120,12 @@ module.exports = {
         embed.setDescription("You will now be prompted to select how you want to add teams. Things may not work as expected if role names are bolded. Note that you can change this at anytime by running /setup again.")
         // 3 options: scan for existing teams, add new teams, add teams later
         message = await messageCollector.update({ embeds:[embed], components:[addTeamRow], ephemeral:true})
-        messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.StringSelect, time: 120000})
+        try {
+            messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.StringSelect, time: 120000})
+        } catch(err) {
+            return messageCollector.update({ content:"Setup expired! Remember that you have 2 minutes per step."})
+        }
+        
         const teamOption = messageCollector.values[0]
 
         embed.setTitle("Thank you for choosing Anarchy!")
