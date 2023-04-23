@@ -56,7 +56,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
 		console.log(guild)
 
-		const guildExists = await db.run('SELECT * FROM Leagues WHERE guild = ?', guild)
+		const guildExists = await db.get('SELECT * FROM Leagues WHERE guild = ?', guild)
 		console.log(guildExists)
 		if (!guildExists) {
 			await db.run("INSERT INTO Leagues (guild, season, offers, filter, maxplayers, demands) VALUES (?, ?, ?, ?, ?, ?)", [guildid, 1, 1, 0, 18, 2])
