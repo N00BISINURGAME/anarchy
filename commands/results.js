@@ -66,9 +66,12 @@ module.exports = {
             // find out which team is invalid. index 0 of the array always contains the valid team
             // also need a case for if both teams are invalid
             if (teams.length === 0) {
+                await db.close()
                 return interaction.editReply({ content: `${team1Role} and ${team2Role} are invalid teams! Ensure that both teams you're passing in are valid!`, ephemeral:true })
             }
             const invalidTeam = teams[0].name === team1Role.name ? team2Role : team1Role
+
+            await db.close()
 
             return interaction.editReply({ content:`${invalidTeam} does not constitute a valid team! Ensure that both teams you're passing in are valid!`, ephemeral:true })
         }
@@ -131,8 +134,14 @@ module.exports = {
             await db.run('UPDATE Teams SET ties = ties + 1, allties = allties + 1 WHERE (name = ? OR name = ?) AND guild = ?', [firstTeamRole.name, secondteamRole.name, guild])
         }
 
-        const firstTeamStandings = await db.get('SELECT wins, losses, ties, ptdifferential FROM Teams WHERE name = ? AND guild = ?', [firstTeamRole.name, guild])
-        const secondTeamStandings = await db.get('SELECT wins, losses, ties, ptdifferential FROM Teams WHERE name = ? AND guild = ?', [secondteamRole.name, guild])
+        // rewrite this
+        const firstTeamStandings = await db.get('SELECT t.wins, t.losses, t.ties, t.ptdifferential FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND guild = ?', [firstTeamRole.id, guild])
+        const secondTeamStandings = await db.get('SELECT t.wins, t.losses, t.ties, t.ptdifferential FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND guild = ?', [secondteamRole.id, guild])
+
+        if (!firstTeamStandings || !secondTeamStandings) {
+            await db.close()
+            return interaction.editReply({ content: `You may have mentioned invalid teams! You may need to run /setup.`, ephemeral:true })
+        }
 
         if (teamWon) {
             embed.setDescription(`The ${firstTeamRole} have won against the ${secondteamRole}!\n>>> **Score:** ${firstTeamRole} ${firstTeamScore}-${secondTeamScore} ${secondteamRole}\n**${firstTeamRole.name} Record:** ${firstTeamStandings.wins}-${firstTeamStandings.losses}-${firstTeamStandings.ties}, ${firstTeamStandings.ptdifferential} point differential\n**${secondteamRole.name} Record:** ${secondTeamStandings.wins}-${secondTeamStandings.losses}-${secondTeamStandings.ties}, ${secondTeamStandings.ptdifferential} point differential\n**Staff:** ${interaction.member} (${interaction.user.tag})`)
