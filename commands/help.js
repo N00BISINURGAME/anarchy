@@ -23,8 +23,8 @@ module.exports = {
         let upper = 8
 
         for (let i = lower; i < upper && i < commands.length; i++) {
-          let name = command.name
-          let description = command.description
+          let name = commands[i].name
+          let description = commands[i].description
           helpStr += `**${name}** - ${description}\n`
         }
         // get teams and time
@@ -67,8 +67,8 @@ module.exports = {
         helpStr = ""
 
         for (let i = lower; i < upper && i < commands.length; i++) {
-            let name = command.name
-            let description = command.description
+            let name = commands[i].name
+            let description = commands[i].description
             helpStr += `**${name}** - ${description}\n`
         }
         if (helpStr === "") helpStr = "There are no more commands!"
