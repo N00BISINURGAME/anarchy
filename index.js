@@ -114,6 +114,20 @@ client.on(Events.GuildCreate, async guild => {
 
 		const guildExists = await db.get('SELECT * FROM Leagues WHERE guild = ?', guildid);
 
+		const joinChannel = guild.systemChannel
+
+		const embed = new EmbedBuilder()
+			.setTitle("Thank you for choosing Anarchy!")
+			.setDescription(`Thank you for choosing anarchy, the newest and fastest-growing signing bot on the market.
+			\nTo get started, we **highly suggest** running the /setup command, as this will guide you in choosing the core channels (transactions, demands, and game results). After running setup, you're more than free to set extra channels using the /channel command.
+			\nAt any time, if you need help getting things to work you're more than free to DM Donovan#3771 or join our support server in order to get assistance debugging.
+			\nEnjoy using Anarchy, and good luck with your league!
+			\n[Link to our support server](https://discord.gg/TuKy4sPcE8)`)
+			.setColor([0, 0, 0])
+			.setThumbnail(client.user.avatarURL())
+
+		await joinChannel.send({ embeds:[embed] })
+
 		if (!guildExists) {
 			await db.run("INSERT INTO Leagues (guild, season, offers, filter, maxplayers, demands) VALUES (?, ?, ?, ?, ?, ?)", [guildid, 1, 1, 0, 18, 2])
 			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", ["168490999235084288", guildid])
