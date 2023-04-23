@@ -26,7 +26,8 @@ module.exports = {
         const db = await getDBConnection();
 
         const userId = interaction.user.id;
-        const userChoice = interaction.options.getMember('player');
+        const user = interaction.options.getUser('player')
+        const userChoice = await interaction.guild.members.fetch(user.id);
         const teamChoice = interaction.options.getRole('team')
         const chosenUserId = userChoice.id;
         const guild = interaction.guild.id

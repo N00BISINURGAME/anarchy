@@ -111,6 +111,10 @@ module.exports = {
 
         await userPing.roles.add(teamRole)
 
+        // then, get the transaction channel ID and send a transaction message
+        const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
+        const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
+
         await db.close()
 
         return interaction.editReply({content:`${userPing} has been successfully signed!`, ephemeral:true});
