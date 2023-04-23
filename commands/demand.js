@@ -94,14 +94,18 @@ module.exports = {
                     \n>>> **Roster:** ${teamRole.members.size}/${maxPlayerQry.maxplayers}\n**Guild:** ${interaction.guild.name}`
         )
 
-        // then, dm the franchise owner notifying them
-        for (const roleMember of teamRole.members.values()) {
-            const roleMemberRoles = roleMember.roles.cache
-            if (roleMemberRoles.has(foRole)) {
-                await roleMember.send( {embeds:[embed]})
-                break
+        const foRole = await db.get('SELECT roleid FROM Roles WHERE guild = ?', guild)
+        if (foRole) {
+            // then, dm the franchise owner notifying them
+            for (const roleMember of teamRole.members.values()) {
+                const roleMemberRoles = roleMember.roles.cache
+                if (roleMemberRoles.get(foRole.roleid)) {
+                    await roleMember.send( {embeds:[embed]})
+                    break
+                }
             }
         }
+        
         await db.close()
         await interaction.editReply( {content:`Successfully demanded! You have ${(maxPlayerQry.demands - currentPlayer.demands) - 1} demands left!`, ephemeral:true})
     }
