@@ -54,6 +54,21 @@ client.on(Events.InteractionCreate, async interaction => {
 		// temp fix for fixing team stuff
 		const guild = interaction.guild.id
 
+		const guildExists = await db.run('SELECT * FROM Leagues WHERE guild = ?', guild)
+		if (!guildExists) {
+			await db.run("INSERT INTO Leagues (guild, season, offers, filter, maxplayers, demands) VALUES (?, ?, ?, ?, ?, ?)", [guildid, 1, 1, 0, 18, 2])
+			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", ["168490999235084288", guildid])
+			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [guild.ownerId, guildid])
+
+			members.forEach(async guildMember => {
+				const userExists = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [guildMember.id, guild])
+				if (!guildMember.user.bot && !userExists) {
+					const id = guildMember.id;
+					await db.run('INSERT INTO Players (discordid, guild) VALUES (?, ?)', [id, guildid]);
+				}
+			})
+		}
+
 		// as a sanity check, ensure the user exists in the database
 		const userExists = await db.get('SELECT * FROM Players WHERE discordid = ? AND guild = ?', [user.id, guild])
 		if (!userExists) {

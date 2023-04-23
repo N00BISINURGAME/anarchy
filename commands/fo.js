@@ -97,9 +97,9 @@ module.exports = {
             .setColor(teamChoice.color)
         
         if (interaction.user.avatarURL()) {
-            embed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+            transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
         } else {
-            embed.setFooter({ text: `${interaction.user.tag}` })
+            transactionEmbed.setFooter({ text: `${interaction.user.tag}` })
         }
 
         const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
