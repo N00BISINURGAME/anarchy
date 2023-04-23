@@ -26,7 +26,7 @@ module.exports = {
         const db = await getDBConnection()
         const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
         const maxPlayers = maxPlayerCount.maxplayers
-        const offerEnabled = await db.get('SELECT offers FROM Leagues WHERE guild = ?', guild)
+        const offerEnabled = await db.get('SELECT signings FROM Leagues WHERE guild = ?', guild)
         if (!offerEnabled.offers) return interaction.editReply({ content: "Signings are disabled!", ephemeral: true})
 
         // check if a transaction channel has been set
