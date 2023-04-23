@@ -30,12 +30,21 @@ module.exports = {
         // then, check if gametime is enabled
         const gametimeChannel = await db.get("SELECT channelid FROM Channels WHERE purpose = ? AND guild = ?", ["gametime", guild]);
         if (!gametimeChannel) {
+            await db.close()
             return interaction.editReply({ content:"Gametimes are currently disabled!", ephemeral:true })
         }
 
         // then, check if a valid user ran the command
         const foRole = await db.get('SELECT * FROM Roles WHERE code = "FO" AND guild = ?', [guild])
+        if (!foRole) {
+            await db.close()
+            return interaction.editReply({ content:"A franchise owner role has not been set! This may indicate you need to run /setup.", ephemeral:true })
+        }
         const gmRole = await db.get('SELECT * FROM Roles WHERE code = "GM" AND guild = ?', [guild])
+        if (!gmRole) {
+            await db.close()
+            return interaction.editReply({ content:"A general manager role has not been set! This may indicate you need to run /setup.", ephemeral:true })
+        }
         const admin = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
         const manager = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
         if (!(interaction.member.roles.cache.get(foRole.roleid) || interaction.member.roles.cache.get(gmRole.roleid) || admin || manager)) {
