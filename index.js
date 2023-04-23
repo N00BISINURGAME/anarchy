@@ -189,9 +189,10 @@ client.on(Events.GuildMemberRemove, async member => {
 					// need to find out if the franchise owner was the person who left
 					const roleMembers = role.members
 					const foRole = await db.get('SELECT * FROM Roles WHERE code = "FO" AND guild = ?', [guildId])
+					const roleObj = await member.guild.roles.fetch(role)
 					embed
 						.setTitle("Player left!")
-						.setColor(role.color)
+						.setColor(roleObj.color)
 						.setDescription(`${member.user.tag} has left the ${role}!\n>>> Roster: ${roleMembers.size} / ${maxPlayers.maxplayers}`)
 					const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guildId);
 					if (channelId) {
