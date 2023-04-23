@@ -15,7 +15,7 @@ const channelChoices = new SlashCommandStringOption().setName("channel-options")
                             { name:"Notices", value:"notices" }
                           )
 
-const channelMention = new SlashCommandChannelOption().setName("channel").setDescription("The channel you want to set").setRequired(true).setChannelTypes(ChannelType.GuildText)
+const channelMention = new SlashCommandChannelOption().setName("channel").setDescription("The channel you want to set").setRequired(true).addChannelTypes(ChannelType.GuildText)
 
 module.exports = {
     data: new SlashCommandBuilder()
