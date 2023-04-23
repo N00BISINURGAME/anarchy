@@ -227,6 +227,7 @@ client.on(Events.GuildMemberRemove, async member => {
 					// need to find out if the franchise owner was the person who left
 					const foRole = await db.get('SELECT * FROM Roles WHERE code = "FO" AND guild = ?', [guildId])
 					const roleObj = await member.guild.roles.fetch(role)
+					if (!roleObj) return;
 
 					const logo = await db.get('SELECT t.logo FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND r.guild = ?', [role, guildId])
 					embed
