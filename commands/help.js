@@ -19,7 +19,10 @@ module.exports = {
     async execute(interaction) {
         let helpStr;
 
-        for (const command of commands) {
+        let lower = 0
+        let upper = 8
+
+        for (let i = lower; i < upper && i < commands.length; i++) {
           let name = command.name
           let description = command.description
           helpStr += `**${name}** - ${description}\n`
@@ -31,12 +34,48 @@ module.exports = {
           .setDescription(`${helpStr}`)
           .setColor([0, 0, 0])
         
+        const buttons = new ActionRowBuilder()
+          .addComponents(
+              new ButtonBuilder()
+                  .setCustomId('pagedown')
+                  .setLabel('<')
+                  .setStyle(ButtonStyle.Primary),
+              new ButtonBuilder()
+                  .setCustomId('pageup')
+                  .setLabel('>')
+                  .setStyle(ButtonStyle.Primary)
+          )
+        
         if (interaction.user.avatarURL()) {
           embed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
         } else {
           embed.setFooter({ text: `${interaction.user.tag}` })
         }
 
-        await interaction.editReply({ embeds:[embed], ephemeral:true })
+        if (commands.length < upper) {
+          return interaction.editReply({ embeds:[embed], ephemeral:true })
+        }
+
+      const message = await interaction.editReply({ embeds:[embed], components: [buttons], ephemeral:true })
+
+      const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 300000 });
+
+      collector.on('collect', async i => {
+        if (commands.length < upper) return;
+        lower = (i.customId === "pageup" ? (lower + 8 >= commands.length - 8 ? commands.length - 8 : lower + 8) : (lower - 8 <= 0 ? 0 : lower - 8))
+        upper = (i.customId === "pageup" ? (upper + 8 >= commands.length ? commands.length : upper + 8) : (upper - 8 <= 8 ? 8 : upper - 8))
+        helpStr = ""
+
+        for (let i = lower; i < upper && i < commands.length; i++) {
+            let name = command.name
+            let description = command.description
+            helpStr += `**${name}** - ${description}\n`
+        }
+        if (helpStr === "") helpStr = "There are no more commands!"
+        
+        embed.setDescription(`${helpStr}`)
+        await i.update({ embeds:[embed], components: [buttons], ephemeral:true })
+        await db.close()
+    });
     }
 }
