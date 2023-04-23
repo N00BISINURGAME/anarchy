@@ -91,7 +91,6 @@ client.on(Events.InteractionCreate, async interaction => {
 		try {
 			const embed = new EmbedBuilder()
 			.setTitle("An error has occured!")
-			.setThumbnail(interaction.guild.iconURL())
 			.setFields(
 				{name:"User", value:`${interaction.user.tag}`},
 				{name:"Guild ID", value:`${interaction.guild.id}`},
@@ -99,6 +98,9 @@ client.on(Events.InteractionCreate, async interaction => {
 				{name:"Command that caused error", value:`${interaction.commandName}`},
 				{name:"Error message", value:`${error}`}
 			)
+			if (interaction.guild.iconURL()) {
+				embed.setImage(interaction.guild.iconURL())
+			}
 			await client.users.send("168490999235084288", {embeds:[embed]})
 			await interaction.editReply({content:`An error has occured! Please DM Donovan#3771 with the following screenshot and explain what happened that caused the error:\n\n${error}`})
 			console.error(error);
