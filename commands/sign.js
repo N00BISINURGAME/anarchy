@@ -36,7 +36,7 @@ module.exports = {
         }
 
         if (user.id === interaction.user.id) {
-          return interaction.editReply({ content:"You are not allowed to offer yourself!", ephemeral:true })
+          return interaction.editReply({ content:"You are not allowed to sign yourself!", ephemeral:true })
         }
 
         // first, check and see if the user that sent the command is authorized to sign a player (as in, they are a FO or GM)
