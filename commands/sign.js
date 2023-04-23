@@ -21,7 +21,7 @@ module.exports = {
     async execute(interaction) {
         let user = interaction.options.getUser('player')
         let userPing = await interaction.guild.members.fetch(user.id)
-        let userid = pingedUser.id;
+        let userid = userPing.id;
         const guild = interaction.guild.id
         const db = await getDBConnection()
         const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
