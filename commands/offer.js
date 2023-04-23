@@ -179,10 +179,10 @@ module.exports = {
                 const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
                 const transactionEmbed = new EmbedBuilder()
-                    .setTitle("Player signed!")
+                    .setTitle("Player Offered!")
                     .setColor(roleObj.color)
                     .setThumbnail(logoStr)
-                    .setDescription(`The ${roleObj} have successfully signed ${userPing} (${userPing.user.tag})!
+                    .setDescription(`The ${roleObj} have successfully offered ${userPing} (${userPing.user.tag})!
                     \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})\n**Roster:** ${roleObj.members.size}/${maxPlayers}`)
                 
                 if (interaction.user.avatarURL()) {
