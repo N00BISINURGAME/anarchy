@@ -113,6 +113,10 @@
       "description":"Allows you to view the roster of a team."
     },
     {
+      "name":"/setdemands <number>",
+      "description":"Sets the max demands each person is allowed to have. Only admins may run this command."
+    },
+    {
       "name":"/setup",
       "description":"Runs you through the setup prompt for Anarchy. May only be run by admins."
     },
