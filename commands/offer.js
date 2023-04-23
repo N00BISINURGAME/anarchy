@@ -73,7 +73,12 @@ module.exports = {
 
             // then, get the team logo
             const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [info, guild]);
-            const logoStr = logo.logo;
+            let logoStr;
+            if (!logo) {
+                logoStr = interaction.client.user.avatarURL()
+            } else {
+                logoStr = logo.logo;
+            }
 
             // get role id
             const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info, guild]);
