@@ -72,7 +72,7 @@ module.exports = {
         try {
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 120000})
         } catch(err) {
-            return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step."})
+            return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step.", embeds:[], components:[], ephemeral:true})
         }
 
         // prompt the user for the transaction channel
@@ -83,7 +83,7 @@ module.exports = {
         try {
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
         } catch(err) {
-            return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step."})
+            return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step.", embeds:[], components:[], ephemeral:true})
         }
         const transactionChannelId = messageCollector.values[0]
         await db.run('DELETE FROM Channels WHERE channelid = ?', transactionChannelId)
@@ -96,7 +96,7 @@ module.exports = {
         try {
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
         } catch(err) {
-            return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step."})
+            return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step.", embeds:[], components:[], ephemeral:true})
         }
         
         const demandChannelId = messageCollector.values[0]
@@ -110,7 +110,7 @@ module.exports = {
         try {
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
         } catch(err) {
-            return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step."})
+            return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step.", embeds:[], components:[], ephemeral:true})
         }
         const resultsChannelId = messageCollector.values[0]
         await db.run('DELETE FROM Channels WHERE channelid = ?', resultsChannelId)
@@ -123,7 +123,7 @@ module.exports = {
         try {
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.StringSelect, time: 120000})
         } catch(err) {
-            return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step."})
+            return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step.", embeds:[], components:[], ephemeral:true})
         }
         
         const teamOption = messageCollector.values[0]
