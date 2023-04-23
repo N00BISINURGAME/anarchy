@@ -24,6 +24,12 @@ module.exports = {
                 return interaction.editReply({ content:"You are not authorized to mass release!", ephemeral:true });
             }
 
+            const channelExists = await db.get('SELECT channelid FROM Channels WHERE purpose = "notices" AND guild = ?', guild)
+            if (!channelExists) {
+                await db.close();
+                return interaction.editReply({ content:"A notices channel has not been set yet!", ephemeral:true });
+            }
+
             const team = interaction.options.getMentionable('team')
 
             // check to see if the team exists
@@ -35,7 +41,7 @@ module.exports = {
 
             
 
-            await interaction.editReply({ content:"All players released from team!", ephemeral:true })
+            await interaction.editReply({ content:"Team has been removed!", ephemeral:true })
 
             await db.close();
 

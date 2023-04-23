@@ -71,6 +71,70 @@
     {
       "name":"/promote <player> <role>",
       "description":"Allows a franchise owner to promote a specific player to either head coach or general manager."
+    },
+    {
+      "name":"/qbstats <completions> <attempts> <touchdowns> <ints> <yards>",
+      "description":"Logs your quarterback stats, as shown on the FF2 'Passing' server stats."
+    },
+    {
+      "name":"/rbstats <attempts> <touchdowns> <yards>",
+      "description":"Logs your runningback stats, as shown on the FF2 'Rushing' server stats."
+    },
+    {
+      "name":"/refreshcommands",
+      "description":"Refreshes all bot commands without having to do a complete shutdown of Anarchy. Only usable by Donovan."
+    },
+    {
+      "name":"/release <user>",
+      "description":"Releases a user from their team."
+    },
+    {
+      "name":"/releaseall <team>",
+      "description":"Releases all players from a team, as well as their franchise owner. This is pretty much 'disbanding'. Only usable by admins."
+    },
+    {
+      "name":"/removeteam <team>",
+      "description":"Removes the team from the bot's database and deletes the team role."
+    },
+    {
+      "name":"/results <team1> <team2> <team1-score> <team2-score>",
+      "description":"Logs the game's score and posts it into the proper channel. May be run by admins or managers."
+    },
+    {
+      "name":"/revertresults <game-id>",
+      "description":"Reverts the results of a game in the event that it was improperly logged. May be run by admins or managers."
+    },
+    {
+      "name":"/ring <team>",
+      "description":"Gives all members of the specified team a ring, and keeps track of how many rings the team itself has run. May only be run by admins."
+    },
+    {
+      "name":"/roster <team>",
+      "description":"Allows you to view the roster of a team."
+    },
+    {
+      "name":"/setup",
+      "description":"Runs you through the setup prompt for Anarchy. May only be run by admins."
+    },
+    {
+      "name":"/standings",
+      "description":"Allows you to view team standings for that season. **This command should be used in conjunction with /results, as /results keeps track of scores for one game.**"
+    },
+    {
+      "name":"/teams",
+      "description":"Allows you to view all teams and their franchise owners. Similar to 'focheck' for other bots."
+    },
+    {
+      "name":"/trade <player1> <player2>",
+      "description":"Allows trade one player for another player. May only be run by franchise owners and general managers."
+    },
+    {
+      "name":"/whitelist <user> <role>",
+      "description":"Allows you to whitelist a user as a manager or an admin, for use in other commands. May only be run by a server owner."
+    },
+    {
+      "name":"/wrstats <attempts> <touchdowns> <yards>",
+      "description":"Logs your wide receiver stats, as shown on the FF2 'Receiving' server stats."
     }
   ]
 }

@@ -36,7 +36,9 @@ module.exports = {
         // then, check if a valid user ran the command
         const foRole = await db.get('SELECT * FROM Roles WHERE code = "FO" AND guild = ?', [guild])
         const gmRole = await db.get('SELECT * FROM Roles WHERE code = "GM" AND guild = ?', [guild])
-        if (!(interaction.member.roles.cache.get(foRole.roleid) || interaction.member.roles.cache.get(gmRole.roleid))) {
+        const admin = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+        const manager = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+        if (!(interaction.member.roles.cache.get(foRole.roleid) || interaction.member.roles.cache.get(gmRole.roleid) || admin || manager)) {
             return interaction.editReply({ content:"You are not permitted to run this command!", ephemeral:true })
         }
 
