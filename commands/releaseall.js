@@ -67,7 +67,12 @@ module.exports = {
                 .setColor(team.color)
                 .setDescription(`All members of the ${team} have been released!
                 \n**Affected users:**\n${userStr}\n>>> **Staff:** ${interaction.member} (${interaction.user.tag})`)
-                .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+            
+            if (interaction.user.avatarURL()) {
+                transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+            } else {
+                transactionEmbed.setFooter({ text: `${interaction.user.tag}` })
+            }
 
             await transactionChannel.send({ embeds: [transactionEmbed] });
 

@@ -113,9 +113,13 @@ module.exports = {
                 .setTitle("Incoming Offer!")
                 .setColor(teamRole.color)
                 .setThumbnail(logoStr)
-                .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
                 .setDescription(`The ${teamRole.name} have sent you an offer! To accept or decline, press the green or red button on this message. You have 15 minutes to accept.
                 \n>>> **Coach:** ${interaction.user.tag}`)
+            if (interaction.user.avatarURL()) {
+                dmMessage.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+            } else {
+                dmMessage.setFooter({ text: `${interaction.user.tag}` })
+            }
 
             const buttons = new ActionRowBuilder()
                     .addComponents(
@@ -173,9 +177,14 @@ module.exports = {
                     .setTitle("Player signed!")
                     .setColor(roleObj.color)
                     .setThumbnail(logoStr)
-                    .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
                     .setDescription(`The ${roleObj} have successfully signed ${userPing} (${userPing.user.tag})!
                     \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})\n**Roster:** ${roleObj.members.size}/${maxPlayers}`)
+                
+                if (interaction.user.avatarURL()) {
+                    transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+                } else {
+                    transactionEmbed.setFooter({ text: `${interaction.user.tag}` })
+                }
 
                 dmMessage.setTitle("Successfully signed!")
 

@@ -116,6 +116,11 @@ module.exports = {
 
         const id = Date.now()
         embed.setFooter({ text: `${interaction.user.tag} | This game has a unique ID of ${id}`, iconURL: `${interaction.user.avatarURL()}` })
+        if (interaction.user.avatarURL()) {
+            embed.setFooter({ text: `${interaction.user.tag} | This game has a unique ID of ${id}`, iconURL: `${interaction.user.avatarURL()}` })
+        } else {
+            embed.setFooter({ text: `${interaction.user.tag} | This game has a unique ID of ${id}` })
+        }
         await db.run('INSERT INTO Results (winner, winnerscore, loser, loserscore, guild, id) VALUES (?, ?, ?, ?, ?, ?)', [firstTeamRole.name, firstTeamScore, secondteamRole.name, secondTeamScore, guild, id])
 
         // then, increment the point differential. two cases: one where there is no tie, and one where there is a tie

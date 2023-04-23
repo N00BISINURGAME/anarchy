@@ -127,7 +127,12 @@ module.exports = {
             .setColor(roleObj.color)
             .setDescription(`The ${roleObj} have released ${user} (${user.user.tag})!
             \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})\n**Roster:** ${roleObj.members.size}/${playerCountQry.maxplayers}`)
-            .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+            
+        if (interaction.user.avatarURL()) {
+            transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+        } else {
+            transactionEmbed.setFooter({ text: `${interaction.user.tag}` })
+        }
 
         await transactionChannel.send({ embeds: [transactionEmbed] });
         await interaction.editReply({ content:`${user} was successfully released!`, ephemeral:true})

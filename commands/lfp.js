@@ -63,7 +63,12 @@ module.exports = {
           .setDescription(`The ${role} are looking for players!
           \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})\n**Description:** ${message}`)
           .setThumbnail(logoSql.logo)
-          .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+        
+        if (interaction.user.avatarURL()) {
+          embed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+        } else {
+          embed.setFooter({ text: `${interaction.user.tag}` })
+        }
 
         await interaction.editReply({ content:"Successfully posted LFP!", ephemeral: true})
 

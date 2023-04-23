@@ -73,11 +73,15 @@ module.exports = {
         // then, construct the embed
         const demandEmbed = new EmbedBuilder()
                     .setTitle("Player demanded!")
-                    .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
                     .setThumbnail(team.logo)
                     .setColor(teamRole.color)
                     .setDescription(`${interaction.member} (${interaction.user.tag}) has demanded from the ${teamRole}! ${specialRole ? `This person was the ${specialRole}.` : ""}
                     \n>>> **Roster:** ${teamRole.members.size}/${maxPlayerQry.maxplayers}`)
+        if (interaction.user.avatarURL()) {
+            demandEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+        } else {
+            demandEmbed.setFooter({ text: `${interaction.user.tag}` })
+        }
         // then, send the message to demands channel
         const demandChannelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "demands" AND guild = ?', guild);
         if (demandChannelId) {

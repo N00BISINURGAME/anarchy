@@ -111,10 +111,15 @@ module.exports = {
         const transactionEmbed = new EmbedBuilder()
             .setTitle('Player promoted!')
             .setThumbnail(logoStr)
-            .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
             .setColor(teamRole.color)
             .setDescription(`The ${teamRole} have promoted ${userChoice} (${userChoice.user.tag}) to ${roleObj}!
             \n>>> **Franchise Owner:** ${interaction.member} (${interaction.user.tag})`)
+        
+        if (interaction.user.avatarURL()) {
+            transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+        } else {
+            transactionEmbed.setFooter({ text: `${interaction.user.tag}` })
+        }
 
         // then, get the transaction channel ID and send a transaction message
         const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)

@@ -60,15 +60,14 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle(`${team.name} Roster`)
             .setColor(team.color)
-            .setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
             .setDescription(`${desc}`)
             .setThumbnail(logo.logo)
-            // .addFields(
-            //     {name:"Franchise Owner", value:fo},
-            //     {name:"General Manager", value:gm},
-            //     {name:"Head Coach", value:hc},
-            //     {name:"Players", value:players}
-            // )
+        
+        if (interaction.user.avatarURL()) {
+            embed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+        } else {
+            embed.setFooter({ text: `${interaction.user.tag}` })
+        }
 
         await interaction.editReply({ embeds: [embed], ephemeral:true })
 
