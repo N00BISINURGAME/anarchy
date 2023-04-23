@@ -17,7 +17,7 @@ module.exports = {
         .setName('help')
         .setDescription('Shows all commands for Anarchy.'),
     async execute(interaction) {
-        let helpStr;
+        let helpStr = "";
 
         let lower = 0
         let upper = 8
@@ -25,7 +25,7 @@ module.exports = {
         for (let i = lower; i < upper && i < commands.length; i++) {
           let name = commands[i].name
           let description = commands[i].description
-          helpStr += `**${name}** - ${description}\n`
+          helpStr += `**${name}** - ${description}\n\n`
         }
         // get teams and time
         const embed = new EmbedBuilder()
@@ -69,7 +69,7 @@ module.exports = {
         for (let i = lower; i < upper && i < commands.length; i++) {
             let name = commands[i].name
             let description = commands[i].description
-            helpStr += `**${name}** - ${description}\n`
+            helpStr += `**${name}** - ${description}\n\n`
         }
         if (helpStr === "") helpStr = "There are no more commands!"
         
