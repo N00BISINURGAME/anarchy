@@ -6,12 +6,12 @@ const { getDBConnection } = require('../getDBConnection');
 
 const capOption = new SlashCommandIntegerOption()
                                 .setRequired(true)
-                                .setName('player-cap')
-                                .setDescription('The maximum players each team is allowed to have')
+                                .setName('max-demands')
+                                .setDescription('The maximum demands each player is allowed to have per season.')
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('maxplayers')
+        .setName('setdemands')
         .addIntegerOption(capOption)
         .setDescription('Sets the maximum player count per team to a specified value.'),
     async execute(interaction) {
@@ -20,19 +20,19 @@ module.exports = {
         // first, check to see if the user is authorized to advance the season
         const user = interaction.user.id;
         const guild = interaction.guild.id
-        const maxPlayers = interaction.options.getInteger("player-cap")
+        const maxPlayers = interaction.options.getInteger("max-demands")
         const authorized = await db.run('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [user, guild])
         if (!authorized) {
             await db.close();
-            return interaction.editReply("You are not authorized to set max players!");
+            return interaction.editReply("You are not authorized to change demands!");
         }
 
         // then, advance the season
-        await db.run("UPDATE Leagues SET maxplayers = ? WHERE guild = ?", [maxPlayers, guild])
+        await db.run("UPDATE Leagues SET demands = ? WHERE guild = ?", [maxPlayers, guild])
 
         await db.close();
 
-        return interaction.editReply({ content:`Max players successfully set at ${maxPlayers}!`, ephemeral:true});
+        return interaction.editReply({ content:`Demands successfully set at ${maxPlayers}!`, ephemeral:true});
 
         
 
