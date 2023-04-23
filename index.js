@@ -190,10 +190,13 @@ client.on(Events.GuildMemberRemove, async member => {
 					// need to find out if the franchise owner was the person who left
 					const foRole = await db.get('SELECT * FROM Roles WHERE code = "FO" AND guild = ?', [guildId])
 					const roleObj = await member.guild.roles.fetch(role)
+
+					const logo = await db.get('SELECT t.logo FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND r.guild = ?', [role, guildId])
 					embed
 						.setTitle("Player left!")
 						.setColor(roleObj.color)
-						.setDescription(`${member.user.tag} has left the ${role}!\n>>> Roster: ${roleObj.members.size} / ${maxPlayers.maxplayers}`)
+						.setThumbnail(logo.logo)
+						.setDescription(`${member.user.tag} has left the ${roleObj}!\n>>> Roster: ${roleObj.members.size} / ${maxPlayers.maxplayers}`)
 					const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guildId);
 					if (channelId) {
 						const channel = await member.guild.channels.fetch(channelId.channelid);
@@ -202,7 +205,8 @@ client.on(Events.GuildMemberRemove, async member => {
 					// then, check for FO existence
 					for (const roleMember of roleMembers.values()) {
 						const roleMemberRoles = roleMember.roles.cache
-						if (roleMemberRoles.has(foRole)) {
+						if (roleMemberRoles.get(foRole)) {
+							embed.setDescription(`${member.user.tag} has left the ${roleObj.name} in ${member.guild.name}!\n>>> Roster: ${roleObj.members.size} / ${maxPlayers.maxplayers}`)
 							await roleMember.send( {embeds:[embed]})
 							break
 						}
