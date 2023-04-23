@@ -36,12 +36,6 @@ module.exports = {
             return interaction.editReply({ content:"You are not authorized to switch channels!", ephemeral:true });
         }
 
-        const uniqueChannel = await db.get('SELECT * FROM Channels WHERE channelid = ? AND guild = ?', [channel.id, guild])
-        if (uniqueChannel) {
-            await db.close()
-            return interaction.editReply({content:`This channel has already been linked for a specific purpose!`, ephemeral:true})
-        }
-
         // check if the channel exists
         const channelExists = await db.get('SELECT * FROM Channels WHERE purpose = ? AND guild = ?', userChoice, guild)
         if (channelExists) {
