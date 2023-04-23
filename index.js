@@ -196,7 +196,7 @@ client.on(Events.GuildMemberRemove, async member => {
 						.setTitle("Player left!")
 						.setColor(roleObj.color)
 						.setThumbnail(logo.logo)
-						.setDescription(`${member.user.tag} has left the ${roleObj}!\n>>> Roster: ${roleObj.members.size} / ${maxPlayers.maxplayers}`)
+						.setDescription(`${member.user.tag} has left the ${roleObj} due to leaving the server!\n>>> **Roster:** ${roleObj.members.size}/${maxPlayers.maxplayers}`)
 					const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guildId);
 					if (channelId) {
 						const channel = await member.guild.channels.fetch(channelId.channelid);
@@ -206,7 +206,7 @@ client.on(Events.GuildMemberRemove, async member => {
 					for (const roleMember of roleMembers.values()) {
 						const roleMemberRoles = roleMember.roles.cache
 						if (roleMemberRoles.get(foRole.roleid)) {
-							embed.setDescription(`${member.user.tag} has left the ${roleObj.name} in ${member.guild.name}!\n>>> Roster: ${roleObj.members.size} / ${maxPlayers.maxplayers}`)
+							embed.setDescription(`${member.user.tag} has left the ${roleObj.name} in ${member.guild.name} due to leaving the server!\n>>> **Roster:** ${roleObj.members.size}/${maxPlayers.maxplayers}`)
 							await roleMember.send( {embeds:[embed]})
 							break
 						}
