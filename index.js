@@ -203,7 +203,7 @@ client.on(Events.GuildMemberRemove, async member => {
 						await channel.send({ embeds:[embed] })
 					}
 					// then, check for FO existence
-					for (const roleMember of roleMembers.values()) {
+					for (const roleMember of roleObj.members.values()) {
 						const roleMemberRoles = roleMember.roles.cache
 						if (roleMemberRoles.get(foRole.roleid)) {
 							embed.setDescription(`${member.user.tag} has left the ${roleObj.name} in ${member.guild.name} due to leaving the server!\n>>> **Roster:** ${roleObj.members.size}/${maxPlayers.maxplayers}`)
