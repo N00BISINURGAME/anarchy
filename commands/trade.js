@@ -63,7 +63,7 @@ module.exports = {
         // then, check that either of the players are not being traded. do this later
         // need to create a trades table in our database
         const player1Traded = await db.get('SELECT * FROM Trades WHERE discordid = ? AND guild = ?', [player1.id, guild])
-        const player2Traded = await db.all('SELECT * FROM Trades WHERE discordid = ? AND guild = ?', [player2.id, guild])
+        const player2Traded = await db.get('SELECT * FROM Trades WHERE discordid = ? AND guild = ?', [player2.id, guild])
         if (player1Traded && player2Traded) {
             await db.close()
             return interaction.editReply({ content:`${player1} and ${player2} are currently involved in other trades! Please try again later!`, ephemeral: true})
