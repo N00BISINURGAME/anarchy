@@ -195,7 +195,7 @@ module.exports = {
                 await player1Member.roles.remove(offeringTeamRole)
                 await player1Member.roles.add(otherTeam)
                 await player2Member.roles.remove(otherTeam)
-                await player1Member.roles.add(offeringTeamRole)
+                await player2Member.roles.add(offeringTeamRole)
 
                 embed.setTitle('Trade successfully executed!')
                 await dmInteraction.update({ embeds:[embed], components:[] })
