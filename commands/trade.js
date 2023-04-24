@@ -134,7 +134,7 @@ module.exports = {
         }
 
         // then, construct the embed
-        const offeringTeam = await db.get('SELECT name, logo, roleid FROM Teams WHERE code = ? AND guild = ?', [info, guild])
+        const offeringTeam = await db.get('SELECT name, logo FROM Teams WHERE code = ? AND guild = ?', [info, guild])
 
         const offeringTeamRole = await interaction.guild.roles.fetch(offeringTeam.roleid)
 
