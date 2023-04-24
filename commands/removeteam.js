@@ -34,7 +34,7 @@ module.exports = {
 
             // check to see if the team exists
             const teamExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [team.id, guild])
-            if (!teamExists) {
+            if (!teamExists || teamExists.code === "FO" || teamExists.code === "GM" || teamExists.code === "HC") {
                 await db.close();
                 return interaction.editReply({ content:"This team does not exist! Ensure you're pinging a team that exists.", ephemeral:true });
             }
