@@ -136,7 +136,7 @@ module.exports = {
         // then, construct the embed
         const offeringTeam = await db.get('SELECT name, logo FROM Teams WHERE code = ? AND guild = ?', [info, guild])
 
-        const offeringTeamRole = await interaction.guild.roles.fetch(offeringTeam.roleid)
+        const offeringTeamRole = await interaction.guild.roles.fetch(infoRoleid)
 
         const embed = new EmbedBuilder()
             .setTitle("Incoming trade offer!")
