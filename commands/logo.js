@@ -17,6 +17,7 @@ module.exports = {
         const db = await getDBConnection();
         const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, interaction.guild.id])
         if (!authorized) {
+            await db.close()
           return interaction.editReply({ content:"You are not authorized to change the team's logo!", ephemeral:true })
         }
 
@@ -30,6 +31,7 @@ module.exports = {
         const matches = link.match(regex)
 
         if (!matches) {
+            await db.close()
             return interaction.editReply({ content:"The logo you provided may not be valid! Ensure it is a valid image link. Feel free to DM Donovan#3771 with any questions.", ephemeral:true })
         }
 

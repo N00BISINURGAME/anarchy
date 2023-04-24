@@ -72,6 +72,7 @@ module.exports = {
         try {
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 120000})
         } catch(err) {
+            await db.close()
             return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step.", embeds:[], components:[], ephemeral:true})
         }
 
@@ -83,6 +84,7 @@ module.exports = {
         try {
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
         } catch(err) {
+            await db.close()
             return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step.", embeds:[], components:[], ephemeral:true})
         }
         const transactionChannelId = messageCollector.values[0]
@@ -96,6 +98,7 @@ module.exports = {
         try {
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
         } catch(err) {
+            await db.close()
             return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step.", embeds:[], components:[], ephemeral:true})
         }
         
@@ -110,6 +113,7 @@ module.exports = {
         try {
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.ChannelSelect, time: 120000})
         } catch(err) {
+            await db.close()
             return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step.", embeds:[], components:[], ephemeral:true})
         }
         const resultsChannelId = messageCollector.values[0]
@@ -123,6 +127,7 @@ module.exports = {
         try {
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.StringSelect, time: 120000})
         } catch(err) {
+            await db.close()
             return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step.", embeds:[], components:[], ephemeral:true})
         }
         

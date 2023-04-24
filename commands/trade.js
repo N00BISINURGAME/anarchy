@@ -216,7 +216,7 @@ module.exports = {
                 await interaction.editReply({ content:"Trade rejected!", ephemeral: true})
             }
             await db.close()
-        } catch(err) {}
+        } catch(err) {
             console.log(err)
             await db.run("DELETE FROM Trades WHERE (discordid = ? OR discordid = ?) AND guild = ?", [player1.id, player2.id, guild]);
             if (err.code === "InteractionCollectorError") {
@@ -229,7 +229,6 @@ module.exports = {
             }
             await db.close();
         }
-        
-        await db.close();
+
     }
 }

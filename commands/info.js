@@ -118,6 +118,7 @@ module.exports = {
                 )
             }
             // then, add inline fields
+            await db.close()
             return interaction.editReply({ embeds:[embed], ephemeral:true});
         } else {
 

@@ -38,6 +38,7 @@ module.exports = {
         const matches = logo.match(regex)
 
         if (!matches) {
+            await db.close()
             return interaction.editReply({ content:"The logo you provided may not be valid! Ensure it is a valid image link. Feel free to DM Donovan#3771 with any questions.", ephemeral:true })
         }
 

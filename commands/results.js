@@ -54,6 +54,7 @@ module.exports = {
         const team2ScoreInt = interaction.options.getInteger("second-team-score")
 
         if (team1Role === team2Role) {
+            await db.close()
             return interaction.editReply({ content:"Command failed! Ensure that team 1 and team 2 are different.", ephemeral:true })
         }
 

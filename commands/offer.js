@@ -32,6 +32,7 @@ module.exports = {
             // check if a transaction channel has been set
             const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
             if (!transactionExists) {
+                await db.close()
                 return interaction.editReply({ content: "A transaction channel has not been set!", ephemeral: true})
             }
 
@@ -41,6 +42,7 @@ module.exports = {
             let userid = user.id;
 
             if (user.id === interaction.user.id) {
+                await db.close()
                 return interaction.editReply({ content:"You are not allowed to offer yourself!", ephemeral:true })
             }
 
@@ -108,7 +110,10 @@ module.exports = {
             const memberTeamRole = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info, guild])
             const teamRole = await interaction.guild.roles.fetch(memberTeamRole.roleid)
 
-            if (teamRole.members.size + 1 > maxPlayers) return interaction.editReply({content:'Signing this player would lead to your team exceeding the maximum player count!', ephemeral:true});
+            if (teamRole.members.size + 1 > maxPlayers) {
+                await db.close()
+                return interaction.editReply({content:'Signing this player would lead to your team exceeding the maximum player count!', ephemeral:true});
+            }
 
             // then, get channel information and send an ephemeral reply to the command saying a user has been offered
             // also create the dm message, format it properly, and send it to the user and listen for a button click
@@ -150,6 +155,7 @@ module.exports = {
                     const failEmbed = new EmbedBuilder()
                         .setTitle("Signing failed")
                         .setDescription(`${info.team} has signed too many players, and can no longer sign you without going over the maximum player cap.`)
+                        await db.close()
                     return dmInteraction.update({ embeds: failEmbed, components: [] })
                 }
 
@@ -168,6 +174,7 @@ module.exports = {
                     const failEmbed = new EmbedBuilder()
                         .setTitle("Signing failed")
                         .setDescription(`You have already signed to another team.`)
+                    await db.close()
                     return dmInteraction.update({ embeds: failEmbed, components: [] })
                 }
 

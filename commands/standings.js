@@ -50,6 +50,7 @@ module.exports = {
                     )
 
         if (teamStandings.length < upper) {
+            await db.close()
             return interaction.editReply({ embeds:[embed], ephemeral:true })
         }
         

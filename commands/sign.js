@@ -32,10 +32,12 @@ module.exports = {
         // check if a transaction channel has been set
         const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
         if (!transactionExists) {
+          await db.close()
             return interaction.editReply({ content: "A transaction channel has not been set!", ephemeral: true})
         }
 
         if (user.id === interaction.user.id) {
+          await db.close()
           return interaction.editReply({ content:"You are not allowed to sign yourself!", ephemeral:true })
         }
 
@@ -92,7 +94,10 @@ module.exports = {
         const memberTeamRole = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info, guild])
         const teamRole = await interaction.guild.roles.fetch(memberTeamRole.roleid)
 
-        if (teamRole.members.size + 1 > maxPlayers) return interaction.editReply({content:'Signing this player would lead to your team exceeding the maximum player count!', ephemeral:true});
+        if (teamRole.members.size + 1 > maxPlayers) {
+          await db.close()
+          return interaction.editReply({content:'Signing this player would lead to your team exceeding the maximum player count!', ephemeral:true});
+        }
 
         let dmChannel = await userPing.createDM()
 

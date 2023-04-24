@@ -48,12 +48,14 @@ module.exports = {
         const admin = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
         const manager = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
         if (!(interaction.member.roles.cache.get(foRole.roleid) || interaction.member.roles.cache.get(gmRole.roleid) || admin || manager)) {
+            await db.close()
             return interaction.editReply({ content:"You are not permitted to run this command!", ephemeral:true })
         }
 
         // then, check edge cases (same team for team1 and team2, invalid teams being pinged)
         // worry about second case tmrw
         if (team1 === team2) {
+            await db.close()
             return interaction.editReply({ content:"Ensure both teams are unique!", ephemeral:true })
         }
 

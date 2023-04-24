@@ -23,7 +23,10 @@ module.exports = {
 
         // check if the user is trying to assign themselves a role
 
-        if (userId === userChoice.id) return interaction.editReply({ content:'You are unable to demote yourself!', ephemeral:true });
+        if (userId === userChoice.id){
+            await db.close()
+            return interaction.editReply({ content:'You are unable to demote yourself!', ephemeral:true });
+        }
 
         // first, check to see if the pinged player is an FO
         let specialRole;

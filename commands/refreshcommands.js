@@ -114,7 +114,7 @@ module.exports = {
             const command = require(filePath);
             interaction.client.commands.set(command.data.name, command);
         }
-
+        await db.close()
         return interaction.editReply({ content:`Successfully refreshed commands!`, ephemeral:true })
     }
 }
