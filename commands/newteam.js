@@ -8,7 +8,7 @@ const fullOption = new SlashCommandStringOption().setRequired(true).setName('tea
 
 const shortOption = new SlashCommandStringOption().setRequired(true).setName('team-short-name').setDescription('The abbreviation of the team you want to create');
 
-const logoOption = new SlashCommandStringOption().setRequired(true).setName('team-logo').setDescription('A link to the logo for the team.');
+const logoOption = new SlashCommandStringOption().setName('team-logo').setDescription('A link to the logo for the team.');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -31,7 +31,10 @@ module.exports = {
 
         const fullName = interaction.options.getString('team-full-name')
         const shortName = interaction.options.getString('team-short-name')
-        const logo = interaction.options.getString('team-logo')
+        let logo = interaction.options.getString('team-logo')
+        if (!logo) {
+            logo = "https://cdn.discordapp.com/avatars/1094711775414460416/a9718c56059cc995ddc774b840e8692b.webp"
+        }
 
         const regex = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
 
