@@ -141,13 +141,9 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle("Incoming trade offer!")
             .setColor(offeringTeamRole.color)
-            .setDescription(`The ${offeringTeam.name} have offered you a trade! You have 15 minutes to accept or decline.
+            .setDescription(`The ${offeringTeam.name} have offered you a trade in ${interaction.guild.name}! You have 15 minutes to accept or decline.
             \n>>> **Players you will receive:** ${player1.tag}\n**Players you will trade away:** ${player2.tag}`)
             .setThumbnail(`${offeringTeam.logo}`)
-            .setFields(
-                { name:"Players you will receive", value:`${player1.tag}`},
-                { name:"Players you will trade away", value:`${player2.tag}`}
-            )
         if (interaction.user.avatarURL()) {
             embed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
         } else {
@@ -167,27 +163,65 @@ module.exports = {
             )
 
         const dmChannel = await otherTeamFo.createDm()
-        const message = await dmChannel.send({ embeds:[embed], compoenents:[buttons] })
+        const message = await dmChannel.send({ embeds:[embed], components:[buttons] })
         await interaction.editReply({ content: "Trade has been sent. Awaiting decision...", ephemeral: true})
         // put both players into the trade db
         await db.run('INSERT INTO Trades(discordid, guild) VALUES(?, ?)', [player1.id, guild])
         await db.run('INSERT INTO Trades(discordid, guild) VALUES(?, ?)', [player2.id, guild])
         try {
             const dmInteraction = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 890000})
+            const otherTeam = await interaction.guild.roles.fetch(player2Roleid)
+
+            await db.run('DELETE FROM Trades WHERE (discordid = ? OR discordid = ?) AND guild = ?', [player1.id, player2.id, guild])
             if (dmInteraction.customId === "accept") {
                 // confirm that the players are still on their respective teams
-                const player1Confirm = await db.get('SELECT * FROM Players WHERE discordid = ? AND team = ? AND guild = ?', [player1.id, player1Authorized.team, guild])
-                const player2Confirm = await db.get('SELECT * FROM Players WHERE discordid = ? AND team = ? AND guild = ?', [player2.id, player2Info.team, guild])
+                if (!player1Member.roles.cache.get(infoRoleId)) {
+                    await db.close()
+                    embed.setTitle("Trade failed!")
+                    embed.setDescription(`${player1Member} is no longer on the ${offeringTeamRole.name}!`)
+                    await dmInteraction.update({ embeds:[embed], components:[] })
+                    return interaction.editReply({ content:`${player1Member} is no longer on their team!`, ephemeral: true})
+                }
+                if (!player2Member.roles.cache.get(player2Roleid)) {
+                    await db.close()
+                    embed.setTitle("Trade failed!")
+                    embed.setDescription(`${player2Member} is no longer on the ${otherTeam.name}!`)
+                    await dmInteraction.update({ embeds:[embed], components:[] })
+                    return interaction.editReply({ content:`${player1Member} is no longer on their team!`, ephemeral: true})
+                }
+
+                await player1Member.roles.remove(offeringTeam)
+                await player1Member.roles.add(otherTeam)
+                await player2Member.roles.remove(otherTeam)
+                await player1Member.roles.add(offeringTeam)
+
+                embed.setTitle('Trade successfully executed!')
+                await dmInteraction.update({ embeds:[embed], components:[] })
+                await interaction.editReply({ content:"Trade successful!", ephemeral: true})
+                embed.setTitle("Trade Processed!")
+                embed.setDescription(`The ${offeringTeam} have conducted a trade with the ${otherTeam}!
+                \n>>> **${offeringTeam.name} receives:** ${player2Member} (${player2.tag})\n**${otherTeam.name} receives:** ${player1Member} (${player1.tag})`)
+
+                // then, get the transaction channel ID and send a transaction message
+                const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
+
+                const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
+
+                await transactionChannel.send({ embeds:[embed] })
 
                 //ìf (!(player1Cònfirm.team === player1Authorized.team))
+            } else if (dmInteraction.customId === "decline") {
+                embed.setTitle("Trade rejected!")
+                await dmInteraction.update({ embeds:[embed], components:[] })
+                await interaction.editReply({ content:"Trade rejected!", ephemeral: true})
             }
-        } catch(err) {
-            await interaction.client.users.send("168490999235084288", `Error for user ${interaction.user.tag}\n\n ${err}`)
+            await db.close()
+        } catch(err) {}
             console.log(err)
-            await db.run("DELETE FROM Offers WHERE discordid = ?", userid);
+            await db.run("DELETE FROM Trades WHERE (discordid = ? OR discordid = ?) AND guild = ?", [player1.id, player2.id, guild]);
             if (err.code === "InteractionCollectorError") {
-                embed.setTitle("Offer Expired!")
-                await message.edit({ embeds: [dmMessage], components: []})
+                embed.setTitle("Trade Expired!")
+                await message.edit({ embeds: [embed], components: []})
              } else if (err.code === 50007) {
                 await interaction.editReply({ content: "This user does not have their DMs open to bots! Ensure that this user can be DMed by bots before sending them another trade!", ephemeral:true })
             } else {

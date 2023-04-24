@@ -39,6 +39,12 @@ module.exports = {
             return interaction.editReply({ content: "A transaction channel has not been set!", ephemeral: true})
         }
 
+        const isBeingTraded = await db.get('SELECT * FROM Trades WHERE discordid = ? AND guild = ?', [userChoice.id, guild])
+        if (isBeingTraded) {
+            await db.close()
+            return interaction.editReply({ content: "This player is currently involved in a trade!", ephemeral: true})
+        }
+
         // check if the user is trying to assign themselves a role
         if (userId === userChoice.id) return interaction.editReply({ content:'You cannot assign yourself a role!', ephemeral:true });
 

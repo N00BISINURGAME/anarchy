@@ -250,7 +250,8 @@ client.on(Events.GuildMemberRemove, async member => {
 						.setTitle("Player left!")
 						.setColor(roleObj.color)
 						.setThumbnail(logo.logo)
-						.setDescription(`${member.user.tag} has left the ${roleObj} due to leaving the server!\n>>> **Roster:** ${roleObj.members.size}/${maxPlayers.maxplayers}`)
+						.setDescription(`${member.user.tag} has left the ${roleObj} due to leaving the server!
+						\n>>> **Roster:** ${roleObj.members.size}/${maxPlayers.maxplayers}`)
 					const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guildId);
 					if (channelId) {
 						const channel = await member.guild.channels.fetch(channelId.channelid);
