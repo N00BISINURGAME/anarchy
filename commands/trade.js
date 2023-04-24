@@ -175,7 +175,7 @@ module.exports = {
             await db.run('DELETE FROM Trades WHERE (discordid = ? OR discordid = ?) AND guild = ?', [player1.id, player2.id, guild])
             if (dmInteraction.customId === "accept") {
                 // confirm that the players are still on their respective teams
-                if (!player1Member.roles.cache.get(infoRoleId)) {
+                if (!player1Member.roles.cache.get(infoRoleid)) {
                     await db.close()
                     embed.setTitle("Trade failed!")
                     embed.setDescription(`${player1Member} is no longer on the ${offeringTeamRole.name}!`)
