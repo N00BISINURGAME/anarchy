@@ -30,9 +30,12 @@ module.exports = {
         const player1Member = await interaction.guild.members.fetch(player1.id)
         const player2 = interaction.options.getUser("player-you-want")
         const player2Member = await interaction.guild.members.fetch(player2.id)
-        if (userid !== "168490999235084288") {
+
+        // check if a transaction channel has been set
+        const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
+        if (!transactionExists) {
             await db.close()
-            return interaction.editReply({ content:"Not implemented yet!", ephemeral: true})
+            return interaction.editReply({ content: "A transaction channel has not been set!", ephemeral: true})
         }
 
         // first, check if the user is allowed to trade people
