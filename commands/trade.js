@@ -171,6 +171,7 @@ module.exports = {
         try {
             const dmInteraction = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 890000})
             const otherTeam = await interaction.guild.roles.fetch(player2Roleid)
+            console.log(otherTeam)
 
             await db.run('DELETE FROM Trades WHERE (discordid = ? OR discordid = ?) AND guild = ?', [player1.id, player2.id, guild])
             if (dmInteraction.customId === "accept") {
