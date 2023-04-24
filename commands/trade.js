@@ -192,10 +192,10 @@ module.exports = {
                     return interaction.editReply({ content:`${player1Member} is no longer on their team!`, ephemeral: true})
                 }
 
-                await player1Member.roles.remove(offeringTeam)
+                await player1Member.roles.remove(offeringTeamRole)
                 await player1Member.roles.add(otherTeam)
                 await player2Member.roles.remove(otherTeam)
-                await player1Member.roles.add(offeringTeam)
+                await player1Member.roles.add(offeringTeamRole)
 
                 embed.setTitle('Trade successfully executed!')
                 await dmInteraction.update({ embeds:[embed], components:[] })
