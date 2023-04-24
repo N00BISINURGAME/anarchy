@@ -201,8 +201,8 @@ module.exports = {
                 await dmInteraction.update({ embeds:[embed], components:[] })
                 await interaction.editReply({ content:"Trade successful!", ephemeral: true})
                 embed.setTitle("Trade Processed!")
-                embed.setDescription(`The ${offeringTeam} have conducted a trade with the ${otherTeam}!
-                \n>>> **${offeringTeam.name} receives:** ${player2Member} (${player2.tag})\n**${otherTeam.name} receives:** ${player1Member} (${player1.tag})`)
+                embed.setDescription(`The ${offeringTeamRole} have conducted a trade with the ${otherTeam}!
+                \n>>> **${offeringTeam.name} receives:** ${player2Member} (${player2.tag})\n**${otherTeam.name} receives:** ${player1Member} (${player1.tag})\n**${offeringTeamRole.name} coach:** ${interaction.member} (${interaction.user.tag})\n**${otherTeam.name} coach:** ${otherTeamFo} (${otherTeamFo.user.tag})`)
 
                 // then, get the transaction channel ID and send a transaction message
                 const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
