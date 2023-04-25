@@ -127,7 +127,7 @@ client.on(Events.GuildCreate, async guild => {
 
 		const guildExists = await db.get('SELECT * FROM Leagues WHERE guild = ?', guildid);
 
-		const joinChannel = guild.channels.cache.first()
+		const joinChannel = await guild.channels.fetch((guild.channels.cache.first()).id)
 
 		try {
 			const guildAddChannel = await client.channels.fetch("1095573451999281225")
@@ -135,7 +135,7 @@ client.on(Events.GuildCreate, async guild => {
 				.setTitle("Anarchy has joined a new guild!")
 				.setDescription(`Anarchy has joined ${guild.name}! Anarchy is now in ${client.guilds.cache.size} guild!
 				\n>>> **Guild ID:** ${guild.id}\n**Server owner:** ${guild.ownerId}\n**Member count:** ${guild.members.size}`)
-			const invite = guild.invites.create(joinChannel)
+			const invite = await guild.invites.create(joinChannel)
 
 			const button = new ActionRowBuilder()
 				.addComponents(new ButtonBuilder()
