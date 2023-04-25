@@ -105,7 +105,7 @@ module.exports = {
             .setTitle("Incoming game results!")
 
         if (teamWon) {
-            const imageLink = await db.get("SELECT t.logo FROM Teams t, Roles r WHERE r.roleid = ? AND r.code = t.code AND t.guild = ?", [teamWon.id, guild])
+            const imageLink = await db.get("SELECT t.logo FROM Teams t, Roles r WHERE r.roleid = ? AND r.code = t.code AND t.guild = r.guild AND t.guild = ?", [teamWon.id, guild])
             embed.setThumbnail(imageLink.logo)
             embed.setColor(teamWon.color)
         } else {

@@ -61,6 +61,10 @@ module.exports = {
 
         const demoterRoles = interaction.member.roles.cache
         const foRoleid = await db.get('SELECT roleid FROM Roles WHERE code = "FO" AND guild = ?', guild)
+        if (!foRoleid) {
+            await db.close()
+            return interaction.editReply({ content:"The franchise owner role does not exist in the database! This may be a sign that you need to run /setup.", ephemeral:true })
+        }
         if (!(demoterRoles.get(foRoleid.roleid))) {
             await db.close()
             return interaction.editReply({ content:"You are not authorized to demote individuals, as you are not a franchise owner!", ephemeral:true })

@@ -110,7 +110,7 @@ module.exports = {
 
 
         // then, get the team logo and player count
-        const logo = await db.get('SELECT t.logo FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND r.guild = ?', [teamSignedRoleid, guild])
+        const logo = await db.get('SELECT t.logo FROM Teams t, Roles r WHERE t.code = r.code AND t.guild = r.guild AND r.roleid = ? AND r.guild = ?', [teamSignedRoleid, guild])
         const logoStr = logo.logo;
 
         // then, get the transaction channel ID and send a transaction message

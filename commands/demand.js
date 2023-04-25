@@ -68,7 +68,7 @@ module.exports = {
             await interaction.member.roles.remove(teamRole)
         }
 
-        const team = await db.get('SELECT t.logo FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND r.guild = ?', [teamRole.id, guild])
+        const team = await db.get('SELECT t.logo FROM Teams t, Roles r WHERE t.code = r.code AND t.guild = r.guild AND r.roleid = ? AND r.guild = ?', [teamRole.id, guild])
 
         // then, construct the embed
         const demandEmbed = new EmbedBuilder()
