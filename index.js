@@ -223,6 +223,7 @@ client.on(Events.GuildMemberAdd, async member => {
 		const button = new ActionRowBuilder()
 			.addComponents(new ButtonBuilder()
 							.setLabel("Invite Anarchy!")
+							.setStyle(ButtonStyle.Link)
 							.setURL("https://discord.com/api/oauth2/authorize?client_id=1094711775414460416&permissions=8&scope=bot%20applications.commands"))
 
 		await memberDm.send({ embeds:[embed], components:[button] })
