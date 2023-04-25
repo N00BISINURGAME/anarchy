@@ -49,7 +49,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	try {
 		await interaction.deferReply({ ephemeral:true })
 		if (client.user.id === "1094711775414460416") {
-			return interaction.editReply("This copy of Anarchy is down, add this one instead! https://discord.com/api/oauth2/authorize?client_id=1094711775414460416&permissions=8&scope=bot%20applications.commands")
+			return interaction.editReply("This copy of Anarchy is down, add this one instead! https://discord.com/api/oauth2/authorize?client_id=1098837048187682816&permissions=8&scope=bot")
 		}
 		const db = await getDBConnection()
 		await client.users.fetch(interaction.user.id) // fetch the user and cache them for future use
