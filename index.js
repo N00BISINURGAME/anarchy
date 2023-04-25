@@ -130,11 +130,12 @@ client.on(Events.GuildCreate, async guild => {
 		const joinChannel = guild.systemChannel
 
 		try {
+			const serverOwner = await guild.members.fetch(guild.ownerId)
 			const guildAddChannel = await client.channels.fetch("1095573451999281225")
 			const embed = new EmbedBuilder()
 				.setTitle("Anarchy has joined a new guild!")
 				.setDescription(`Anarchy has joined ${guild.name}! Anarchy is now in ${client.guilds.cache.size} guild!
-				\n>>> **Guild ID:** ${guild.id}\n**Server owner:** ${guild.ownerId}\n**Member count:** ${guild.memberCount}`)
+				\n>>> **Guild ID:** ${guild.id}\n**Server owner:** ${serverOwner} (${guild.ownerId})\n**Member count:** ${guild.memberCount}`)
 			const invites = await guild.invites.fetch()
 
 			const button = new ActionRowBuilder()
