@@ -36,6 +36,10 @@ module.exports = {
         }
 
         const code = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [team.id, guild])
+        if (!code) {
+            await db.close()
+            return interaction.editReply({ content:"The team you want to change the logo of does not exist in the database! This may indicate that you need to run /setup.", ephemeral:true })
+        }
 
         await db.run('UPDATE Teams SET logo = ? WHERE code = ? AND guild = ?', [link, code.code, guild])
 
