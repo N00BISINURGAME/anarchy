@@ -222,7 +222,6 @@ client.on(Events.GuildMemberAdd, async member => {
 
 		const button = new ActionRowBuilder()
 			.addComponents(new ButtonBuilder()
-							.setCustomId("invite")
 							.setLabel("Invite Anarchy!")
 							.setURL("https://discord.com/api/oauth2/authorize?client_id=1094711775414460416&permissions=8&scope=bot%20applications.commands"))
 
