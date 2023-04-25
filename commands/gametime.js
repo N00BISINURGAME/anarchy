@@ -66,7 +66,7 @@ module.exports = {
                         .setDescription(`The ${team1} are going against the ${team2}!
                         \n>>> **Time:** ${time}\n**Referee:** None\n**Coach:** ${interaction.member} (${interaction.user.tag})`)
                         .setThumbnail(interaction.guild.iconURL())
-                        
+
         if (interaction.user.avatarURL()) {
             embed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
         } else {

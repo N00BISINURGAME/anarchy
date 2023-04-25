@@ -49,6 +49,10 @@ module.exports = {
             // first, check and see if the user that sent the command is authorized to sign a player (as in, they are a FO or GM)
             const userSent = interaction.user.id;
             const allTeams = await db.all('SELECT roleid, code FROM Roles WHERE guild = ?', guild)
+            if (allTeams.length === 0) {
+                await db.close()
+                return interaction.editReply({ content:"There are no teams in this league! This may indicate you need to run /setup.", ephemeral:true })
+            }
             let authorized = false
             let info
             for (const team of allTeams) {
@@ -84,6 +88,10 @@ module.exports = {
 
             // get role id
             const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info, guild]);
+            if (!role) {
+                await db.close()
+                return interaction.editReply({ content:"The team you are on does not exist in the database! This may indicate you need to run /setup.", ephemeral:true })
+            }
             const roleObj = await interaction.guild.roles.fetch(role.roleid)
 
             // then, check to see if the user is already signed
@@ -102,12 +110,20 @@ module.exports = {
             if (userSigned) {
                 // then, get the team that the player is signed on
                 const team = await db.get('SELECT roleid FROM roles WHERE code = ? AND guild = ?', [teamSigned, guild]);
+                if (!team) {
+                    await db.close()
+                    return interaction.editReply({ content:"The team that the player you want to offer is on does not exist in the database! This may be a sign that you need to run /setup.", ephemeral:true })
+                }
                 const teamRole = await interaction.guild.roles.fetch(team.roleid);
                 await db.close();
                 return interaction.editReply({content:`This user has already been signed by the ${teamRole}!`, ephemeral:true});
             }
 
             const memberTeamRole = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info, guild])
+            if (!memberTeamRole) {
+                await db.close()
+                return interaction.editReply({ content:"The team you are on does not exist in the database! This may indicate you need to run /setup.", ephemeral:true })
+            }
             const teamRole = await interaction.guild.roles.fetch(memberTeamRole.roleid)
 
             if (teamRole.members.size + 1 > maxPlayers) {
