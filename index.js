@@ -216,8 +216,8 @@ client.on(Events.GuildMemberAdd, async member => {
 		const memberDm = await member.createDM()
 		const embed = new EmbedBuilder()
 			.setTitle("Make the switch to Anarchy!")
-			.setDescription(`If you are the owner of a league or are considering starting a league, consider using Anarchy! We are one of the fastest-growing league utility bots on the market,
-			and we have the tools that **you** need in order to make sure that your league able to quickly start operating at peak efficiency.
+			.setThumbnail(client.user.avatarURL())
+			.setDescription(`If you are the owner of a league or are considering starting a league, consider using Anarchy! We are one of the fastest-growing league utility bots on the market, and we have the tools that **you** need in order to make sure that your league able to quickly start operating at peak efficiency for any sport, offered to you completely **for free**.
 			\nIf you want to invite Anarchy, click the button below!`)
 
 		const button = new ActionRowBuilder()
