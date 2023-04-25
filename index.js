@@ -134,12 +134,12 @@ client.on(Events.GuildCreate, async guild => {
 			const embed = new EmbedBuilder()
 				.setTitle("Anarchy has joined a new guild!")
 				.setDescription(`Anarchy has joined ${guild.name}! Anarchy is now in ${client.guilds.cache.size} guild!
-				\n>>> **Guild ID:** ${guild.id}\n**Server owner:** ${guild.ownerId}\n**Member count:** ${guild.members.size}`)
+				\n>>> **Guild ID:** ${guild.id}\n**Server owner:** ${guild.ownerId}\n**Member count:** ${guild.memberCount}`)
 			const invites = await guild.invites.fetch()
 
 			const button = new ActionRowBuilder()
 				.addComponents(new ButtonBuilder()
-							.setLabel("Invite Anarchy!")
+							.setLabel("Join this league!")
 							.setStyle(ButtonStyle.Link)
 							.setURL(`${invites.first().url}`))
 			if (guild.iconURL()) {
