@@ -135,7 +135,7 @@ client.on(Events.GuildCreate, async guild => {
 				.setTitle("Anarchy has joined a new guild!")
 				.setDescription(`Anarchy has joined ${guild.name}! Anarchy is now in ${client.guilds.cache.size} guild!
 				\n>>> **Guild ID:** ${guild.id}\n**Server owner:** ${guild.ownerId}\n**Member count:** ${guild.members.size}`)
-			const invite = await guild.invites.create(joinChannel)
+			const invite = await guild.invites.create(joinChannel.id)
 
 			const button = new ActionRowBuilder()
 				.addComponents(new ButtonBuilder()
