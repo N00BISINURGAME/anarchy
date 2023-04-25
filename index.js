@@ -135,7 +135,7 @@ client.on(Events.GuildCreate, async guild => {
 			const embed = new EmbedBuilder()
 				.setTitle("Anarchy has joined a new guild!")
 				.setDescription(`Anarchy has joined ${guild.name}! Anarchy is now in ${client.guilds.cache.size} guild!
-				\n>>> **Guild ID:** ${guild.id}\n**Server owner:** ${serverOwner} (${guild.ownerId})\n**Member count:** ${guild.memberCount}`)
+				\n>>> **Guild ID:** ${guild.id}\n**Server owner:** ${serverOwner.user.tag} (${guild.ownerId})\n**Member count:** ${guild.memberCount}`)
 			const invites = await guild.invites.fetch()
 
 			const button = new ActionRowBuilder()
