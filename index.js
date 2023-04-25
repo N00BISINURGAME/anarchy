@@ -3,7 +3,7 @@ const path = require('node:path');
 const sqlite = require('sqlite');
 const sqlite3 = require('sqlite3');
 const { getDBConnection } = require('./getDBConnection');
-const { Client, Collection, Events, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { token, presenceData, maxPlayers, filter, clientId, guildId } = require('./config.json');
 const { REST, Routes } = require('discord.js');
 
@@ -212,6 +212,21 @@ client.on(Events.GuildMemberAdd, async member => {
 		if (!memberData) {
 			await db.run('INSERT INTO Players (discordid, guild) VALUES (?, ?)', [member.id, guild]);
 		}
+
+		const memberDm = await member.createDM()
+		const embed = new EmbedBuilder()
+			.setTitle("Make the switch to Anarchy!")
+			.setDescription(`If you are the owner of a league or are considering starting a league, consider using Anarchy! We are one of the fastest-growing league utility bots on the market,
+			and we have the tools that **you** need in order to make sure that your league able to quickly start operating at peak efficiency.
+			\nIf you want to invite Anarchy, click the button below!`)
+
+		const button = new ActionRowBuilder()
+			.addComponents(new ButtonBuilder()
+							.setCustomId("invite")
+							.setLabel("Invite Anarchy!")
+							.setURL("https://discord.com/api/oauth2/authorize?client_id=1094711775414460416&permissions=8&scope=bot%20applications.commands"))
+
+		await memberDm.send({ embeds:[embed], components:[button] })
 		await db.close();
 	} catch(err) {
 		console.log(err)
