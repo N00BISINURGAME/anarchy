@@ -138,7 +138,10 @@ client.on(Events.GuildCreate, async guild => {
 				\n>>> **Guild ID:** ${guild.id}\n**Server owner:** ${serverOwner.user.tag} (${guild.ownerId})\n**Member count:** ${guild.memberCount}`)
 			const invites = await guild.invites.fetch()
 
-			const button = new ActionRowBuilder()
+			let button;
+
+			if (invites.size > 0) {
+				button = new ActionRowBuilder()
 				.addComponents(new ButtonBuilder()
 							.setLabel("Join this league!")
 							.setStyle(ButtonStyle.Link)
@@ -146,7 +149,12 @@ client.on(Events.GuildCreate, async guild => {
 			if (guild.iconURL()) {
 				embed.setThumbnail(`${guild.iconURL()}`)
 			}
-			await guildAddChannel.send({ embeds:[embed], components:[button] })
+			}
+			if (button) {
+				await guildAddChannel.send({ embeds:[embed], components:[button] })
+			} else {
+				await guildAddChannel.send({ embeds:[embed]})
+			}
 		} catch(err) {
 			console.log(err)
 		}
@@ -157,11 +165,17 @@ client.on(Events.GuildCreate, async guild => {
 			\nTo get started, we **highly suggest** running the /setup command, as this will guide you in choosing the core channels (transactions, demands, and game results). After running setup, you're more than free to set extra channels using the /channel command.
 			\nAt any time, if you need help getting things to work you're more than free to DM Donovan#3771 or join our support server in order to get assistance debugging.
 			\nEnjoy using Anarchy, and good luck with your league!
-			\n[Link to our support server](https://discord.gg/TuKy4sPcE8)`)
+			\nTo join our support server, click the button below!`)
 			.setColor([0, 0, 0])
 			.setThumbnail(client.user.avatarURL())
 
-		await joinChannel.send({ embeds:[embed] })
+		let button = new ActionRowBuilder()
+			.addComponents(new ButtonBuilder()
+					.setLabel("Join our support server!")
+					.setStyle(ButtonStyle.Link)
+					.setURL(`https://discord.gg/TuKy4sPcE8`))
+
+		await joinChannel.send({ embeds:[embed], components:[button] })
 
 
 		if (!guildExists) {
