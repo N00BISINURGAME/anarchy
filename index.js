@@ -38,7 +38,7 @@ client.once(Events.ClientReady, async () => {
 				const roleExists = await fetchedGuild.roles.fetch(role.roleid);
 				if (!roleExists) {
 					console.log('deleting roles')
-					await db.run('DELETE FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guild.id])
+					await db.run('DELETE FROM Roles WHERE roleid = ? AND guild = ?', [role.roleid, guild.id])
 				}
 			}
 		}
