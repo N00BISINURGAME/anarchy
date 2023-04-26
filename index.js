@@ -33,7 +33,7 @@ client.once(Events.ClientReady, async () => {
 
 		for (const guild of guilds.values()) {
 			const fetchedGuild = await guild.fetch()
-			const roles = await db.all('SELECT * FROM Roles WHERE guild = ?', guild.id)
+			const roles = await db.all('SELECT * FROM Roles WHERE guild = ?', fetchedGuild.id)
 			for (const role of roles) {
 				const roleExists = await fetchedGuild.roles.fetch(role.roleid);
 				if (!roleExists) {
