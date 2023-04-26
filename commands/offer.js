@@ -20,6 +20,9 @@ module.exports = {
         .addUserOption(userOption),
     async execute(interaction) {
         let pingedUser = interaction.options.getMember('player')
+        if (!pingedUser) {
+            return interaction.editReply({ content:"This user may have left the server! Ensure they are in the server, and contact Donovan#3771 if you believe this is a mistake.", ephemeral:true})
+        }
         let userid = pingedUser.id;
         const guild = interaction.guild.id
         try {
