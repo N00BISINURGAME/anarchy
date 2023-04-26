@@ -49,7 +49,7 @@ client.once(Events.ClientReady, async () => {
 					}
 				})
 				try {
-					const otherBotExists = await guild.members.fetch("1098837048187682816")
+					const otherBotExists = await fetchedGuild.members.fetch("1098837048187682816")
 					if (!otherBotExists) {
 						await channel.send({ embeds:[embed], components:[button]})
 					}
