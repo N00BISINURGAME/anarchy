@@ -21,7 +21,6 @@ for (const file of commandFiles) {
 }
 
 client.once(Events.ClientReady, async () => {
-	console.log('Ready!');
 	try {
 		const db = await getDBConnection()
 		await db.run("DELETE FROM Offers")
@@ -32,6 +31,17 @@ client.once(Events.ClientReady, async () => {
 			await guildFetched.members.fetch()
 		})
 
+		for (const guild of guilds.values()) {
+			const fetchedGuild = await guild.fetch()
+			const roles = await db.all('SELECT * FROM Roles WHERE guild = ?', guild.id)
+			for (const role of roles) {
+				const roleExists = await fetchedGuild.roles.fetch(role.roleid);
+				if (!roleExists) {
+					await db.run('DELETE FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guild.id])
+				}
+			}
+		}
+		console.log('Ready!');
 		await db.close()
 	} catch(err) {
 		console.log(err)

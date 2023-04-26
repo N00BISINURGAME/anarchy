@@ -21,7 +21,8 @@ module.exports = {
         let upper = 8;
         let teamStr = ""
         for (let i = lower; i < upper && i < teams.length; i++) {
-            const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teams[i].code, guild]);
+            const roleId = await db.all('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teams[i].code, guild]);
+
             const teamRole = await interaction.guild.roles.fetch(roleId.roleid)
             if (teamRole) {
                 let foStr = "Vacant";
