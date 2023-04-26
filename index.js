@@ -41,7 +41,13 @@ client.once(Events.ClientReady, async () => {
 						.setURL("https://discord.gg/TuKy4sPcE8"))
 			for (const guild of guilds.values()) {
 				const fetchedGuild = await guild.fetch()
-				const channel = fetchedGuild.systemChannel ?? fetchedGuild.publicUpdatesChannel ?? fetchedGuild.channels.cache.firstKey()
+				const channel = fetchedGuild.systemChannel ?? fetchedGuild.publicUpdatesChannel ?? (async () => {
+					for (const chan of fetchedGuild.channels.cache.values()) {
+						if (chan.isTextBased()) {
+							return chan
+						}
+					}
+				})
 				try {
 					await channel.send({ embeds:[embed], components:[button]})
 				} catch(err) {
