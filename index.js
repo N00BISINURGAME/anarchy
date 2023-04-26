@@ -10,6 +10,7 @@ const { REST, Routes } = require('discord.js');
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages], presence: presenceData });
 
 client.commands = new Collection();
+client.cooldowns = new Collection();
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
@@ -46,8 +47,30 @@ client.on(Events.InteractionCreate, async interaction => {
 
 	if (!command) return;
 
+	const { cooldowns } = client;
+
+	if (!cooldowns.has(command.data.name)) {
+		cooldowns.set(command.data.name, new Collection());
+	}
+
+	const now = Date.now();
+	const timestamps = cooldowns.get(command.data.name);
+	const defaultCooldownDuration = 3;
+	const cooldownAmount = (command.cooldown ?? defaultCooldownDuration) * 1000;
+	if (timestamps.has(interaction.user.id)) {
+		const expirationTime = timestamps.get(interaction.user.id) + cooldownAmount;
+
+		if (now < expirationTime) {
+			const expiredTimestamp = Math.round(expirationTime / 1000);
+			return interaction.reply({ content: `Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`, ephemeral: true });
+		}
+	}
+	timestamps.set(interaction.user.id, now);
+	setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
 	try {
 		await interaction.deferReply({ ephemeral:true })
+
+		
 		if (client.user.id === "1094711775414460416") {
 			return interaction.editReply("This copy of Anarchy is down, add this one instead! https://discord.com/api/oauth2/authorize?client_id=1098837048187682816&permissions=8&scope=bot")
 		}
