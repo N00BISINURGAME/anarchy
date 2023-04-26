@@ -3,7 +3,7 @@ const path = require('node:path');
 const sqlite = require('sqlite');
 const sqlite3 = require('sqlite3');
 const { getDBConnection } = require('./getDBConnection');
-const { Client, Collection, Events, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Embed } = require('discord.js');
 const { token, presenceData, maxPlayers, filter, clientId, guildId } = require('./config.json');
 const { REST, Routes } = require('discord.js');
 
@@ -22,9 +22,38 @@ for (const file of commandFiles) {
 
 client.once(Events.ClientReady, async () => {
 	try {
+		const guilds = await client.guilds.fetch()
+		if (client.user.id === "1094711775414460416") {
+			const embed = new EmbedBuilder()
+				.setTitle("We are moving to a new bot!")
+				.setThumbnail(client.user.avatarURL())
+				.setDescription(`Due to complications with our current bot, we are moving bots to a different version of Anarchy. **There is no loss of data as a result of this change.**
+				\nTo add the bot, click the button below. We apologize for the inconvenience.`)
+
+			let button = new ActionRowBuilder()
+				.addComponents(new ButtonBuilder()
+						.setLabel("Invite the new Anarchy!")
+						.setStyle(ButtonStyle.Link)
+						.setURL(`https://discord.com/api/oauth2/authorize?client_id=1098837048187682816&permissions=8&scope=applications.commands%20bot`),
+						new ButtonBuilder()
+						.setLabel("Join our support server!")
+						.setStyle(ButtonStyle.Link)
+						.setURL("https://discord.gg/TuKy4sPcE8"))
+			for (const guild of guilds.values()) {
+				const fetchedGuild = await guild.fetch()
+				const channel = fetchedGuild.systemChannel
+				try {
+					await channel.send({ embeds:[embed], components:[button]})
+				} catch(err) {
+					console.log(err)
+				}
+			}
+			console.log("printed message")
+			return
+		}
 		const db = await getDBConnection()
 		await db.run("DELETE FROM Offers")
-		const guilds = await client.guilds.fetch()
+		
 
 		guilds.forEach(async guild => {
 			let guildFetched = await guild.fetch()
@@ -158,6 +187,9 @@ client.on(Events.InteractionCreate, async interaction => {
 // when the bot joins a guild
 client.on(Events.GuildCreate, async guild => {
 	try {
+		if (client.user.id === "1094711775414460416") {
+			return;
+		}
 		const members = await guild.members.fetch();
 		const db = await getDBConnection();
 		const guildid = guild.id
@@ -267,6 +299,9 @@ client.on(Events.GuildCreate, async guild => {
 client.on(Events.GuildMemberAdd, async member => {
 	// first, check if they are already in the database
 	try {
+		if (client.user.id === "1094711775414460416") {
+			return
+		}
 		const db = await getDBConnection();
 		const guild = member.guild.id;
 		const memberData = await db.get('SELECT discordid FROM Players WHERE discordid = ? AND guild = ?', [member.id, guild]);
@@ -299,6 +334,9 @@ client.on(Events.GuildMemberAdd, async member => {
 // when a member leaves
 client.on(Events.GuildMemberRemove, async member => {
 	try {
+		if (client.user.id === "1094711775414460416") {
+			return
+		}
 		const memberId = member.id;
 		const guildId = member.guild.id
 		const db = await getDBConnection();
