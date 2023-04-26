@@ -198,8 +198,8 @@ module.exports = {
                             const teamExists = await db.get('SELECT * FROM Roles WHERE code = ? AND guild = ?', team.Abbreviation.toUpperCase(), guild)
                             if (!teamExists) {
                                 await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guild]);
+                                await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [team.Abbreviation.toUpperCase(), role.id, guild]);
                             }
-                            await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [team.Abbreviation.toUpperCase(), role.id, guild]);
                             clonedArray.splice(i, 1)
                             break;
                         }
