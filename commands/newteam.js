@@ -36,6 +36,8 @@ module.exports = {
             logo = "https://cdn.discordapp.com/avatars/1094711775414460416/a9718c56059cc995ddc774b840e8692b.webp"
         }
 
+    
+
         const regex = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
 
         const matches = logo.match(regex)

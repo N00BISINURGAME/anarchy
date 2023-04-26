@@ -14,7 +14,7 @@ module.exports = {
         // first, check to see if the user is authorized to advance the season
         const user = interaction.user.id;
         const guild = interaction.guild.id
-        const authorized = await db.run('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [user, guild])
+        const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [user, guild])
         if (!authorized) {
             await db.close();
             return interaction.editReply("You are not authorized to advance the season!");

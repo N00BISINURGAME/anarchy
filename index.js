@@ -289,7 +289,7 @@ client.on(Events.GuildMemberRemove, async member => {
 					const roleObj = await member.guild.roles.fetch(role)
 					if (!roleObj) return;
 
-					const logo = await db.get('SELECT t.logo FROM Teams t, Roles r WHERE t.code = r.code AND r.roleid = ? AND r.guild = ?', [role, guildId])
+					const logo = await db.get('SELECT t.logo FROM Teams t, Roles r WHERE t.code = r.code AND t.guild = r.guild AND r.roleid = ? AND r.guild = ?', [role, guildId])
 					embed
 						.setTitle("Player left!")
 						.setColor(roleObj.color)

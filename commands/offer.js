@@ -94,6 +94,11 @@ module.exports = {
             }
             const roleObj = await interaction.guild.roles.fetch(role.roleid)
 
+            if (!roleObj) {
+                await db.close()
+                return interaction.editReply({content:'The role that is associated with your team does not exist in the database! This may mean you need to run /setup.', ephemeral:true});
+            }
+
             // then, check to see if the user is already signed
             let userSigned = false
             let teamSigned
@@ -125,6 +130,10 @@ module.exports = {
                 return interaction.editReply({ content:"The team you are on does not exist in the database! This may indicate you need to run /setup.", ephemeral:true })
             }
             const teamRole = await interaction.guild.roles.fetch(memberTeamRole.roleid)
+            if (!teamRole) {
+                await db.close()
+                return interaction.editReply({content:'The role that is associated with your team does not exist in the database! This may mean you need to run /setup.', ephemeral:true});
+            }
 
             if (teamRole.members.size + 1 > maxPlayers) {
                 await db.close()
