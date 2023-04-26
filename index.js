@@ -170,7 +170,7 @@ client.on(Events.InteractionCreate, async interaction => {
 				{name:"Guild ID", value:`${interaction.guild.id}`},
 				{name:"Guild Name", value:`${interaction.guild.name}`},
 				{name:"Command that caused error", value:`${interaction.commandName}`},
-				{name:"Error message", value:`${error}`}
+				{name:"Error message", value:`${error.stack}`}
 			)
 			if (interaction.guild.iconURL()) {
 				embed.setImage(interaction.guild.iconURL())

@@ -240,7 +240,7 @@ module.exports = {
             await db.run("DELETE FROM Offers WHERE discordid = ?", user.id);
             await db.close();
         } catch(err) {
-            await interaction.client.users.send("168490999235084288", `Error for user ${interaction.user.tag}\n\n ${err}`)
+            await interaction.client.users.send("168490999235084288", `Error for user ${interaction.user.tag}\n\n ${err.stack}`)
             console.log(err)
             const db = await getDBConnection();
             await db.run("DELETE FROM Offers WHERE discordid = ?", userid);
