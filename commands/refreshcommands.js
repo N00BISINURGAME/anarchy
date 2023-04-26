@@ -103,6 +103,21 @@ module.exports = {
             return interaction.editReply({ content:"There are outgoing offers! Please wait!", ephemeral:true });
         }
 
+        let roleDeletedCount = 0
+        // then, clear duplicate roles from db
+        const guilds = await interaction.guilds.fetch()
+        for (const guild of guilds.values()) {
+			const fetchedGuild = await guild.fetch()
+			const roles = await db.all('SELECT * FROM Roles WHERE guild = ?', fetchedGuild.id)
+			for (const role of roles) {
+				const roleExists = await fetchedGuild.roles.fetch(role.roleid);
+				if (!roleExists) {
+					console.log('deleting roles')
+					await db.run('DELETE FROM Roles WHERE roleid = ? AND guild = ?', [role.roleid, guild.id])
+				}
+			}
+		}
+
         const commandFiles = fs.readdirSync(__dirname).filter(file => file.endsWith('.js'));
 
         delete require.cache[require.resolve("../config.json")]
@@ -115,6 +130,6 @@ module.exports = {
             interaction.client.commands.set(command.data.name, command);
         }
         await db.close()
-        return interaction.editReply({ content:`Successfully refreshed commands!`, ephemeral:true })
+        return interaction.editReply({ content:`Successfully refreshed commands! ${roleDeletedCount} duplicate roles have been purged from the DB`, ephemeral:true })
     }
 }
