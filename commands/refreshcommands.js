@@ -105,7 +105,7 @@ module.exports = {
 
         let roleDeletedCount = 0
         // then, clear duplicate roles from db
-        const guilds = await interaction.guilds.fetch()
+        const guilds = await interaction.client.guilds.fetch()
         for (const guild of guilds.values()) {
 			const roles = await db.all('SELECT * FROM Roles WHERE guild = ?', guild.id)
 			for (const role of roles) {
