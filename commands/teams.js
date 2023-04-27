@@ -22,20 +22,20 @@ module.exports = {
         let teamStr = ""
         for (let i = lower; i < upper && i < teams.length; i++) {
             const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teams[i].code, guild]);
-
-            const teamRole = await interaction.guild.roles.fetch(roleId.roleid)
-            if (teamRole) {
-                let foStr = "Vacant";
-                for (const member of teamRole.members.values()) {
-                    if (member.roles.cache.get(foRole.roleid)) {
-                        foStr = `${member} (${member.user.tag})`
-                        break
+            if (roleId) {
+                const teamRole = await interaction.guild.roles.fetch(roleId.roleid)
+                if (teamRole) {
+                    let foStr = "Vacant";
+                    for (const member of teamRole.members.values()) {
+                        if (member.roles.cache.get(foRole.roleid)) {
+                            foStr = `${member} (${member.user.tag})`
+                            break
+                        }
                     }
+                    const role = await interaction.guild.roles.fetch(roleId.roleid);
+                    teamStr += `${role} - ${teamRole.members.size} members\nFranchise Owner:${foStr}\n\n`
                 }
-                const role = await interaction.guild.roles.fetch(roleId.roleid);
-                teamStr += `${role} - ${teamRole.members.size} members\nFranchise Owner:${foStr}\n\n`
             }
-            
         }
 
         if (teamStr === "") teamStr = "None";
@@ -76,17 +76,19 @@ module.exports = {
 
             for (let i = lower; i < upper && i < teams.length; i++) {
                 const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teams[i].code, guild]);
-                const teamRole = await interaction.guild.roles.fetch(roleId.roleid)
-                if (teamRole) {
-                    let foStr = "Vacant";
-                    for (const member of teamRole.members.values()) {
-                        if (member.roles.cache.get(foRole.roleid)) {
-                            foStr = member
-                            break
+                if (roleId) {
+                    const teamRole = await interaction.guild.roles.fetch(roleId.roleid)
+                    if (teamRole) {
+                        let foStr = "Vacant";
+                        for (const member of teamRole.members.values()) {
+                            if (member.roles.cache.get(foRole.roleid)) {
+                                foStr = member
+                                break
+                            }
                         }
+                        const role = await interaction.guild.roles.fetch(roleId.roleid);
+                        teamStr += `${role} - ${teamRole.members.size} members\nFranchise Owner:${foStr}\n\n`
                     }
-                    const role = await interaction.guild.roles.fetch(roleId.roleid);
-                    teamStr += `${role} - ${teamRole.members.size} members\nFranchise Owner:${foStr}\n\n`
                 }
             }
             if (teamStr === "") teamStr = "None"
