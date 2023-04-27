@@ -145,15 +145,15 @@ module.exports = {
         for (const role of foCheck.values()) {
             const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', role.id, guild)
             if (!roleExists) {
-                if (role.name.toLowerCase() === "franchise owner") {
+                if (role.name.toLowerCase().includes("franchise owner")) {
                     foExists = true
                     await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", role.id, guild]);
                 }
-                if (role.name.toLowerCase() === "general manager") {
+                if (role.name.toLowerCase().includes("general manager")) {
                     gmExists = true
                     await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", role.id, guild]);
                 }
-                if (role.name.toLowerCase() === "head coach") {
+                if (role.name.toLowerCase().includes("head coach")) {
                     hcExists = true
                     await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", role.id, guild]);
                 }
