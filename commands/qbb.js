@@ -70,7 +70,7 @@ module.exports = {
           return interaction.editReply({ content:"You are not authorized to run this command!", ephemeral: true})
         }
 
-        const channelSql = await db.get('SELECT channelid FROM Channels WHERE purpose = "pickup-qbbs" AND guild = ?', guild)
+        const channelSql = await db.get('SELECT channelid FROM Channels WHERE purpose = "pickups-qbbs" AND guild = ?', guild)
         if (!channelSql) {
           await db.close()
           return interaction.editReply({ content:"The pickup & QBB channel has not been set!", ephemeral: true})
