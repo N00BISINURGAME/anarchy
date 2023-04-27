@@ -70,7 +70,7 @@ module.exports = {
           return interaction.editReply({ content:"You are not authorized to run this command!", ephemeral: true})
         }
 
-        const channelSql = await db.get('SELECT channelid FROM Channels WHERE purpose = "pickup-qbb" AND guild = ?', guild)
+        const channelSql = await db.get('SELECT channelid FROM Channels WHERE purpose = "pickup-qbbs" AND guild = ?', guild)
         if (!channelSql) {
           await db.close()
           return interaction.editReply({ content:"The pickup & QBB channel has not been set!", ephemeral: true})
@@ -80,11 +80,11 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setTitle("Quarterback battle!")
           .setColor([0, 0, 0])
-          .setDescription(`A Quarterback battle is being hosted right now! To join, click the button at the bottom of this message!
+          .setDescription(`A Quarterback battle is being hosted right now with ${player1} (${player1.user.tag}) against ${player2} (${player2.user.tag})! To join, click the button at the bottom of this message!
           \n>>> **Staff member:** ${interaction.member} (${interaction.user.tag})${message ? `\n**Description:** ${message}` : ""}`)
 
         if (interaction.guild.iconURL()) {
-            embed.setThumbnail(logoSql.logo)
+            embed.setThumbnail(interaction.guild.iconURL())
         }
 
         if (interaction.user.avatarURL()) {
