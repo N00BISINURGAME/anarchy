@@ -122,7 +122,7 @@ module.exports = {
         const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
         dmMessage.setDescription(`The ${teamRole} have successfully signed ${userPing} (${userPing.user.tag})!
-        \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})`)
+        \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})\n**Roster:** ${teamRole.members.size}/${maxPlayers}`)
 
         await transactionChannel.send({ embeds:[dmMessage] })
 

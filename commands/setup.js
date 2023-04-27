@@ -193,7 +193,7 @@ module.exports = {
                 if (!roleExists) {
                     for (let i = 0; i < teamJson.length; i++) {
                         const team = teamJson[i]
-                        if (team.Name.toLowerCase() === role.name.toLowerCase()) {
+                        if (team.Name.toLowerCase().includes(role.name.toLowerCase())) {
                             // we have a valid team! add it to db and break
                             const teamExists = await db.get('SELECT * FROM Roles WHERE code = ? AND guild = ?', team.Abbreviation.toUpperCase(), guild)
                             if (!teamExists) {
