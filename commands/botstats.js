@@ -11,7 +11,10 @@ module.exports = {
     async execute(interaction) {
         const db = await getDBConnection();
 
-        const uniqueUsers = await db.get('SELECT COUNT(DISTINCT discordid) AS users FROM Players')
+        let uniqueUsers = 0
+        for (const guild of interaction.client.guilds.cache.values()) {
+            uniqueUsers += guild.memberCount
+        }
 
         const uniqueGuilds = interaction.client.guilds.cache.size
 
@@ -22,7 +25,7 @@ module.exports = {
             .setThumbnail(`${interaction.client.user.displayAvatarURL()}`)
             .setFields(
                 {name:"Bot Creator", value:"Donovan#3771"},
-                {name:"Number of unique users", value:`${uniqueUsers.users}`},
+                {name:"Number of unique users", value:`${uniqueUsers}`},
                 {name:"Number of leagues using Anarchy", value:`${uniqueGuilds}`},
                 {name:"Current uptime", value:`${uptime}`}
             )
