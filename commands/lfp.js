@@ -35,10 +35,15 @@ module.exports = {
           if (roleExists) {
             if (roleExists.code === "FO" || roleExists.code === "GM" || roleExists.code === "HC") {
               authorized = true
-            } else {
+            } else if (!(roleExists.code === "FO" || roleExists.code === "GM" || roleExists.code === "HC")) {
               teamRole = roleExists
             }
           }
+        }
+
+        if (!teamRole) {
+          await db.close()
+          return interaction.editReply({ content:"The team you are on is not in the database! This may indicate you need to run /setup.", ephemeral: true})
         }
 
         if (!authorized) {

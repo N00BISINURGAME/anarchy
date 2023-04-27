@@ -35,7 +35,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('Existing templates for ' + choice)
             .setThumbnail(`${interaction.client.user.avatarURL()}`)
-            .setDescription(`Anarchy currently has ${templates[choice].length} ${templates[choice].length === 1 ? "template" : "templates"}! To add more, DM Donovan#3771 sending him a template and he will add it! To preview templates, copy-paste the link into a chat and you can preview it by clicking the "view template" button.
+            .setDescription(`Anarchy currently has ${templates[choice].length} ${templates[choice].length === 1 ? "template" : "templates"} for ${choice}! To add more, DM Donovan#3771 sending him a template and he will add it! To preview templates, copy-paste the link into a chat and you can preview it by clicking the "view template" button.
             \nCredit to those who made the template, and particularly Lav#0002 and krem!#0736
             \n**Templates:**\n${templateStr}`)
 

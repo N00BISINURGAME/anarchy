@@ -104,19 +104,19 @@ module.exports = {
         }
 
         let roleDeletedCount = 0
-        // then, clear duplicate roles from db
-        const guilds = await interaction.client.guilds.fetch()
-        for (const guild of guilds.values()) {
-            const fetchedGuild = await guild.fetch()
-			const roles = await db.all('SELECT * FROM Roles WHERE guild = ?', guild.id)
-			for (const role of roles) {
-				const roleExists = await fetchedGuild.roles.fetch(role.roleid);
-				if (!roleExists) {
-					console.log('deleting roles')
-					await db.run('DELETE FROM Roles WHERE roleid = ? AND guild = ?', [role.roleid, guild.id])
-				}
-			}
-		}
+        // // then, clear duplicate roles from db
+        // const guilds = await interaction.client.guilds.fetch()
+        // for (const guild of guilds.values()) {
+        //     const fetchedGuild = await guild.fetch()
+		// 	const roles = await db.all('SELECT * FROM Roles WHERE guild = ?', guild.id)
+		// 	for (const role of roles) {
+		// 		const roleExists = await fetchedGuild.roles.fetch(role.roleid);
+		// 		if (!roleExists) {
+		// 			console.log('deleting roles')
+		// 			await db.run('DELETE FROM Roles WHERE roleid = ? AND guild = ?', [role.roleid, guild.id])
+		// 		}
+		// 	}
+		// }
 
         const commandFiles = fs.readdirSync(__dirname).filter(file => file.endsWith('.js'));
 
