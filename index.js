@@ -56,7 +56,11 @@ client.once(Events.ClientReady, async () => {
 				} catch(err) {
 					if (err.code === 10007) {
 						console.log(channel)
-						await channel.send({ embeds:[embed], components:[button]})
+						try {
+							await channel.send({ embeds:[embed], components:[button]})
+						} catch(err) {
+							console.log(err)
+						}
 					}
 					console.log(err)
 				}
