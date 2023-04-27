@@ -31,7 +31,9 @@ module.exports = {
         let standingsString = ""
         for (let i = lower; i < upper && i < teamStandings.length; i++) {
             const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teamStandings[i].code, guild])
-            standingsString += `**${i + 1})** <@&${roleId.roleid}> ${teamStandings[i].wins}-${teamStandings[i].losses}-${teamStandings[i].ties}, ${teamStandings[i].ptdifferential} point differential\n\n`
+            if (roleId) {
+                standingsString += `**${i + 1})** <@&${roleId.roleid}> ${teamStandings[i].wins}-${teamStandings[i].losses}-${teamStandings[i].ties}, ${teamStandings[i].ptdifferential} point differential\n\n`
+            }
         }
         if (standingsString === "") standingsString = "There are no teams in this league!"
 
@@ -70,7 +72,9 @@ module.exports = {
 
             for (let i = lower; i < upper && i < teamStandings.length; i++) {
                 const roleId = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [teamStandings[i].code, guild])
-                standingsString += `**${i + 1})** <@&${roleId.roleid}> ${teamStandings[i].wins}-${teamStandings[i].losses}-${teamStandings[i].ties}, ${teamStandings[i].ptdifferential} point differential\n\n`
+                if (roleId) {
+                    standingsString += `**${i + 1})** <@&${roleId.roleid}> ${teamStandings[i].wins}-${teamStandings[i].losses}-${teamStandings[i].ties}, ${teamStandings[i].ptdifferential} point differential\n\n`
+                }
             }
             if (standingsString === "") standingsString = "There are no teams in this league!"
             
