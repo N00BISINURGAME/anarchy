@@ -31,6 +31,7 @@ module.exports = {
         let authorized = false
         let teamRole;
         for (const role of interaction.member.roles.cache.keys()) {
+          if (authorized && teamRole) break;
           const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
           if (roleExists) {
             if (roleExists.code === "FO" || roleExists.code === "GM" || roleExists.code === "HC") {
