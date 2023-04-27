@@ -41,13 +41,13 @@ client.once(Events.ClientReady, async () => {
 						.setURL("https://discord.gg/TuKy4sPcE8"))
 			for (const guild of guilds.values()) {
 				const fetchedGuild = await guild.fetch()
-				const channel = fetchedGuild.systemChannel ?? fetchedGuild.publicUpdatesChannel ?? (() => {
-					for (const chan of fetchedGuild.channels.cache.values()) {
-						if (chan.isTextBased()) {
-							return chan
-						}
+				let channel;
+				for (const chan of fetchedGuild.channels.cache.values()) {
+					if (chan.isTextBased()) {
+						channel = chan;
+						break
 					}
-				})
+				}
 				try {
 					const otherBotExists = await fetchedGuild.members.fetch("1098837048187682816")
 					if (!otherBotExists) {
