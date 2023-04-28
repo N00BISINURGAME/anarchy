@@ -1,7 +1,7 @@
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 const {
-    SlashCommandBuilder, SlashCommandStringOption, EmbedBuilder, SlashCommandRoleOption,
+    SlashCommandBuilder, SlashCommandStringOption, EmbedBuilder, ChannelType,
     ComponentType, ButtonStyle, ActionRowBuilder, ButtonBuilder
       } = require('discord.js');
 const { getDBConnection } = require('../getDBConnection');
@@ -75,10 +75,81 @@ module.exports = {
         }
         // tomorrow, add a button to make channels
 
+        const genButton = new ButtonBuilder()
+                            .setCustomId('generate')
+                            .setLabel('Generate threads!')
+                            .setStyle(ButtonStyle.Success)
+
+        const deleteButton = new ButtonBuilder()
+                            .setCustomId('delete')
+                            .setLabel('Delete threads!')
+                            .setStyle(ButtonStyle.Danger)
+
+        const buttons = new ActionRowBuilder()
+                    .addComponents(
+                        genButton,
+                        deleteButton
+                    )
+
         const channel = await interaction.guild.channels.fetch(scheduleChannel.channelid)
-        const message = await channel.send({ embeds:[embed]})
+        const message = await channel.send({ embeds:[embed], components:[buttons]})
 
         await interaction.editReply({ content:`Successfully posted schedule!`, ephemeral:true })
+
+        const filter = async i => {
+            const db = await getDBConnection()
+            const admin = await db.get('SELECT * from Admins WHERE discordid = ? AND guild = ?', [i.user.id, guild])
+            const manager = await db.get('SELECT * from Managers WHERE discordid = ? AND guild = ?', [i.user.id, guild])
+            return admin !== undefined || manager !== undefined || i.user.id === interaction.user.id
+        }
+
+        const collector = message.createMessageComponentCollector({ filter, componentType: ComponentType.Button, time: 7e8 });
+
+        collector.on("collect", async i => {
+            const db = await getDBConnection()
+            if (i.customId === "generate") {
+                const teams = gameStr.split("\n")
+                // teams should **always** be length of 2
+                for (const team of teams) {
+                    const regex = /\d{17,}/g
+                    const twoTeams = team.match(regex)
+                    const firstTeam = await interaction.guild.roles.fetch(twoTeams[0])
+                    const secondTeam = await interaction.guild.roles.fetch(twoTeams[1])
+                    const thread = await channel.threads.create({
+                        name:`${firstTeam.name} vs ${secondTeam.name}`,
+                        type: ChannelType.PrivateThread
+                    })
+                    for (const member of firstTeam.members.cache.values()) {
+                        const roles = member.roles.cache
+                        for (const role of roles.keys()) {
+                            const frontOffice = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
+                            if (frontOffice.code === "FO" || frontOffice.code === "GM" || frontOffice.code === "HC") {
+                                await thread.members.add(member)
+                            }
+                        }
+                    }
+                    for (const member of secondTeam.members.cache.values()) {
+                        const roles = member.roles.cache
+                        for (const role of roles.keys()) {
+                            const frontOffice = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
+                            if (frontOffice.code === "FO" || frontOffice.code === "GM" || frontOffice.code === "HC") {
+                                await thread.members.add(member)
+                            }
+                        }
+                    }
+                    await thread.send(`${team}: Schedule your game here!`)
+                }
+                genButton.setDisabled(true)
+                await collector.update({ embeds:[embed], components:[buttons]})
+            } else {
+                for (const channel of channel.threads.cache.values()) {
+                    await channel.delete()
+                }
+                await collector.update({ embeds:[embed], components:[]})
+                collector.stop()
+            }
+            await db.close()
+        })
 
         await db.close()
     }

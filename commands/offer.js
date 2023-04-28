@@ -219,7 +219,7 @@ module.exports = {
                     .setThumbnail(logoStr)
                     .setDescription(`The ${roleObj} have successfully offered ${userPing} (${userPing.user.tag})!
                     \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})\n**Roster:** ${roleObj.members.size}/${maxPlayers}`)
-                
+
                 if (interaction.user.avatarURL()) {
                     transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
                 } else {
@@ -236,7 +236,6 @@ module.exports = {
                 await dmInteraction.update({ embeds: [dmMessage], components: [] })
                 await interaction.editReply({ content:"Offer rejected!", ephemeral:true })
             } else {
-                
                 await dmInteraction.update({ content:"An error has occured! Please ask your FO to send another offer", components: [] })
                 await interaction.editReply({ content:"Error, please DM Donovan#3771 with a description of what happened", ephemeral:true })
             }
