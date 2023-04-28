@@ -33,7 +33,7 @@ module.exports = {
 
         // then, generate the schedule
         let teamsArr = []
-        const teams = await db.get('SELECT roleid, code FROM Roles WHERE guild = ?', guild)
+        const teams = await db.all('SELECT roleid, code FROM Roles WHERE guild = ?', guild)
         for (const team of teams) {
             const roleExists = await interaction.guild.roles.fetch(team.roleid)
             if (roleExists && !(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
