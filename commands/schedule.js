@@ -62,7 +62,7 @@ module.exports = {
                         .setTitle("Incoming schedule!")
                         .setColor([0,0,0])
                         .setDescription(`This week's schedule has been released! All games must be played before **${deadline}**.
-                        \n${byeWeekTeam ? `The ${byeWeekTeam} have a bye this week!` : ""}\n\n**Schedule:**\n${gameStr}\n>>> **Admin:** ${interaction.member} (${interaction.user.tag})`)
+                        \n${byeWeekTeam ? `The ${byeWeekTeam} have a bye this week!\n\n` : ""}**Schedule:**\n${gameStr}\n>>> **Admin:** ${interaction.member} (${interaction.user.tag})`)
 
         if (interaction.guild.iconURL()) {
             embed.setThumbnail(interaction.guild.iconURL())
