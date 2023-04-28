@@ -109,7 +109,7 @@ module.exports = {
             const db = await getDBConnection()
             if (i.customId === "generate") {
                 genButton.setDisabled(true)
-                await message.edit({ embeds:[embed], components:[buttons]})
+                await i.update({ embeds:[embed], components:[buttons]})
                 await channel.send("Threads have been created for each team, schedule your games in there!")
                 const teams = gameStr.split("\n")
                 // teams should **always** be length of 2
@@ -143,7 +143,7 @@ module.exports = {
                     await thread.send(`${team}: Schedule your game here!`)
                 }
             } else {
-                await message.edit({ embeds:[embed], components:[]})
+                await i.update({ embeds:[embed], components:[]})
                 await channel.send("All scheduling threads have been deleted!")
                 if (channel.threads.cache.values()) {
                     for (const threadChannel of channel.threads.cache.values()) {
