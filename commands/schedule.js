@@ -119,7 +119,7 @@ module.exports = {
                         name:`${firstTeam.name} vs ${secondTeam.name}`,
                         type: ChannelType.PrivateThread
                     })
-                    for (const member of firstTeam.members.cache.values()) {
+                    for (const member of firstTeam.members.values()) {
                         const roles = member.roles.cache
                         for (const role of roles.keys()) {
                             const frontOffice = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
@@ -128,7 +128,7 @@ module.exports = {
                             }
                         }
                     }
-                    for (const member of secondTeam.members.cache.values()) {
+                    for (const member of secondTeam.members.values()) {
                         const roles = member.roles.cache
                         for (const role of roles.keys()) {
                             const frontOffice = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
