@@ -123,7 +123,7 @@ module.exports = {
                         const roles = member.roles.cache
                         for (const role of roles.keys()) {
                             const frontOffice = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
-                            if (frontOffice.code === "FO" || frontOffice.code === "GM" || frontOffice.code === "HC") {
+                            if (frontOffice && (frontOffice.code === "FO" || frontOffice.code === "GM" || frontOffice.code === "HC")) {
                                 await thread.members.add(member)
                             }
                         }
@@ -132,7 +132,7 @@ module.exports = {
                         const roles = member.roles.cache
                         for (const role of roles.keys()) {
                             const frontOffice = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
-                            if (frontOffice.code === "FO" || frontOffice.code === "GM" || frontOffice.code === "HC") {
+                            if (frontOffice && (frontOffice.code === "FO" || frontOffice.code === "GM" || frontOffice.code === "HC")) {
                                 await thread.members.add(member)
                             }
                         }
