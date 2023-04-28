@@ -203,7 +203,7 @@ module.exports = {
                         .setTitle("Signing failed")
                         .setDescription(`You have already signed to another team.`)
                     await db.close()
-                    return dmInteraction.update({ embeds: failEmbed, components: [] })
+                    return dmInteraction.update({ embeds: [failEmbed], components: [] })
                 }
 
                 await userPing.roles.add(roleObj);
