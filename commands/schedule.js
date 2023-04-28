@@ -140,12 +140,14 @@ module.exports = {
                     await thread.send(`${team}: Schedule your game here!`)
                 }
                 genButton.setDisabled(true)
-                await collector.update({ embeds:[embed], components:[buttons]})
+                await message.update({ embeds:[embed], components:[buttons]})
             } else {
-                for (const threadChannel of channel.threads.cache.values()) {
-                    await threadChannel.delete()
+                if (channel.threads.cache.values()) {
+                    for (const threadChannel of channel.threads.cache.values()) {
+                        await threadChannel.delete()
+                    }
                 }
-                await collector.update({ embeds:[embed], components:[]})
+                await message.update({ embeds:[embed], components:[]})
                 collector.stop()
             }
             await db.close()
