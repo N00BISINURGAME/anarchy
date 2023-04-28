@@ -104,9 +104,11 @@ module.exports = {
         }
 
         const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
-        const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
-
-        await transactionChannel.send({ embeds: [transactionEmbed] })
+        if (channelId) {
+            const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
+            await transactionChannel.send({ embeds: [transactionEmbed] })
+        }
+        
 
         // then, send a message back to the user
         await interaction.editReply({ content:'Successfully promoted the specified user to franchise owner!', ephemeral:true });

@@ -53,7 +53,7 @@ module.exports = {
         const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "notices" AND guild = ?', guild)
         if (!channelId) {
             await db.close();
-            return interaction.editReply({content:`A notices channel has not been set!`, ephemeral:true});
+            return interaction.editReply({content:`A notices channel has not been set! This can be set by running /channel.`, ephemeral:true});
         }
 
         // then, add them to the database

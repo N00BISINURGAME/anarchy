@@ -47,6 +47,13 @@ module.exports = {
             return interaction.editReply({ content:"You are not authorized to report game results!", ephemeral: true });
         }
 
+        // then, get the transaction channel ID and send a transaction message
+        const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "results" AND guild = ?', guild)
+        if (!channelId) {
+            await db.close()
+            return interaction.editReply({ content:"The game results channel has not been set! This can be set by running /setup or /channel.", ephemeral:true})
+        }
+
         // get user input
         const team1Role = interaction.options.getRole("first-team")
         const team2Role = interaction.options.getRole("second-team")
@@ -89,10 +96,6 @@ module.exports = {
                 their differential.`}
             )
             await db.run('UPDATE Teams SET ties = ties + 1, ptdifferential = ptdifferential - 25 WHERE name = ? OR name = ? AND guild = ?', [team1Role.name, team2Role.name, guild])
-            // then, get the transaction channel ID and send a transaction message
-            const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "results" AND guild = ?', guild)
-
-            const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
             await transactionChannel.send({ embeds: [embed]});
             await interaction.editReply({ content:"Successfully posted results!", ephemeral:true })
@@ -151,7 +154,6 @@ module.exports = {
         }
 
         // then, get the transaction channel ID and send a transaction message
-        const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "results" AND guild = ?', guild)
 
         const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 

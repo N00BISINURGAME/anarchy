@@ -23,7 +23,7 @@ module.exports = {
         const scheduleChannel = await db.get("SELECT channelid FROM Channels WHERE purpose = ? AND guild = ?", ["schedules", guild]);
         if (!scheduleChannel) {
             await db.close()
-            return interaction.editReply({ content:"Schedules are currently disabled!", ephemeral:true })
+            return interaction.editReply({ content:"Schedules are currently disabled! This can be set by running /channel.", ephemeral:true })
         }
         const admin = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
         if (!admin) {

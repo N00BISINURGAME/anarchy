@@ -57,7 +57,7 @@ module.exports = {
         const channelSql = await db.get('SELECT channelid FROM Channels WHERE purpose = "lfp" AND guild = ?', guild)
         if (!channelSql) {
           await db.close()
-          return interaction.editReply({ content:"The LFP channel has not been set!", ephemeral: true})
+          return interaction.editReply({ content:"The LFP channel has not been set! This can be set by running /channel.", ephemeral: true})
         }
         const channel = await interaction.guild.channels.fetch(channelSql.channelid)
 

@@ -35,7 +35,7 @@ module.exports = {
         const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
         if (!transactionExists) {
             await db.close()
-            return interaction.editReply({ content: "A transaction channel has not been set!", ephemeral: true})
+            return interaction.editReply({ content: "A transaction channel has not been set! This can be set by running /setup or /channel.", ephemeral: true})
         }
 
         // first, check if the user is allowed to trade people

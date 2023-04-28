@@ -25,7 +25,7 @@ module.exports = {
         const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
         if (!transactionExists) {
             await db.close()
-            return interaction.editReply({ content: "A transaction channel has not been set!", ephemeral: true})
+            return interaction.editReply({ content: "A transaction channel has not been set! This can be set by running /setup or /channel.", ephemeral: true})
         }
 
         // first, check and see if the user that sent the command is authorized to release a player (as in, they are a FO or GM)

@@ -56,25 +56,26 @@ module.exports = {
 
             // then, get the transaction channel ID and send a transaction message
             const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
-            const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
+            if (channelId) {
+                const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
-            const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
+                const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
 
-            // then, format the embed and send it to the transaction channel
-            const transactionEmbed = new EmbedBuilder()
-                .setTitle("Team mass release!")
-                .setThumbnail(logoStr)
-                .setColor(team.color)
-                .setDescription(`All members of the ${team} have been released!
-                \n**Affected users:**\n${userStr}\n>>> **Staff:** ${interaction.member} (${interaction.user.tag})`)
-            
-            if (interaction.user.avatarURL()) {
-                transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
-            } else {
-                transactionEmbed.setFooter({ text: `${interaction.user.tag}` })
+                // then, format the embed and send it to the transaction channel
+                const transactionEmbed = new EmbedBuilder()
+                    .setTitle("Team mass release!")
+                    .setThumbnail(logoStr)
+                    .setColor(team.color)
+                    .setDescription(`All members of the ${team} have been released!
+                    \n**Affected users:**\n${userStr}\n>>> **Staff:** ${interaction.member} (${interaction.user.tag})`)
+                if (interaction.user.avatarURL()) {
+                    transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+                } else {
+                    transactionEmbed.setFooter({ text: `${interaction.user.tag}` })
+                }
+
+                await transactionChannel.send({ embeds: [transactionEmbed] });
             }
-
-            await transactionChannel.send({ embeds: [transactionEmbed] });
 
             await interaction.editReply({ content:"All players released from team!", ephemeral:true })
 

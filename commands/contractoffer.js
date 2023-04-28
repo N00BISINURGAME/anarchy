@@ -37,13 +37,13 @@ module.exports = {
             const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
             const maxPlayers = maxPlayerCount.maxplayers
             const offerEnabled = await db.get('SELECT contracts FROM Leagues WHERE guild = ?', guild)
-            if (!offerEnabled.contracts) return interaction.editReply({ content: "Contracts are disabled!", ephemeral: true})
+            if (!offerEnabled.contracts) return interaction.editReply({ content: "Contracts are disabled! These can be enabled by running /toggle.", ephemeral: true})
 
             // check if a transaction channel has been set
             const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
             if (!transactionExists) {
                 await db.close()
-                return interaction.editReply({ content: "A transaction channel has not been set!", ephemeral: true})
+                return interaction.editReply({ content: "A transaction channel has not been set! This can be set by running /channel or by running /setup if you have not already.", ephemeral: true})
             }
 
             // gets all information that the user sent

@@ -56,7 +56,7 @@ module.exports = {
         const channelSql = await db.get('SELECT channelid FROM Channels WHERE purpose = "notices" AND guild = ?', guild)
         if (!channelSql) {
           await db.close()
-          return interaction.editReply({ content:"The notices channel has not been set!", ephemeral: true})
+          return interaction.editReply({ content:"The notices channel has not been set! You can set this channel by running /channel.", ephemeral: true})
         }
 
         // check if both teams are valid
