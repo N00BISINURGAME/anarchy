@@ -26,7 +26,7 @@ module.exports = {
             } catch(err) {
                 continue;
             }
-            teamStr += `${player} (${player.user.tag}) - Suspended for **${teams[i].reason}** due to **${teams[i].reason}**\n\n`
+            teamStr += `${player} (${player.user.tag}) - Suspended for **${teams[i].duration}** due to **${teams[i].reason}**\n\n`
         }
 
         if (teamStr === "") teamStr = "None";
@@ -79,7 +79,7 @@ module.exports = {
                 } catch(err) {
                     continue;
                 }
-                teamStr += `${player} - Suspended for **${teams[i].reason}** due to **${teams[i].reason}**\n\n`
+                teamStr += `${player} - Suspended for **${teams[i].duration}** due to **${teams[i].reason}**\n\n`
             }
             if (teamStr === "") teamStr = "None"
             embed.setDescription(`${teamStr}`)
