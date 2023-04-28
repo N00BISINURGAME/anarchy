@@ -79,7 +79,7 @@ module.exports = {
                 } catch(err) {
                     continue;
                 }
-                teamStr += `${player} - Suspended for **${teams[i].reason} due to ${teams[i].reason}`
+                teamStr += `${player} - Suspended for **${teams[i].reason}** due to **${teams[i].reason}**\n\n`
             }
             if (teamStr === "") teamStr = "None"
             embed.setDescription(`${teamStr}`)
