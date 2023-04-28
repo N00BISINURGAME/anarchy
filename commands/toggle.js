@@ -8,7 +8,8 @@ const { admins } = require('../config.json');
 const commandChoices = new SlashCommandStringOption().setName("command").setDescription("The command to toggle on and off").setRequired(true)
                           .addChoices(
                             { name:"Offers", value: "offers" },
-                            { name:"Signings", value: "signings" }
+                            { name:"Signings", value: "signings" },
+                            { name:"Contract Offers", value: "contracts" }
                           )
 
 const toggleChoices = new SlashCommandIntegerOption().setName("state").setDescription("Whether you want the command on or off").setRequired(true)
