@@ -142,8 +142,8 @@ module.exports = {
                 genButton.setDisabled(true)
                 await collector.update({ embeds:[embed], components:[buttons]})
             } else {
-                for (const channel of channel.threads.cache.values()) {
-                    await channel.delete()
+                for (const threadChannel of channel.threads.cache.values()) {
+                    await threadChannel.delete()
                 }
                 await collector.update({ embeds:[embed], components:[]})
                 collector.stop()
