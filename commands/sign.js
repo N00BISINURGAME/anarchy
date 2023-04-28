@@ -80,7 +80,6 @@ module.exports = {
                     teamSigned = team.code
                     break
                 }
-                
             }
         }
         if (userSigned) {
