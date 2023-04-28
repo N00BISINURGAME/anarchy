@@ -37,7 +37,7 @@ module.exports = {
         for (const team of teams) {
             const roleExists = await interaction.guild.roles.fetch(team.roleid)
             if (roleExists && !(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
-                teamsArr.append(roleExists)
+                teamsArr.push(roleExists)
             }
         }
 
