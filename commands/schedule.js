@@ -92,6 +92,11 @@ module.exports = {
                     )
 
         const channel = await interaction.guild.channels.fetch(scheduleChannel.channelid)
+        if (channel.threads.cache.values() && channel.threads.cache.size > 0) {
+            for (const threadChannel of channel.threads.cache.values()) {
+                await threadChannel.delete()
+            }
+        }
         const message = await channel.send({ embeds:[embed], components:[buttons]})
 
         await interaction.editReply({ content:`Successfully posted schedule!`, ephemeral:true })
