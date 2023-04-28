@@ -13,13 +13,20 @@ userOption.setRequired(true);
 userOption.setName('player');
 userOption.setDescription('The player to sign');
 
+const termsOption = new SlashCommandStringOption()
+    .setRequired(true)
+    .setName("terms")
+    .setDescription("The terms of the contract being offered")
+
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('offer')
-        .setDescription('Offer to sign a player to a team.')
-        .addUserOption(userOption),
+        .setName('contractoffer')
+        .setDescription('Offer a contract to sign a player to a team.')
+        .addUserOption(userOption)
+        .addStringOption(termsOption),
     async execute(interaction) {
         let pingedUser = interaction.options.getMember('player')
+        const terms = interaction.options.getString("terms")
         if (!pingedUser) {
             return interaction.editReply({ content:"This user may have left the server! Ensure they are in the server, and contact Donovan#3771 if you believe this is a mistake.", ephemeral:true})
         }
@@ -29,8 +36,8 @@ module.exports = {
             const db = await getDBConnection();
             const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
             const maxPlayers = maxPlayerCount.maxplayers
-            const offerEnabled = await db.get('SELECT offers FROM Leagues WHERE guild = ?', guild)
-            if (!offerEnabled.offers) return interaction.editReply({ content: "Offers are disabled!", ephemeral: true})
+            const offerEnabled = await db.get('SELECT contracts FROM Leagues WHERE guild = ?', guild)
+            if (!offerEnabled.offers) return interaction.editReply({ content: "Contracts are disabled!", ephemeral: true})
 
             // check if a transaction channel has been set
             const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
@@ -148,11 +155,11 @@ module.exports = {
             dmChannel = await userPing.createDM()
 
             dmMessage = new EmbedBuilder()
-                .setTitle("Incoming Offer!")
+                .setTitle("Incoming Contract Offer!")
                 .setColor(teamRole.color)
                 .setThumbnail(logoStr)
-                .setDescription(`The ${teamRole.name} have sent you an offer! To accept or decline, press the green or red button on this message. You have 15 minutes to accept.
-                \n>>> **Coach:** ${interaction.user.tag}\n**League:** ${interaction.guild.name}`)
+                .setDescription(`The ${teamRole.name} have sent you a contract offer! To accept or decline, press the green or red button on this message. You have 15 minutes to accept.
+                \n>>> **Contract Terms:** ${terms}\n**Coach:** ${interaction.user.tag}\n**League:** ${interaction.guild.name}`)
             if (interaction.user.avatarURL()) {
                 dmMessage.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
             } else {
@@ -214,11 +221,11 @@ module.exports = {
                 const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
                 const transactionEmbed = new EmbedBuilder()
-                    .setTitle("Offer accepted!")
+                    .setTitle("Contract accepted!")
                     .setColor(roleObj.color)
                     .setThumbnail(logoStr)
-                    .setDescription(`The ${roleObj} have successfully offered ${userPing} (${userPing.user.tag})!
-                    \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})\n**Roster:** ${roleObj.members.size}/${maxPlayers}`)
+                    .setDescription(`The ${roleObj} have successfully offered a contract to ${userPing} (${userPing.user.tag})!
+                    \n>>> **Contract Terms:** ${terms}\n**Coach:** ${interaction.member} (${interaction.user.tag})\n**Roster:** ${roleObj.members.size}/${maxPlayers}`)
                 
                 if (interaction.user.avatarURL()) {
                     transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })

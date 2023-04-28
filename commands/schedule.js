@@ -73,7 +73,7 @@ module.exports = {
         } else {
             embed.setFooter({ text: `${interaction.user.tag}` })
         }
-
+        // tomorrow, add a button to make channels
 
         const channel = await interaction.guild.channels.fetch(scheduleChannel.channelid)
         const message = await channel.send({ embeds:[embed]})
