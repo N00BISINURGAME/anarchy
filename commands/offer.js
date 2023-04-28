@@ -30,7 +30,7 @@ module.exports = {
             const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
             const maxPlayers = maxPlayerCount.maxplayers
             const offerEnabled = await db.get('SELECT offers FROM Leagues WHERE guild = ?', guild)
-            if (!offerEnabled.offers) return interaction.editReply({ content: "Offers are disabled!", ephemeral: true})
+            if (!offerEnabled.offers) return interaction.editReply({ content: "Offers are disabled! They can be enabled by running /toggle.", ephemeral: true})
 
             // check if a transaction channel has been set
             const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
