@@ -92,6 +92,10 @@ module.exports = {
         }
 
         const memberTeamRole = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info, guild])
+        if (!memberTeamRole) {
+            await db.close()
+            return interaction.editReply({content:`The team that you are on does not exist in the database! This may indicate that you need to run /setup.`, ephemeral:true});
+        }
         const teamRole = await interaction.guild.roles.fetch(memberTeamRole.roleid)
 
         if (teamRole.members.size + 1 > maxPlayers) {
