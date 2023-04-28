@@ -26,7 +26,7 @@ module.exports = {
             } catch(err) {
                 continue;
             }
-            teamStr += `${player} (${player.user.tag}) - Suspended for **${teams[i].reason} due to ${teams[i].reason}\n\n`
+            teamStr += `${player} (${player.user.tag}) - Suspended for **${teams[i].reason}** due to **${teams[i].reason}**\n\n`
         }
 
         if (teamStr === "") teamStr = "None";
@@ -34,6 +34,15 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle(`Suspended players`)
             .setDescription(`${teamStr}`)
+        if (interaction.guild.iconURL()) {
+            embed.setThumbnail(interaction.guild.iconURL())
+        }
+
+        if (interaction.user.avatarURL()) {
+            embed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+        } else {
+            embed.setFooter({ text: `${interaction.user.tag}` })
+        }
         const buttons = new ActionRowBuilder()
                     .addComponents(
                         new ButtonBuilder()
