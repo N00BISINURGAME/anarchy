@@ -141,6 +141,14 @@
       "description":"Allows you to view team standings for that season. **This command should be used in conjunction with /results, as /results keeps track of scores for one game.**"
     },
     {
+      "name":"/suspend <player> <reason> <duration>",
+      "description":"Allows a manager or admin to suspend a player."
+    },
+    {
+      "name":"/suspensions",
+      "description":"Allows you to view current active suspensions."
+    },
+    {
       "name":"/teams",
       "description":"Allows you to view all teams and their franchise owners. Similar to 'focheck' for other bots."
     },
@@ -151,6 +159,10 @@
     {
       "name":"/trade <player1> <player2>",
       "description":"Allows trade one player for another player. May only be run by franchise owners and general managers."
+    },
+    {
+      "name":"/unsuspend <user>",
+      "description":"Allows admins or managers to unsuspend a player."
     },
     {
       "name":"/whitelist <user> <role>",
