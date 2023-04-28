@@ -21,6 +21,10 @@
       "description":"Links the channel you mentioned for a specific purpose, like for transactions or demands."
     },
     {
+      "name":"/contractoffer <player> <terms>",
+      "description":"Allows a franchise owner or general manager to send a contract offer to a player, who can choose to accept or decline."
+    },
+    {
       "name":"/defensestats <tackles> <ints> <touchdowns> <sacks> <safeties> <fumble-recoveries>",
       "description":"Logs your defensive stats, as shown on the FF2 'Defense' server stats."
     },
@@ -115,6 +119,10 @@
     {
       "name":"/roster <team>",
       "description":"Allows you to view the roster of a team."
+    },
+    {
+      "name":"/schedule <deadline>",
+      "description":"Allows you to automatically generate a random schedule with a specified deadline."
     },
     {
       "name":"/setdemands <number>",
