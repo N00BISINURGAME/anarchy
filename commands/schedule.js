@@ -75,7 +75,7 @@ module.exports = {
         }
 
 
-        const channel = await interaction.guild.channels.fetch(gametimeChannel.channelid)
+        const channel = await interaction.guild.channels.fetch(scheduleChannel.channelid)
         const message = await channel.send({ embeds:[embed]})
 
         await interaction.editReply({ content:`Successfully posted schedule!`, ephemeral:true })
