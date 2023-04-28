@@ -49,12 +49,12 @@ module.exports = {
 
         let gameStr = ""
 
-        if (gameStr === "") {
-            gameStr = "No games are scheduled!"
+        while (teamsArr.length > 0) {
+            gameStr += `${teamsArr.pop()} vs ${teamsArr.pop()}\n`
         }
 
-        while (teamsArr.length > 0) {
-            gameStr += `${teamsArr.pop()} vs ${teamsArr.pop()}`
+        if (gameStr === "") {
+            gameStr = "No games are scheduled!"
         }
 
         // then, construct the embed
