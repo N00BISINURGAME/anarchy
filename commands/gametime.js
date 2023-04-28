@@ -31,7 +31,7 @@ module.exports = {
         const gametimeChannel = await db.get("SELECT channelid FROM Channels WHERE purpose = ? AND guild = ?", ["gametime", guild]);
         if (!gametimeChannel) {
             await db.close()
-            return interaction.editReply({ content:"Gametimes are currently disabled!", ephemeral:true })
+            return interaction.editReply({ content:"Gametimes are currently disabled! You can enable them by running /channel and setting a gametime channel.", ephemeral:true })
         }
 
         // then, check if a valid user ran the command
