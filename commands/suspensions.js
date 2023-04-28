@@ -13,7 +13,7 @@ module.exports = {
         const db = await getDBConnection();
         const guild = interaction.guild.id
         // first, get all teams
-        const teams = await db.get('SELECT discordid, reason, duration FROM Suspensions WHERE guild = ?', guild)
+        const teams = await db.all('SELECT discordid, reason, duration FROM Suspensions WHERE guild = ?', guild)
 
         let page = 1;
         let lower = 0;
