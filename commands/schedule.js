@@ -108,6 +108,9 @@ module.exports = {
         collector.on("collect", async i => {
             const db = await getDBConnection()
             if (i.customId === "generate") {
+                genButton.setDisabled(true)
+                await message.edit({ embeds:[embed], components:[buttons]})
+                await channel.send("Threads have been created for each team, schedule your games in there!")
                 const teams = gameStr.split("\n")
                 // teams should **always** be length of 2
                 for (const team of teams) {
@@ -139,15 +142,14 @@ module.exports = {
                     }
                     await thread.send(`${team}: Schedule your game here!`)
                 }
-                genButton.setDisabled(true)
-                await message.update({ embeds:[embed], components:[buttons]})
             } else {
+                await message.edit({ embeds:[embed], components:[]})
+                await channel.send("All scheduling threads have been deleted!")
                 if (channel.threads.cache.values()) {
                     for (const threadChannel of channel.threads.cache.values()) {
                         await threadChannel.delete()
                     }
                 }
-                await message.update({ embeds:[embed], components:[]})
                 collector.stop()
             }
             await db.close()
