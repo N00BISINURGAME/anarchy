@@ -141,7 +141,7 @@ module.exports = {
                         }
                     }
                     await thread.send(`${team}: Schedule your game here!`)
-                    await i.update({ embeds:[embed], components:[buttons]})
+                    await i.editReply({ embeds:[embed], components:[buttons]})
                 }
             } else {
                 await channel.send("All scheduling threads have been deleted!")
@@ -150,7 +150,7 @@ module.exports = {
                         await threadChannel.delete()
                     }
                 }
-                await i.update({ embeds:[embed], components:[]})
+                await i.editReply({ embeds:[embed], components:[]})
                 collector.stop()
             }
             await db.close()
