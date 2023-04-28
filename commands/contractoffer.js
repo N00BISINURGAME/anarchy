@@ -255,8 +255,7 @@ module.exports = {
             const db = await getDBConnection();
             await db.run("DELETE FROM Offers WHERE discordid = ?", userid);
             if (err.code === "InteractionCollectorError") {
-                dmMessage.setTitle("Offer Expired!")
-                await userMessage.edit({ embeds: [dmMessage], components: []})
+                await userMessage.delete()
              } else if (err.code === 50007) {
                 await interaction.editReply({ content: "This user does not have their DMs open to bots! Ensure that this user can be DMed by bots before sending them another offer!", ephemeral:true })
             } else {
