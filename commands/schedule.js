@@ -116,6 +116,7 @@ module.exports = {
                 for (const team of teams) {
                     const regex = /\d{17,}/g
                     const twoTeams = team.match(regex)
+                    if (twoTeams.length != 2) continue;
                     const firstTeam = await interaction.guild.roles.fetch(twoTeams[0])
                     const secondTeam = await interaction.guild.roles.fetch(twoTeams[1])
                     const thread = await channel.threads.create({
