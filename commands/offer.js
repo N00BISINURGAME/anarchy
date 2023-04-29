@@ -71,13 +71,6 @@ module.exports = {
             return interaction.editReply({ content:'You are not authorized to sign a player!', ephemeral:true});
         }
 
-        // then, check if the user already has an outgoing offer
-        const existingOffer = await db.get("SELECT * FROM Offers where discordid = ?", user.id);
-        if (existingOffer) {
-            await db.close();
-            return interaction.editReply({ content:"This user already has an outgoing offer. Please try again later.", ephemeral:true })
-        }
-
         // then, get the team logo
         const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [info, guild]);
         let logoStr;
@@ -170,7 +163,6 @@ module.exports = {
                 )
 
         userMessage = await dmChannel.send({embeds: [dmMessage], components: [buttons]})
-        await db.run("INSERT INTO Offers (discordid) VALUES (?)", user.id);
         await interaction.editReply({ content: "Offer has been sent. Awaiting decision...", ephemeral: true})
         try {
             const dmInteraction = await userMessage.awaitMessageComponent({ componentType: ComponentType.Button, time: 890000})
@@ -182,7 +174,7 @@ module.exports = {
                         .setTitle("Signing failed")
                         .setDescription(`${info.team} has signed too many players, and can no longer sign you without going over the maximum player cap.`)
                         await db.close()
-                    return dmInteraction.update({ embeds: failEmbed, components: [] })
+                    return dmInteraction.update({ embeds:[failEmbed], components: [] })
                 }
 
                 // check if the player signed to another team
