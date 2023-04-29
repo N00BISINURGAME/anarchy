@@ -53,23 +53,6 @@ module.exports = {
             }
         }
 
-        const demoterRoles = interaction.member.roles.cache
-        const foRoleid = await db.get('SELECT roleid FROM Roles WHERE code = "FO" AND guild = ?', guild)
-        if (!foRoleid) {
-            await db.close()
-            return interaction.editReply({ content:"The franchise owner role does not exist in the database! This may be a sign that you need to run /setup.", ephemeral:true })
-        }
-        if (!(demoterRoles.get(foRoleid.roleid))) {
-            await db.close()
-            return interaction.editReply({ content:"You are not authorized to demote individuals, as you are not a franchise owner!", ephemeral:true })
-        }
-
-        // check and see if theyre actually a member of the front office
-        if (!specialRole) {
-            await db.close()
-            return interaction.editReply({ content:"This person is not a member of your front office!", ephemeral:true })
-        }
-
         // then, check to see if the user pinged is on the same team as the user who ran the command
         // need to do this part -- get team role for franchise owner and get team role for player pinged
         let teamRole;
@@ -121,6 +104,23 @@ module.exports = {
             await transactionChannel.send({ embeds: [transactionEmbed] })
             await db.close()
             return interaction.editReply({ content:"Successfully demoted franchise owner down!", ephemeral:true })
+        }
+
+        const demoterRoles = interaction.member.roles.cache
+        const foRoleid = await db.get('SELECT roleid FROM Roles WHERE code = "FO" AND guild = ?', guild)
+        if (!foRoleid) {
+            await db.close()
+            return interaction.editReply({ content:"The franchise owner role does not exist in the database! This may be a sign that you need to run /setup.", ephemeral:true })
+        }
+        if (!(demoterRoles.get(foRoleid.roleid))) {
+            await db.close()
+            return interaction.editReply({ content:"You are not authorized to demote individuals, as you are not a franchise owner!", ephemeral:true })
+        }
+
+        // check and see if theyre actually a member of the front office
+        if (!specialRole) {
+            await db.close()
+            return interaction.editReply({ content:"This person is not a member of your front office!", ephemeral:true })
         }
 
         // then, take away the role from the person
