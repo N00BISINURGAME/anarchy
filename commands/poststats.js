@@ -29,18 +29,71 @@ module.exports = {
         .setDescription('Posts game statistics into a specific channel'),
     async execute(interaction) {
         const db = await getDBConnection();
-        const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, interaction.guild.id])
-        if (!authorized) {
+        const guild = interaction.guild.id
+
+        const statsChannel = await db.get("SELECT channelid FROM Channels WHERE purpose = ? AND guild = ?", ["stats", guild]);
+        if (!statsChannel) {
             await db.close()
-          return interaction.editReply({ content:"You are not authorized to change the team's logo!", ephemeral:true })
+            return interaction.editReply({ content:"A stats channel has not been set! You can set a channel for stats by running /channel.", ephemeral:true })
+        }
+        let authorized = false;
+        for (const role of interaction.member.roles.cache.keys()) {
+          const auth = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
+          if (auth.code === "FO" || auth.code === "GM" || auth.code === "HC") {
+            authorized = true;
+            break;
+          }
+        }
+
+        if (!authorized) {
+          await db.close()
+          return interaction.editReply({ content:"You are not authorized to post stats!", ephemeral:true })
         }
 
         // first, get player stats
-        const link = interaction.options.getAttachment('qb-stats')
+        const team1 = interaction.options.getRole("your-team")
+        const team1Score = interaction.options.getInteger('your-team-score')
+        const team2 = interaction.options.getRole("other-team")
+        const team2Score = interaction.options.getInteger('other-team-score')
+        const qbStats = interaction.options.getAttachment('qb-stats')
+        if (!qbStats.includes("image")) {
+          await db.close()
+          return interaction.editReply({ content:"The QB stats you submitted are not a valid image! Ensure you attach a valid image and try again.", ephemeral:true })
+        }
+
+        const rbStats = interaction.options.getAttachment('rb-stats')
+        if (!rbStats.includes("image")) {
+          await db.close()
+          return interaction.editReply({ content:"The RB stats you submitted are not a valid image! Ensure you attach a valid image and try again.", ephemeral:true })
+        }
+
+        const wrStats = interaction.options.getAttachment('wr-stats')
+        if (!wrStats.includes("image")) {
+          await db.close()
+          return interaction.editReply({ content:"The WR stats you submitted are not a valid image! Ensure you attach a valid image and try again.", ephemeral:true })
+        }
+
+        const defStats = interaction.options.getAttachment('def-stats')
+        if (!defStats.includes("image")) {
+          await db.close()
+          return interaction.editReply({ content:"The defensive stats you submitted are not a valid image! Ensure you attach a valid image and try again.", ephemeral:true })
+        }
+
+        const kStats = interaction.options.getAttachment('k-stats')
+        if (!kStats.includes("image")) {
+          await db.close()
+          return interaction.editReply({ content:"The K stats you submitted are not a valid image! Ensure you attach a valid image and try again.", ephemeral:true })
+        }
+
+        const channel = await interaction.guild.channels.fetch(statsChannel.channelid)
         
-        console.log(link.contentType)
+        if (team1Score > team2Score) {
+          await channel.send(`${qbStats.url}\n${rbStats.url}\n${wrStats.url}\n${defStats.url}\n${kStats.url}\n${team1} ${team1Score} - ${team2Score} ${team2}\nStats posted by ${interaction.member} (${interaction.user.tag})`)
+        } else {
+          await channel.send(`${qbStats.url}\n${rbStats.url}\n${wrStats.url}\n${defStats.url}\n${kStats.url}\n${team2} ${team2Score} - ${team1Score} ${team1}\nStats posted by ${interaction.member} (${interaction.user.tag})`)
+        }
 
         await db.close()
-        return interaction.editReply({ content:`Successfully changed logo!`, ephemeral:true })
+        return interaction.editReply({ content:`Successfully posted stats!`, ephemeral:true })
     }
 }
