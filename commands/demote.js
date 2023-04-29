@@ -82,6 +82,9 @@ module.exports = {
                 }
             }
 
+            const logo = await db.get('SELECT logo FROM Teams t, Roles r WHERE t.code = r.code AND t.guild = r.guild AND r.roleid = ? AND r.guild = ?', [teamRole.id, guild]);
+            const logoStr = logo.logo;
+
             const transactionEmbed = new EmbedBuilder()
                 .setTitle('Franchise Owner demoted!')
                 .setThumbnail(logoStr)
