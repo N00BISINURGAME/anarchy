@@ -5,9 +5,7 @@ const { getDBConnection } = require('../getDBConnection');
 const { message } = require('noblox.js');
 
 
-let dmChannel;
-let dmMessage;
-let userMessage;
+
 const userOption = new SlashCommandUserOption();
 userOption.setRequired(true);
 userOption.setName('player');
@@ -19,163 +17,162 @@ module.exports = {
         .setDescription('Offer to sign a player to a team.')
         .addUserOption(userOption),
     async execute(interaction) {
-        let pingedUser = interaction.options.getMember('player')
-        if (!pingedUser) {
-            return interaction.editReply({ content:"This user may have left the server! Ensure they are in the server, and contact Donovan#3771 if you believe this is a mistake.", ephemeral:true})
-        }
+        let dmChannel;
+        let dmMessage;
+        let userMessage;
         let userid = pingedUser.id;
         const guild = interaction.guild.id
+        const db = await getDBConnection();
+        const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
+        const maxPlayers = maxPlayerCount.maxplayers
+        const offerEnabled = await db.get('SELECT offers FROM Leagues WHERE guild = ?', guild)
+        if (!offerEnabled.offers) return interaction.editReply({ content: "Offers are disabled! They can be enabled by running /toggle.", ephemeral: true})
+
+        // check if a transaction channel has been set
+        const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
+        if (!transactionExists) {
+            await db.close()
+            return interaction.editReply({ content: "A transaction channel has not been set! This can be set by running /setup or /channel.", ephemeral: true})
+        }
+
+        // gets all information that the user sent
+        let userPing = interaction.options.getMember('player');
+        if (!userPing) {
+          return interaction.editReply({ content:"This user may have left the server! Ensure they are in the server, and contact Donovan#3771 if you believe this is a mistake.", ephemeral:true})
+        }
+
+        if (user.id === interaction.user.id) {
+            await db.close()
+            return interaction.editReply({ content:"You are not allowed to offer yourself!", ephemeral:true })
+        }
+
+        // first, check and see if the user that sent the command is authorized to sign a player (as in, they are a FO or GM)
+        const userSent = interaction.user.id;
+        const allTeams = await db.all('SELECT roleid, code FROM Roles WHERE guild = ?', guild)
+        if (allTeams.length === 0) {
+            await db.close()
+            return interaction.editReply({ content:"There are no teams in this league! This may indicate you need to run /setup.", ephemeral:true })
+        }
+        let authorized = false
+        let info
+        for (const team of allTeams) {
+            if (interaction.member.roles.cache.get(team.roleid)) {
+                if (team.code === "FO" || team.code === "GM") {
+                    authorized = true
+                }
+                if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
+                    info = team.code
+                }
+            }
+        }
+        if (!authorized) {
+            await db.close();
+            return interaction.editReply({ content:'You are not authorized to sign a player!', ephemeral:true});
+        }
+
+        // then, check if the user already has an outgoing offer
+        const existingOffer = await db.get("SELECT * FROM Offers where discordid = ?", user.id);
+        if (existingOffer) {
+            await db.close();
+            return interaction.editReply({ content:"This user already has an outgoing offer. Please try again later.", ephemeral:true })
+        }
+
+        // then, get the team logo
+        const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [info, guild]);
+        let logoStr;
+        if (!logo) {
+            logoStr = interaction.client.user.avatarURL()
+        } else {
+            logoStr = logo.logo;
+        }
+
+        // get role id
+        const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info, guild]);
+        if (!role) {
+            await db.close()
+            return interaction.editReply({ content:"The team you are on does not exist in the database! This may indicate you need to run /setup.", ephemeral:true })
+        }
+        const roleObj = await interaction.guild.roles.fetch(role.roleid)
+
+        if (!roleObj) {
+            await db.close()
+            return interaction.editReply({content:'The role that is associated with your team does not exist in the database! This may mean you need to run /setup.', ephemeral:true});
+        }
+
+        // then, check to see if the user is already signed
+        let userSigned = false
+        let teamSigned
+        for (const team of allTeams) {
+            if (userPing.roles.cache.get(team.roleid)) {
+                if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
+                    userSigned = true
+                    teamSigned = team.code
+                    break
+                }
+                
+            }
+        }
+        if (userSigned) {
+            // then, get the team that the player is signed on
+            const team = await db.get('SELECT roleid FROM roles WHERE code = ? AND guild = ?', [teamSigned, guild]);
+            if (!team) {
+                await db.close()
+                return interaction.editReply({ content:"The team that the player you want to offer is on does not exist in the database! This may be a sign that you need to run /setup.", ephemeral:true })
+            }
+            const teamRole = await interaction.guild.roles.fetch(team.roleid);
+            await db.close();
+            return interaction.editReply({content:`This user has already been signed by the ${teamRole}!`, ephemeral:true});
+        }
+
+        const memberTeamRole = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info, guild])
+        if (!memberTeamRole) {
+            await db.close()
+            return interaction.editReply({ content:"The team you are on does not exist in the database! This may indicate you need to run /setup.", ephemeral:true })
+        }
+        const teamRole = await interaction.guild.roles.fetch(memberTeamRole.roleid)
+        if (!teamRole) {
+            await db.close()
+            return interaction.editReply({content:'The role that is associated with your team does not exist in the database! This may mean you need to run /setup.', ephemeral:true});
+        }
+
+        if (teamRole.members.size + 1 > maxPlayers) {
+            await db.close()
+            return interaction.editReply({content:'Signing this player would lead to your team exceeding the maximum player count!', ephemeral:true});
+        }
+
+        // then, get channel information and send an ephemeral reply to the command saying a user has been offered
+        // also create the dm message, format it properly, and send it to the user and listen for a button click
+        dmChannel = await userPing.createDM()
+
+        dmMessage = new EmbedBuilder()
+            .setTitle("Incoming Offer!")
+            .setColor(teamRole.color)
+            .setThumbnail(logoStr)
+            .setDescription(`The ${teamRole.name} have sent you an offer! To accept or decline, press the green or red button on this message. You have 15 minutes to accept.
+            \n>>> **Coach:** ${interaction.user.tag}\n**League:** ${interaction.guild.name}`)
+        if (interaction.user.avatarURL()) {
+            dmMessage.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+        } else {
+            dmMessage.setFooter({ text: `${interaction.user.tag}` })
+        }
+
+        const buttons = new ActionRowBuilder()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('accept')
+                        .setLabel('Accept')
+                        .setStyle(ButtonStyle.Success),
+                    new ButtonBuilder()
+                        .setCustomId('decline')
+                        .setLabel('Decline')
+                        .setStyle(ButtonStyle.Danger)
+                )
+
+        userMessage = await dmChannel.send({embeds: [dmMessage], components: [buttons]})
+        await db.run("INSERT INTO Offers (discordid) VALUES (?)", user.id);
+        await interaction.editReply({ content: "Offer has been sent. Awaiting decision...", ephemeral: true})
         try {
-            const db = await getDBConnection();
-            const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
-            const maxPlayers = maxPlayerCount.maxplayers
-            const offerEnabled = await db.get('SELECT offers FROM Leagues WHERE guild = ?', guild)
-            if (!offerEnabled.offers) return interaction.editReply({ content: "Offers are disabled! They can be enabled by running /toggle.", ephemeral: true})
-
-            // check if a transaction channel has been set
-            const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
-            if (!transactionExists) {
-                await db.close()
-                return interaction.editReply({ content: "A transaction channel has not been set! This can be set by running /setup or /channel.", ephemeral: true})
-            }
-
-            // gets all information that the user sent
-            let userPing = interaction.options.getMember('player');
-            let user = await interaction.guild.members.fetch(userPing.id)
-            let userid = user.id;
-
-            if (user.id === interaction.user.id) {
-                await db.close()
-                return interaction.editReply({ content:"You are not allowed to offer yourself!", ephemeral:true })
-            }
-
-            // first, check and see if the user that sent the command is authorized to sign a player (as in, they are a FO or GM)
-            const userSent = interaction.user.id;
-            const allTeams = await db.all('SELECT roleid, code FROM Roles WHERE guild = ?', guild)
-            if (allTeams.length === 0) {
-                await db.close()
-                return interaction.editReply({ content:"There are no teams in this league! This may indicate you need to run /setup.", ephemeral:true })
-            }
-            let authorized = false
-            let info
-            for (const team of allTeams) {
-                if (interaction.member.roles.cache.get(team.roleid)) {
-                    if (team.code === "FO" || team.code === "GM") {
-                        authorized = true
-                    }
-                    if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
-                        info = team.code
-                    }
-                }
-            }
-            if (!authorized) {
-                await db.close();
-                return interaction.editReply({ content:'You are not authorized to sign a player!', ephemeral:true});
-            }
-
-            // then, check if the user already has an outgoing offer
-            const existingOffer = await db.get("SELECT * FROM Offers where discordid = ?", user.id);
-            if (existingOffer) {
-                await db.close();
-                return interaction.editReply({ content:"This user already has an outgoing offer. Please try again later.", ephemeral:true })
-            }
-
-            // then, get the team logo
-            const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [info, guild]);
-            let logoStr;
-            if (!logo) {
-                logoStr = interaction.client.user.avatarURL()
-            } else {
-                logoStr = logo.logo;
-            }
-
-            // get role id
-            const role = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info, guild]);
-            if (!role) {
-                await db.close()
-                return interaction.editReply({ content:"The team you are on does not exist in the database! This may indicate you need to run /setup.", ephemeral:true })
-            }
-            const roleObj = await interaction.guild.roles.fetch(role.roleid)
-
-            if (!roleObj) {
-                await db.close()
-                return interaction.editReply({content:'The role that is associated with your team does not exist in the database! This may mean you need to run /setup.', ephemeral:true});
-            }
-
-            // then, check to see if the user is already signed
-            let userSigned = false
-            let teamSigned
-            for (const team of allTeams) {
-                if (userPing.roles.cache.get(team.roleid)) {
-                    if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
-                        userSigned = true
-                        teamSigned = team.code
-                        break
-                    }
-                    
-                }
-            }
-            if (userSigned) {
-                // then, get the team that the player is signed on
-                const team = await db.get('SELECT roleid FROM roles WHERE code = ? AND guild = ?', [teamSigned, guild]);
-                if (!team) {
-                    await db.close()
-                    return interaction.editReply({ content:"The team that the player you want to offer is on does not exist in the database! This may be a sign that you need to run /setup.", ephemeral:true })
-                }
-                const teamRole = await interaction.guild.roles.fetch(team.roleid);
-                await db.close();
-                return interaction.editReply({content:`This user has already been signed by the ${teamRole}!`, ephemeral:true});
-            }
-
-            const memberTeamRole = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [info, guild])
-            if (!memberTeamRole) {
-                await db.close()
-                return interaction.editReply({ content:"The team you are on does not exist in the database! This may indicate you need to run /setup.", ephemeral:true })
-            }
-            const teamRole = await interaction.guild.roles.fetch(memberTeamRole.roleid)
-            if (!teamRole) {
-                await db.close()
-                return interaction.editReply({content:'The role that is associated with your team does not exist in the database! This may mean you need to run /setup.', ephemeral:true});
-            }
-
-            if (teamRole.members.size + 1 > maxPlayers) {
-                await db.close()
-                return interaction.editReply({content:'Signing this player would lead to your team exceeding the maximum player count!', ephemeral:true});
-            }
-
-            // then, get channel information and send an ephemeral reply to the command saying a user has been offered
-            // also create the dm message, format it properly, and send it to the user and listen for a button click
-            dmChannel = await userPing.createDM()
-
-            dmMessage = new EmbedBuilder()
-                .setTitle("Incoming Offer!")
-                .setColor(teamRole.color)
-                .setThumbnail(logoStr)
-                .setDescription(`The ${teamRole.name} have sent you an offer! To accept or decline, press the green or red button on this message. You have 15 minutes to accept.
-                \n>>> **Coach:** ${interaction.user.tag}\n**League:** ${interaction.guild.name}`)
-            if (interaction.user.avatarURL()) {
-                dmMessage.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
-            } else {
-                dmMessage.setFooter({ text: `${interaction.user.tag}` })
-            }
-
-            const buttons = new ActionRowBuilder()
-                    .addComponents(
-                        new ButtonBuilder()
-                            .setCustomId('accept')
-                            .setLabel('Accept')
-                            .setStyle(ButtonStyle.Success),
-                        new ButtonBuilder()
-                            .setCustomId('decline')
-                            .setLabel('Decline')
-                            .setStyle(ButtonStyle.Danger)
-                    )
-
-            userMessage = await dmChannel.send({embeds: [dmMessage], components: [buttons]})
-            await db.run("INSERT INTO Offers (discordid) VALUES (?)", user.id);
-            await interaction.editReply({ content: "Offer has been sent. Awaiting decision...", ephemeral: true})
             const dmInteraction = await userMessage.awaitMessageComponent({ componentType: ComponentType.Button, time: 890000})
-
             if (dmInteraction.customId === "accept") {
                 // check again to see if player count would be exceeded
                 const newMaxPlayers = await interaction.guild.roles.fetch(memberTeamRole.roleid)
@@ -256,5 +253,5 @@ module.exports = {
             }
             await db.close();
         }
-    }
+      }
 }
