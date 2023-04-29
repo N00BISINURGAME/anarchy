@@ -56,31 +56,31 @@ module.exports = {
         const team2 = interaction.options.getRole("other-team")
         const team2Score = interaction.options.getInteger('other-team-score')
         const qbStats = interaction.options.getAttachment('qb-stats')
-        if (!qbStats.includes("image")) {
+        if (!qbStats.contentType.includes("image")) {
           await db.close()
           return interaction.editReply({ content:"The QB stats you submitted are not a valid image! Ensure you attach a valid image and try again.", ephemeral:true })
         }
 
         const rbStats = interaction.options.getAttachment('rb-stats')
-        if (!rbStats.includes("image")) {
+        if (!rbStats.contentType.includes("image")) {
           await db.close()
           return interaction.editReply({ content:"The RB stats you submitted are not a valid image! Ensure you attach a valid image and try again.", ephemeral:true })
         }
 
         const wrStats = interaction.options.getAttachment('wr-stats')
-        if (!wrStats.includes("image")) {
+        if (!wrStats.contentType.includes("image")) {
           await db.close()
           return interaction.editReply({ content:"The WR stats you submitted are not a valid image! Ensure you attach a valid image and try again.", ephemeral:true })
         }
 
         const defStats = interaction.options.getAttachment('def-stats')
-        if (!defStats.includes("image")) {
+        if (!defStats.contentType.includes("image")) {
           await db.close()
           return interaction.editReply({ content:"The defensive stats you submitted are not a valid image! Ensure you attach a valid image and try again.", ephemeral:true })
         }
 
         const kStats = interaction.options.getAttachment('k-stats')
-        if (!kStats.includes("image")) {
+        if (!kStats.contentType.includes("image")) {
           await db.close()
           return interaction.editReply({ content:"The K stats you submitted are not a valid image! Ensure you attach a valid image and try again.", ephemeral:true })
         }
