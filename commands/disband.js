@@ -9,7 +9,7 @@ const teamOption = new SlashCommandMentionableOption().setRequired(true).setName
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('releaseall')
+        .setName('disband')
         .setDescription('Releases all players from a team.')
         .addMentionableOption(teamOption),
     async execute(interaction) {
@@ -22,6 +22,13 @@ module.exports = {
             if (!authorized) {
                 await db.close();
                 return interaction.editReply({ content:"You are not authorized to mass release!", ephemeral:true });
+            }
+
+            // then, get the transaction channel ID and send a transaction message
+            const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "notices" AND guild = ?', guild)
+            if (!channelId) {
+                await db.close();
+                return interaction.editReply({ content:"A notices channel has not been set! This can be set by running /channel.", ephemeral:true });
             }
 
             const team = interaction.options.getMentionable('team')
@@ -54,8 +61,6 @@ module.exports = {
             const logo = await db.get('SELECT logo FROM Teams WHERE code = ? AND guild = ?', [teamExists.code, guild]);
             const logoStr = logo.logo;
 
-            // then, get the transaction channel ID and send a transaction message
-            const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
             if (channelId) {
                 const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
@@ -63,7 +68,7 @@ module.exports = {
 
                 // then, format the embed and send it to the transaction channel
                 const transactionEmbed = new EmbedBuilder()
-                    .setTitle("Team mass release!")
+                    .setTitle("Team disbanded!")
                     .setThumbnail(logoStr)
                     .setColor(team.color)
                     .setDescription(`All members of the ${team} have been released!

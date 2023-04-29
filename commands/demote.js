@@ -21,6 +21,12 @@ module.exports = {
         const userChoice = interaction.options.getMember('player');
         const guild = interaction.guild.id
 
+        const channelExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
+        if (!channelExists) {
+            await db.close()
+            return interaction.editReply({ content:'The transactions channel does not exist! This can be set by using /setup or /channel.', ephemeral:true });
+        }
+
         // check if the user is trying to assign themselves a role
 
         if (userId === userChoice.id){
@@ -45,18 +51,6 @@ module.exports = {
                     break;
                 }
             }
-        }
-
-        if (isFO) {
-            // then, check if the user running the command is an admin
-            const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [userId, guild])
-            if (!authorized) {
-                await db.close()
-                return interaction.editReply({ content:"You are not authorized to demote franchise owners!", ephemeral:true })
-            }
-            await userChoice.roles.remove(specialRole);
-            await db.close()
-            return interaction.editReply({ content:"Successfully demoted franchise owner down!", ephemeral:true })
         }
 
         const demoterRoles = interaction.member.roles.cache
@@ -94,6 +88,39 @@ module.exports = {
                     break;
                 }
             }
+        }
+
+        if (isFO) {
+            const noticeExists = await db.get('SELECT * FROM Channels WHERE purpose = "notices" AND guild = ?', guild)
+            if (!noticeExists) {
+                await db.close()
+                return interaction.editReply({ content:'The notices channel does not exist! This can be set by using /channel.', ephemeral:true });
+            }
+            // then, check if the user running the command is an admin
+            const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [userId, guild])
+            if (!authorized) {
+                await db.close()
+                return interaction.editReply({ content:"You are not authorized to demote franchise owners!", ephemeral:true })
+            }
+            await userChoice.roles.remove(specialRole);
+
+            const transactionEmbed = new EmbedBuilder()
+                .setTitle('Franchise Owner demoted!')
+                .setThumbnail(logoStr)
+                .setDescription(`${userChoice} (${userChoice.user.tag}) from ${specialRole} of the ${teamRole}!
+                \n>>> **Admin:** ${interaction.member} (${interaction.user.tag})`)
+                .setColor(teamRole.color)
+            if (interaction.user.avatarURL()) {
+                transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+            } else {
+                transactionEmbed.setFooter({ text: `${interaction.user.tag}` })
+            }
+            const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "notices" AND guild = ?', guild)
+            const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
+
+            await transactionChannel.send({ embeds: [transactionEmbed] })
+            await db.close()
+            return interaction.editReply({ content:"Successfully demoted franchise owner down!", ephemeral:true })
         }
 
         // then, take away the role from the person

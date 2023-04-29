@@ -43,6 +43,13 @@ module.exports = {
             return interaction.editReply({ content:"You are not authorized to assign a franchise owner!", ephemeral:true });
         }
 
+        // then, get the transaction channel ID and send a transaction message
+        const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "notices" AND guild = ?', guild)
+        if (!channelId) {
+            await db.close();
+            return interaction.editReply({ content:"A notices channel has not been set! This can be set by running /channel.", ephemeral:true });
+        }
+
         // then, check to see if the team exists or not
         const teamExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ? AND NOT code = "FA" AND NOT code = "GM" AND NOT code = "HC" AND NOT code = "FO"', [teamChoice.id, guild])
 
@@ -102,8 +109,6 @@ module.exports = {
         } else {
             transactionEmbed.setFooter({ text: `${interaction.user.tag}` })
         }
-
-        const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
         if (channelId) {
             const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
             await transactionChannel.send({ embeds: [transactionEmbed] })
