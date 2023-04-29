@@ -20,7 +20,6 @@ module.exports = {
         let dmChannel;
         let dmMessage;
         let userMessage;
-        let userid = pingedUser.id;
         const guild = interaction.guild.id
         const db = await getDBConnection();
         const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
@@ -40,6 +39,7 @@ module.exports = {
         if (!userPing) {
           return interaction.editReply({ content:"This user may have left the server! Ensure they are in the server, and contact Donovan#3771 if you believe this is a mistake.", ephemeral:true})
         }
+        let userid = userPing.id;
 
         if (user.id === interaction.user.id) {
             await db.close()
