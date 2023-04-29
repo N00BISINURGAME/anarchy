@@ -54,6 +54,53 @@ module.exports = {
             }
         }
 
+        if (isFO) {
+            const noticeExists = await db.get('SELECT * FROM Channels WHERE purpose = "notices" AND guild = ?', guild)
+            if (!noticeExists) {
+                await db.close()
+                return interaction.editReply({ content:'The notices channel does not exist! This can be set by using /channel.', ephemeral:true });
+            }
+            // then, check if the user running the command is an admin
+            const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [userId, guild])
+            if (!authorized) {
+                await db.close()
+                return interaction.editReply({ content:"You are not authorized to demote franchise owners!", ephemeral:true })
+            }
+            await userChoice.roles.remove(specialRole);
+
+            let teamRole;
+            for (const role of demoterRoles.values()) {
+                const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guild])
+                // we have a valid role in the database!
+                if (roleExists) {
+                    if (!(roleExists.code === "FO" || roleExists.code === "GM" || roleExists.code === "HC")) {
+                        // and it's a valid team role! we can now compare against the cache of the
+                        // person that was pinged
+                        teamRole = role
+                        break;
+                    }
+                }
+            }
+
+            const transactionEmbed = new EmbedBuilder()
+                .setTitle('Franchise Owner demoted!')
+                .setThumbnail(logoStr)
+                .setDescription(`${userChoice} (${userChoice.user.tag}) from ${specialRole} of the ${teamRole}!
+                \n>>> **Admin:** ${interaction.member} (${interaction.user.tag})`)
+                .setColor(teamRole.color)
+            if (interaction.user.avatarURL()) {
+                transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+            } else {
+                transactionEmbed.setFooter({ text: `${interaction.user.tag}` })
+            }
+            const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "notices" AND guild = ?', guild)
+            const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
+
+            await transactionChannel.send({ embeds: [transactionEmbed] })
+            await db.close()
+            return interaction.editReply({ content:"Successfully demoted franchise owner down!", ephemeral:true })
+        }
+
         // then, check to see if the user pinged is on the same team as the user who ran the command
         // need to do this part -- get team role for franchise owner and get team role for player pinged
         let teamRole;
@@ -74,38 +121,7 @@ module.exports = {
             }
         }
 
-        if (isFO) {
-            const noticeExists = await db.get('SELECT * FROM Channels WHERE purpose = "notices" AND guild = ?', guild)
-            if (!noticeExists) {
-                await db.close()
-                return interaction.editReply({ content:'The notices channel does not exist! This can be set by using /channel.', ephemeral:true });
-            }
-            // then, check if the user running the command is an admin
-            const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [userId, guild])
-            if (!authorized) {
-                await db.close()
-                return interaction.editReply({ content:"You are not authorized to demote franchise owners!", ephemeral:true })
-            }
-            await userChoice.roles.remove(specialRole);
-
-            const transactionEmbed = new EmbedBuilder()
-                .setTitle('Franchise Owner demoted!')
-                .setThumbnail(logoStr)
-                .setDescription(`${userChoice} (${userChoice.user.tag}) from ${specialRole} of the ${teamRole}!
-                \n>>> **Admin:** ${interaction.member} (${interaction.user.tag})`)
-                .setColor(teamRole.color)
-            if (interaction.user.avatarURL()) {
-                transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
-            } else {
-                transactionEmbed.setFooter({ text: `${interaction.user.tag}` })
-            }
-            const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "notices" AND guild = ?', guild)
-            const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
-
-            await transactionChannel.send({ embeds: [transactionEmbed] })
-            await db.close()
-            return interaction.editReply({ content:"Successfully demoted franchise owner down!", ephemeral:true })
-        }
+        
         const foRoleid = await db.get('SELECT roleid FROM Roles WHERE code = "FO" AND guild = ?', guild)
         if (!foRoleid) {
             await db.close()
