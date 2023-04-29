@@ -212,7 +212,14 @@ client.on(Events.GuildCreate, async guild => {
 
 		const guildExists = await db.get('SELECT * FROM Leagues WHERE guild = ?', guildid);
 
-		const joinChannel = guild.systemChannel
+		let joinChannel;
+
+		for (const channel of guild.channels.cache.values()) {
+			if (channel.isTextBased()) {
+				joinChannel = channel;
+				break;
+			}
+		}
 
 		try {
 			const serverOwner = await guild.members.fetch(guild.ownerId)
