@@ -6,6 +6,7 @@ const { getDBConnection } = require('./getDBConnection');
 const { Client, Collection, Events, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Embed } = require('discord.js');
 const { token, presenceData, maxPlayers, filter, clientId, guildId } = require('./config.json');
 const { REST, Routes } = require('discord.js');
+const { teamJson } = require('./commands/teams.json')
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages], presence: presenceData });
 
@@ -273,6 +274,68 @@ client.on(Events.GuildCreate, async guild => {
 					await db.run('INSERT INTO Players (discordid, guild) VALUES (?, ?)', [id, guildid]);
 				}
 			})
+
+			// if the guild does not exist, sync all the roles
+			for (const role of guild.roles.cache.values()) {
+            const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', role.id, guildid)
+            if (!roleExists) {
+                if (role.name.toLowerCase().includes("franchise owner")) {
+                    foExists = true
+                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", role.id, guildid]);
+                }
+                if (role.name.toLowerCase().includes("general manager")) {
+                    gmExists = true
+                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", role.id, guildid]);
+                }
+                if (role.name.toLowerCase().includes("head coach")) {
+                    hcExists = true
+                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", role.id, guildid]);
+                }
+            }
+        }
+        if (!foExists) {
+            const newRole = await guild.roles.create({
+                name: "Franchise Owner",
+            });
+
+            await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", newRole.id, guildid]);
+        }
+
+        if (!gmExists) {
+            const newRole = await guild.roles.create({
+                name: "General Manager",
+            });
+
+            await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", newRole.id, guildid]);
+        }
+
+        if (!hcExists) {
+            const newRole = await guild.roles.create({
+                name: "Head Coach",
+            });
+
+            await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", newRole.id, guild]);
+        }
+
+				const roles = await guild.roles.fetch()
+				for (const role of roles.values()) {
+						// first, check if the role is already in the DB
+						const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', role.id, guild)
+						if (!roleExists) {
+								for (let i = 0; i < teamJson.length; i++) {
+										const team = teamJson[i]
+										if (team.Name.toLowerCase().includes(role.name.toLowerCase())) {
+												// we have a valid team! add it to db and break
+												const teamExists = await db.get('SELECT * FROM Roles WHERE code = ? AND guild = ?', team.Abbreviation.toUpperCase(), guildid)
+												if (!teamExists) {
+														await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guildid]);
+														await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [team.Abbreviation.toUpperCase(), role.id, guildid]);
+												}
+												break;
+										}
+								}
+						}
+				}
 		}
 
 		// deploy commands
