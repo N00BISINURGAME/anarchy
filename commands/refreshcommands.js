@@ -96,13 +96,6 @@ module.exports = {
             return interaction.editReply({ content:"You are not authorized to refresh bot commands!", ephemeral:true });
         }
 
-        // delete all offers
-        const offers = await db.get("SELECT * FROM Offers")
-        if (offers) {
-            await db.close()
-            return interaction.editReply({ content:"There are outgoing offers! Please wait!", ephemeral:true });
-        }
-
         let roleDeletedCount = 0
         // // then, clear duplicate roles from db
         // const guilds = await interaction.client.guilds.fetch()
@@ -124,6 +117,7 @@ module.exports = {
 
         // then, add commands to the collection of commands stored in client
         for (const file of commandFiles) {
+            if (file.includes("offer") || file.includes("sign") || file.includes("gametime") || file.includes("schedule") || file.includes("trade")) continue;
             const filePath = path.join(__dirname, file);
             delete require.cache[require.resolve(filePath)]
             const command = require(filePath);
