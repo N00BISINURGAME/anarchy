@@ -20,6 +20,7 @@ module.exports = {
         const userId = interaction.user.id;
         const userChoice = interaction.options.getMember('player');
         const guild = interaction.guild.id
+        const demoterRoles = interaction.member.roles.cache
 
         const channelExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
         if (!channelExists) {
@@ -105,8 +106,6 @@ module.exports = {
             await db.close()
             return interaction.editReply({ content:"Successfully demoted franchise owner down!", ephemeral:true })
         }
-
-        const demoterRoles = interaction.member.roles.cache
         const foRoleid = await db.get('SELECT roleid FROM Roles WHERE code = "FO" AND guild = ?', guild)
         if (!foRoleid) {
             await db.close()
