@@ -86,11 +86,15 @@ module.exports = {
         }
 
         const channel = await interaction.guild.channels.fetch(statsChannel.channelid)
+
+        const links = [qbStats.url, rbStats.url, wrStats.url, defStats.url, kStats.url]
+
+        await channel.send({ files:links})
         
         if (team1Score > team2Score) {
-          await channel.send(`${qbStats.url}\n${rbStats.url}\n${wrStats.url}\n${defStats.url}\n${kStats.url}\n${team1} ${team1Score} - ${team2Score} ${team2}\nStats posted by ${interaction.member} (${interaction.user.tag})`)
+          await channel.send(`${team1} ${team1Score} - ${team2Score} ${team2}\nStats posted by ${interaction.member} (${interaction.user.tag})`)
         } else {
-          await channel.send(`${qbStats.url}\n${rbStats.url}\n${wrStats.url}\n${defStats.url}\n${kStats.url}\n${team2} ${team2Score} - ${team1Score} ${team1}\nStats posted by ${interaction.member} (${interaction.user.tag})`)
+          await channel.send(`${team2} ${team2Score} - ${team1Score} ${team1}\nStats posted by ${interaction.member} (${interaction.user.tag})`)
         }
 
         await db.close()
