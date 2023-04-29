@@ -85,10 +85,12 @@ module.exports = {
             const logo = await db.get('SELECT logo FROM Teams t, Roles r WHERE t.code = r.code AND t.guild = r.guild AND r.roleid = ? AND r.guild = ?', [teamRole.id, guild]);
             const logoStr = logo.logo;
 
+            const foRole = await interaction.guild.roles.fetch(specialRole)
+
             const transactionEmbed = new EmbedBuilder()
                 .setTitle('Franchise Owner demoted!')
                 .setThumbnail(logoStr)
-                .setDescription(`${userChoice} (${userChoice.user.tag}) from ${specialRole} of the ${teamRole}!
+                .setDescription(`${userChoice} (${userChoice.user.tag}) has been demoted from ${foRole} of the ${teamRole}!
                 \n>>> **Admin:** ${interaction.member} (${interaction.user.tag})`)
                 .setColor(teamRole.color)
             if (interaction.user.avatarURL()) {
