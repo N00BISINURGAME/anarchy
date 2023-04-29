@@ -117,8 +117,10 @@ module.exports = {
 
         // then, add commands to the collection of commands stored in client
         for (const file of commandFiles) {
-            console.log(file)
-            if (file.includes("offer") || file.includes("sign") || file.includes("gametime") || file.includes("schedule") || file.includes("trade")) continue;
+            if (file.includes("offer") || file.includes("sign") || file.includes("gametime") || file.includes("schedule") || file.includes("trade")) {
+                console.log(file)
+                continue;
+            }
             const filePath = path.join(__dirname, file);
             delete require.cache[require.resolve(filePath)]
             const command = require(filePath);
