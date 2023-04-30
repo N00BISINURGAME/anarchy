@@ -65,6 +65,6 @@ module.exports = {
         await channel.send({ embeds:[embed] })
 
         await db.close()
-        return interaction.editReply({ content:`Successfully posted stats!`, ephemeral:true })
+        return interaction.editReply({ content:`Successfully switched rosters around!`, ephemeral:true })
     }
 }
