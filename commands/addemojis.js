@@ -27,13 +27,13 @@ module.exports = {
         // first, find existing emojis - check for all possible names using dashes, underscores, etc
         for (const team of teams) {
           for (const emoji of emojis.values()) {
-            if (emoji.name.toLowerCase().includes(team.name.toLowerCase().replace(" ", "_"))) {
+            if (emoji.name.toLowerCase().includes(team.name.toLowerCase().replaceAll(" ", "_"))) {
               existingEmojis.push(team)
               break;
-            } else if (emoji.name.toLowerCase().includes(team.name.toLowerCase().replace(" ", "-"))) {
+            } else if (emoji.name.toLowerCase().includes(team.name.toLowerCase().replaceAll(" ", "-"))) {
               existingEmojis.push(team)
               break;
-            } else if (emoji.name.toLowerCase().includes(team.name.toLowerCase().replace(" ", ""))) {
+            } else if (emoji.name.toLowerCase().includes(team.name.toLowerCase().replaceAll(" ", ""))) {
               existingEmojis.push(team)
               break;
             }
@@ -41,7 +41,7 @@ module.exports = {
           // if it is not existing, add emoji to server
           if (!existingEmojis.includes(team)) {
             try {
-              const newEmoji = await interaction.guild.emojis.create({ attachment:`${team.logo}`, name:`${team.name.replace(" ", "-")}`})
+              const newEmoji = await interaction.guild.emojis.create({ attachment:`${team.logo}`, name:`${team.name.replaceAll(" ", "-")}`})
               emojisAdded += `${newEmoji}`
               count++
             } catch(err) {
