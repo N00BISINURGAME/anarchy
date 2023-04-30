@@ -18,6 +18,7 @@ module.exports = {
 
         // first, get player stats
         const userid = interaction.user.id;
+        const guild = interaction.guild.id
         const attempts = interaction.options.getInteger('attempts')
         const good = interaction.options.getInteger('good-kicks')
 
@@ -27,7 +28,7 @@ module.exports = {
         // first, check to see if player already has qb stats logged
         const playerExists = await db.get("SELECT * FROM KStats WHERE discordid = ?", userid);
         if (!playerExists) {
-            await db.run("INSERT INTO KStats (discordid, attempts, good_kicks) VALUES (?, ?, ?)", [userid, attempts, good])
+            await db.run("INSERT INTO KStats (discordid, guild, attempts, good_kicks) VALUES (?, ?, ?)", [userid, guild, 0, 0])
         } else {
             await db.run("UPDATE KStats SET attempts = ?, good_kicks = ? WHERE discordid = ?", [attempts, good, userid])
         }
