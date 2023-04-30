@@ -454,6 +454,19 @@ client.on(Events.GuildMemberRemove, async member => {
 						.setDescription(`${member.user.tag} has left the ${roleObj} due to leaving the server!
 						\n>>> **Roster:** ${roleObj.members.size}/${maxPlayers.maxplayers}`)
 					const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guildId);
+					if (roles.get(foRole.roleid)) {
+						const foRoleObj = await member.guild.roles.fetch(foRole.roleid)
+						embed.setTitle("Franchise Owner left!")
+						.setDescription(`The ${foRoleObj} of the ${roleObj}, ${member.user.tag} has left the the server!
+						\n>>> **Roster:** ${roleObj.members.size}/${maxPlayers.maxplayers}`)
+
+						const noticeChannel = await db.get('SELECT channelid FROM Channels WHERE purpose = "notices" AND guild = ?', guildId);
+						if (noticeChannel) {
+							const channel = await member.guild.channels.fetch(noticeChannel.channelid);
+							await channel.send({ embeds:[embed] })
+							return;
+						}
+					}
 					if (channelId) {
 						const channel = await member.guild.channels.fetch(channelId.channelid);
 						await channel.send({ embeds:[embed] })
