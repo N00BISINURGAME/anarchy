@@ -165,8 +165,18 @@ client.on(Events.InteractionCreate, async interaction => {
 		// get all roles, and also get the highest role of a guild
 		const userRoles = user.roles.cache
 		const highestRole = interaction.guild.roles.highest
-		if (userRoles.get(highestRole.id)) {
-			await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [user.id, guild])
+		const exists = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [user.id, guild])
+		if (!exists) {
+			if (userRoles.get(highestRole.id)) {
+				await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [user.id, guild])
+			}
+	
+			for (const role of userRoles.values()) {
+				if (role.name.toLowerCase().includes("commissioner") || role.name.toLowerCase().includes("founder")) {
+					await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [user.id, guild])
+					break;
+				}
+			}
 		}
 
 		await db.close()
