@@ -38,9 +38,9 @@ module.exports = {
                 for (const role of member.roles.cache.keys()) {
                     const roleExists = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
                     if (roleExists) {
-                        if (roleExists.code === "FO") fo = `${member} (${member.user.tag})`;
-                        else if (roleExists.code === "GM") gm = `${member} (${member.user.tag})`;
-                        else if (roleExists.code === "HC") hc = `${member} (${member.user.tag})`;
+                        if (roleExists.code === "FO") fo = `${member} \`${member.user.tag}\``;
+                        else if (roleExists.code === "GM") gm = `${member} \`${member.user.tag}\``;
+                        else if (roleExists.code === "HC") hc = `${member} \`${member.user.tag}\``;
                         else players += `${member} (${member.user.tag})\n`;
                         break
                     }

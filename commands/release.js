@@ -126,7 +126,7 @@ module.exports = {
             .setThumbnail(logoStr)
             .setColor(roleObj.color)
             .setDescription(`The ${roleObj} have released ${user} (${user.user.tag})!
-            \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})\n**Roster:** ${roleObj.members.size}/${playerCountQry.maxplayers}`)
+            \n>>> **Coach:** ${interaction.member} \`${interaction.user.tag}\`\n**Roster:** ${roleObj.members.size}/${playerCountQry.maxplayers}`)
             
         if (interaction.user.avatarURL()) {
             transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })

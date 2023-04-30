@@ -118,8 +118,8 @@ module.exports = {
             .setTitle('Player promoted!')
             .setThumbnail(logoStr)
             .setColor(teamRole.color)
-            .setDescription(`The ${teamRole} have promoted ${userChoice} (${userChoice.user.tag}) to ${roleObj}!
-            \n>>> **Franchise Owner:** ${interaction.member} (${interaction.user.tag})`)
+            .setDescription(`The ${teamRole} have promoted ${userChoice} \`${userChoice.user.tag}\` to ${roleObj}!
+            \n>>> **Franchise Owner:** ${interaction.member} \`${interaction.user.tag}\``)
         
         if (interaction.user.avatarURL()) {
             transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })

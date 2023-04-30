@@ -67,7 +67,7 @@ module.exports = {
           .setTitle("Looking for Players")
           .setColor(role.color)
           .setDescription(`The ${role} are looking for players!
-          \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})\n**Description:** ${message}`)
+          \n>>> **Coach:** ${interaction.member} \`${interaction.user.tag}\`\n**Description:** ${message}`)
           .setThumbnail(logoSql.logo)
         
         if (interaction.user.avatarURL()) {

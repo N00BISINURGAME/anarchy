@@ -67,7 +67,7 @@ module.exports = {
                     .setTitle("Multiple teams disbanded!")
                     .setColor([0, 0, 0])
                     .setDescription(`Multiple teams have been disbanded due to having less than **${min}** players!
-                    \n**Affected teams:**\n${disbandedStr}\n>>> **Staff:** ${interaction.member} (${interaction.user.tag})`)
+                    \n**Affected teams:**\n${disbandedStr}\n>>> **Staff:** ${interaction.member} \`${interaction.user.tag}\``)
 
                 if (interaction.guild.iconURL()) {
                   transactionEmbed.setThumbnail(interaction.guild.iconURL())

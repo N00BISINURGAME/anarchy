@@ -57,8 +57,8 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle("Player unsuspended!")
             .setColor([0, 255, 0])
-            .setDescription(`${suspendedUser} has been unsuspended from the league! They were previously suspended for **${alreadySuspended.duration}** due to **${alreadySuspended.reason}**!
-            \n>>> **Admin:** ${interaction.member} (${interaction.user.tag})`)
+            .setDescription(`${suspendedUser} \`${suspendedUser.user.tag}\` has been unsuspended from the league! They were previously suspended for **${alreadySuspended.duration}** due to **${alreadySuspended.reason}**!
+            \n>>> **Admin:** ${interaction.member} \`${interaction.user.tag}\``)
 
         if (interaction.guild.iconURL()) {
             embed.setThumbnail(interaction.guild.iconURL())

@@ -138,8 +138,8 @@ module.exports = {
         const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
         const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
-        dmMessage.setDescription(`The ${teamRole} have successfully signed ${userPing} (${userPing.user.tag})!
-        \n>>> **Coach:** ${interaction.member} (${interaction.user.tag})\n**Roster:** ${teamRole.members.size}/${maxPlayers}`)
+        dmMessage.setDescription(`The ${teamRole} have successfully signed ${userPing} \`${userPing.user.tag}\`!
+        \n>>> **Coach:** ${interaction.member} \`${interaction.user.tag}\`\n**Roster:** ${teamRole.members.size}/${maxPlayers}`)
 
         await transactionChannel.send({ embeds:[dmMessage] })
 

@@ -46,7 +46,7 @@ module.exports = {
             let userStr = ""
             // this needs to be updated to remove gm/hc roles too
             for (const member of team.members.values()) {
-                userStr += `${member} (${member.user.tag})\n`
+                userStr += `${member} \`${member.user.tag}\`\n`
                 await member.roles.remove(team)
                 for (const role of frontOfficeRoles) {
                     if (member.roles.cache.get(role.roleid)) {
@@ -72,7 +72,7 @@ module.exports = {
                     .setThumbnail(logoStr)
                     .setColor(team.color)
                     .setDescription(`All members of the ${team} have been released!
-                    \n**Affected users:**\n${userStr}\n>>> **Staff:** ${interaction.member} (${interaction.user.tag})`)
+                    \n**Affected users:**\n${userStr}\n>>> **Staff:** ${interaction.member} \`${interaction.user.tag}\``)
                 if (interaction.user.avatarURL()) {
                     transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
                 } else {

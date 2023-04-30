@@ -90,8 +90,8 @@ module.exports = {
             const transactionEmbed = new EmbedBuilder()
                 .setTitle('Franchise Owner demoted!')
                 .setThumbnail(logoStr)
-                .setDescription(`${userChoice} (${userChoice.user.tag}) has been demoted from ${foRole} of the ${teamRole}!
-                \n>>> **Admin:** ${interaction.member} (${interaction.user.tag})`)
+                .setDescription(`${userChoice} \`${userChoice.user.tag}\` has been demoted from ${foRole} of the ${teamRole}!
+                \n>>> **Admin:** ${interaction.member} \`${interaction.user.tag}\``)
                 .setColor(teamRole.color)
             if (interaction.user.avatarURL()) {
                 transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
@@ -155,8 +155,8 @@ module.exports = {
         const transactionEmbed = new EmbedBuilder()
             .setTitle('Player demoted!')
             .setThumbnail(logoStr)
-            .setDescription(`The ${teamRole}'s Franchise Owner has demoted ${userChoice} (${userChoice.user.tag}) from ${specialRoleObj}!
-            \n>>> **Franchise Owner:** ${interaction.member} (${interaction.user.tag})`)
+            .setDescription(`The ${teamRole}'s Franchise Owner has demoted ${userChoice} \`${userChoice.user.tag}\` from ${specialRoleObj}!
+            \n>>> **Franchise Owner:** ${interaction.member} \`${interaction.user.tag}\``)
             .setColor(teamRole.color)
         if (interaction.user.avatarURL()) {
             transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })

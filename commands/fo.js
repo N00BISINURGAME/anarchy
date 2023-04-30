@@ -100,8 +100,8 @@ module.exports = {
         const transactionEmbed = new EmbedBuilder()
             .setTitle('Franchise Owner promoted!')
             .setThumbnail(logoStr)
-            .setDescription(`${userChoice} (${userChoice.user.tag}) has been promoted to ${specialRoleObj} of the ${teamChoice}!
-            \n>>> **Roster Size:** ${teamMemberCount}/${maxPlayerQry.maxplayers}\n**Staff Member:** ${interaction.member} (${interaction.user.tag})`)
+            .setDescription(`${userChoice} \`${userChoice.user.tag}\` has been promoted to ${specialRoleObj} of the ${teamChoice}!
+            \n>>> **Roster Size:** ${teamMemberCount}/${maxPlayerQry.maxplayers}\n**Staff Member:** ${interaction.member} \`${interaction.user.tag}\``)
             .setColor(teamChoice.color)
         
         if (interaction.user.avatarURL()) {

@@ -81,7 +81,7 @@ module.exports = {
           .setTitle("Quarterback battle!")
           .setColor([0, 0, 0])
           .setDescription(`A Quarterback battle is being hosted right now! To join, click the button at the bottom of this message!
-          \n>>> **Players:** ${player1} (${player1.user.tag}) vs ${player2} (${player2.user.tag})\n**Staff member:** ${interaction.member} (${interaction.user.tag})${message ? `\n**Description:** ${message}` : ""}`)
+          \n>>> **Players:** ${player1} \`${player1.user.tag}\` vs ${player2} \`${player2.user.tag}\`\n**Staff member:** ${interaction.member} \`${interaction.user.tag}\`${message ? `\n**Description:** ${message}` : ""}`)
 
         if (interaction.guild.iconURL()) {
             embed.setThumbnail(interaction.guild.iconURL())

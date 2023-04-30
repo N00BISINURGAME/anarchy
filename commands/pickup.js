@@ -58,7 +58,7 @@ module.exports = {
           .setTitle("Pickup game!")
           .setColor([0, 0, 0])
           .setDescription(`A pickup game is being hosted right now! To join, click the button at the bottom of this message!
-          \n>>> **Staff member:** ${interaction.member} (${interaction.user.tag})${message ? `\n**Description:** ${message}` : ""}`)
+          \n>>> **Staff member:** ${interaction.member} \`${interaction.user.tag}\`${message ? `\n**Description:** ${message}` : ""}`)
 
         let button = new ActionRowBuilder()
           .addComponents(new ButtonBuilder()

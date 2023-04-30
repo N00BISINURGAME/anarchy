@@ -92,9 +92,9 @@ module.exports = {
         await channel.send({ files:links})
         
         if (team1Score > team2Score) {
-          await channel.send(`${team1} ${team1Score} - ${team2Score} ${team2}\nStats posted by ${interaction.member} (${interaction.user.tag})`)
+          await channel.send(`${team1} ${team1Score} - ${team2Score} ${team2}\nStats posted by ${interaction.member} \`${interaction.user.tag}\``)
         } else {
-          await channel.send(`${team2} ${team2Score} - ${team1Score} ${team1}\nStats posted by ${interaction.member} (${interaction.user.tag})`)
+          await channel.send(`${team2} ${team2Score} - ${team1Score} ${team1}\nStats posted by ${interaction.member} \`${interaction.user.tag}\``)
         }
 
         await db.close()

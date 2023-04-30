@@ -64,7 +64,7 @@ module.exports = {
                         .setTitle("Gametime scheduled!")
                         .setColor(team1.color)
                         .setDescription(`The ${team1} are going against the ${team2}!
-                        \n>>> **Time:** ${time}\n**Referee:** None\n**Coach:** ${interaction.member} (${interaction.user.tag})`)
+                        \n>>> **Time:** ${time}\n**Referee:** None\n**Coach:** ${interaction.member} \`${interaction.user.tag}\``)
                         .setThumbnail(interaction.guild.iconURL())
 
         if (interaction.guild.iconURL()) {
@@ -113,7 +113,7 @@ module.exports = {
             await db.close()
             if (i.customId === "ref" && (adminAuthorized || managerAuthorized)) {
                 embed.setDescription(`The ${team1} are going against the ${team2}!
-                \n>>> **Time:** ${time}\n**Referee:** ${i.member} (${i.user.tag})\n**Coach:** ${interaction.member} (${interaction.user.tag})`)
+                \n>>> **Time:** ${time}\n**Referee:** ${i.member} \`${i.user.tag}\`\n**Coach:** ${interaction.member} \`${interaction.user.tag}\``)
                 refButton.setDisabled(true);
                 await i.update({ embeds:[embed], components:[buttons]})
             } else if (i.customId === "cancel") {

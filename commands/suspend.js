@@ -69,8 +69,8 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle("Player suspended!")
             .setColor([255, 0, 0])
-            .setDescription(`${suspendedUser} has been suspended from the league for **${duration}** due to **${reason}**!
-            \n>>> **Admin:** ${interaction.member} (${interaction.user.tag})`)
+            .setDescription(`${suspendedUser} \`${suspendedUser.user.tag}\` has been suspended from the league for **${duration}** due to **${reason}**!
+            \n>>> **Admin:** ${interaction.member} \`${interaction.user.tag}\``)
 
         if (interaction.guild.iconURL()) {
             embed.setThumbnail(interaction.guild.iconURL())

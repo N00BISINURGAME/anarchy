@@ -79,7 +79,7 @@ module.exports = {
           .setTitle("Incoming Referee Decision!")
           .setColor(challenging.color)
           .setDescription(`The ${challenging} are challenging the ${offending}!
-          \n>>> **Referee:** ${interaction.member} (${interaction.user.tag})\n**Rule Violated:** ${rule}\n**Ruling:** ${ruling}`)
+          \n>>> **Referee:** ${interaction.member} \`${interaction.user.tag}\`\n**Rule Violated:** ${rule}\n**Ruling:** ${ruling}`)
           .setThumbnail(interaction.guild.iconURL())
         
         if (interaction.user.avatarURL()) {
