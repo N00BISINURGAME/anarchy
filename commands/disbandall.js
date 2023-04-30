@@ -32,6 +32,7 @@ module.exports = {
             }
 
             const min = interaction.options.getInteger('threshold')
+            console.log(min)
 
             const allTeams = await db.all('SELECT roleid FROM Roles WHERE NOT (code = "FO" OR code = "GM" OR code = "HC") AND guild = ?', guild)
             let disbandedStr = ""
