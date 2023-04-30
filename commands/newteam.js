@@ -36,7 +36,7 @@ module.exports = {
             logo = "https://cdn.discordapp.com/avatars/1094711775414460416/a9718c56059cc995ddc774b840e8692b.webp"
         }
 
-        if (!logo.contentType.includes("image")) {
+        if (logo.contentType && !logo.contentType.includes("image")) {
             await db.close()
             return interaction.editReply({ content:"The logo you submitted is not a valid image! Ensure you attach a valid image and try again.", ephemeral:true })
         }
@@ -49,7 +49,7 @@ module.exports = {
         }
 
         // then, insert the team
-        await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [shortName.toUpperCase(), fullName, logo.url, guild]);
+        await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [shortName.toUpperCase(), fullName, (logo.url ? logo.url : logo), guild]);
 
         // Then, create the role for the team in the guild that the command was called in.
         const newRole = await interaction.guild.roles.create({
