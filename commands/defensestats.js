@@ -49,7 +49,7 @@ module.exports = {
         let avg = (0.15 * tackles) + (0.2 * interceptions) + (0.2 * touchdowns) + (0.15 * sacks) + (0.2 * safeties) + (0.1 * fumble_recoveries)
         avg = Math.round(avg * 10) / 10
 
-        await db.run("UPDATE DefenseStats SET average = ? WHERE discordid = ? AND guild = ?", [avg, userid, guild])
+        await db.run("UPDATE DefenseStats SET rank = ? WHERE discordid = ? AND guild = ?", [avg, userid, guild])
         
         await db.close()
         return interaction.editReply({ content:`Successfully uploaded defensive stats!`, ephemeral:true })
