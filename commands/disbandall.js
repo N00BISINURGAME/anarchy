@@ -35,6 +35,7 @@ module.exports = {
             console.log(min)
 
             const allTeams = await db.all('SELECT roleid FROM Roles WHERE NOT (code = "FO" OR code = "GM" OR code = "HC") AND guild = ?', guild)
+            const specialRoles = await db.all('SELECT roleid FROM Roles WHERE (code = "FO" OR code = "GM" OR code = "HC") AND guild = ?', guild)
             let disbandedStr = ""
 
             for (const team of allTeams) {
@@ -43,6 +44,11 @@ module.exports = {
               if (teamObj.members.size < min) {
                 for (const member of teamObj.members.values()) {
                   await member.roles.remove(team.roleid)
+                  for (const role of specialRoles) {
+                    if (member.roles.cache.get(role.roleid)) {
+                      await member.roles.remove(role.roleid)
+                    }
+                  }
                 }
                 disbandedStr += `${teamObj}\n`
               }
