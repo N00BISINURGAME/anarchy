@@ -39,7 +39,7 @@ module.exports = {
         let authorized = false;
         for (const role of interaction.member.roles.cache.keys()) {
           const auth = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
-          if (auth.code === "FO" || auth.code === "GM" || auth.code === "HC") {
+          if (auth && (auth.code === "FO" || auth.code === "GM" || auth.code === "HC")) {
             authorized = true;
             break;
           }
