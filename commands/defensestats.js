@@ -28,6 +28,7 @@ module.exports = {
 
         // first, get player stats
         const userid = interaction.user.id;
+        const guild = interaction.guild.id
         const tackles = interaction.options.getInteger('tackles')
         const ints = interaction.options.getInteger('interceptions')
         const tds = interaction.options.getInteger('defensive-touchdowns')
@@ -39,11 +40,9 @@ module.exports = {
         average = Math.round(average * 10) / 10
 
         // first, check to see if player already has qb stats logged
-        const playerExists = await db.get("SELECT * FROM DefenseStats WHERE discordid = ?", userid);
+        const playerExists = await db.get("SELECT * FROM DefenseStats WHERE discordid = ? AND guild = ?", [userid, guild]);
         if (!playerExists) {
             await db.run("INSERT INTO DefenseStats (discordid, rank, tackles, interceptions, touchdowns, sacks, safeties, fumble_recoveries) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [userid, average, tackles, ints, tds, sacks, safeties, fumrecs])
-        } else {
-            await db.run("UPDATE DefenseStats SET rank = ?, tackles = ?, interceptions = ?, touchdowns = ?, sacks = ?, safeties = ?, fumble_recoveries = ? WHERE discordid = ?", [average, tackles, ints, tds, sacks, safeties, fumrecs, userid])
         }
         
         await db.close()

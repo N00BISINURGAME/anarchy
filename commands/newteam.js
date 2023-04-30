@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
-const { SlashCommandBuilder, SlashCommandUserOption, SlashCommandStringOption, SlashCommandIntegerOption, SlashCommandNumberOption, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, SlashCommandUserOption, SlashCommandStringOption, SlashCommandAttachmentOption, SlashCommandNumberOption, EmbedBuilder } = require('discord.js');
 const { getDBConnection } = require('../getDBConnection');
 const { admins } = require('../config.json');
 
@@ -8,7 +8,7 @@ const fullOption = new SlashCommandStringOption().setRequired(true).setName('tea
 
 const shortOption = new SlashCommandStringOption().setRequired(true).setName('team-short-name').setDescription('The abbreviation of the team you want to create');
 
-const logoOption = new SlashCommandStringOption().setName('team-logo').setDescription('A link to the logo for the team.');
+const logoOption = new SlashCommandAttachmentOption().setName('team-logo').setDescription('A link to the logo for the team.');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -16,7 +16,7 @@ module.exports = {
         .setDescription('Creates a new team.')
         .addStringOption(fullOption)
         .addStringOption(shortOption)
-        .addStringOption(logoOption),
+        .addAttachmentOption(logoOption),
     async execute(interaction) {
         const db = await getDBConnection();
 
@@ -31,20 +31,14 @@ module.exports = {
 
         const fullName = interaction.options.getString('team-full-name')
         const shortName = interaction.options.getString('team-short-name')
-        let logo = interaction.options.getString('team-logo')
+        let logo = interaction.options.getAttachment('team-logo')
         if (!logo) {
             logo = "https://cdn.discordapp.com/avatars/1094711775414460416/a9718c56059cc995ddc774b840e8692b.webp"
         }
 
-    
-
-        const regex = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
-
-        const matches = logo.match(regex)
-
-        if (!matches) {
+        if (!logo.contentType.includes("image")) {
             await db.close()
-            return interaction.editReply({ content:"The logo you provided may not be valid! Ensure it is a valid image link. Feel free to DM Donovan#3771 with any questions.", ephemeral:true })
+            return interaction.editReply({ content:"The logo you submitted is not a valid image! Ensure you attach a valid image and try again.", ephemeral:true })
         }
 
         // Checks to see if a team exists
@@ -55,7 +49,7 @@ module.exports = {
         }
 
         // then, insert the team
-        await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [shortName.toUpperCase(), fullName, logo, guild]);
+        await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [shortName.toUpperCase(), fullName, logo.url, guild]);
 
         // Then, create the role for the team in the guild that the command was called in.
         const newRole = await interaction.guild.roles.create({
