@@ -17,6 +17,8 @@ module.exports = {
           return interaction.editReply({ content:"You are not authorized to change the team's logo!", ephemeral:true })
         }
 
+        await interaction.editReply({ content:`Emojis are being created. Please wait...`, ephemeral:true })
+
         const existingEmojis = []
 
         const emojis = await interaction.guild.emojis.fetch()
@@ -50,6 +52,6 @@ module.exports = {
         }
 
         await db.close()
-        return interaction.editReply({ content:`${count} emojis were successfully added! They are displayed here:${emojisAdded}\nIf you do not see all emojis displayed, this likely means you have reached the maximum cap for emojis.`, ephemeral:true })
+        return interaction.editReply({ content:`${count} emojis were successfully added! They are displayed here:${emojisAdded}\nIf you do not see all emojis displayed, this likely either means you have reached the maximum cap for emojis or the emoji already exists in the server.`, ephemeral:true })
     }
 }
