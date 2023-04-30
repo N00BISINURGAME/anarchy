@@ -43,8 +43,8 @@ module.exports = {
               if (teamObj.members.size < min) {
                 for (const member of teamObj.members.values()) {
                   await member.roles.remove(team.roleid)
-                  disbandedStr += `${teamObj}\n`
                 }
+                disbandedStr += `${teamObj}\n`
               }
               
             }
