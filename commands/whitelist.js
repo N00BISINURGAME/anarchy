@@ -34,12 +34,13 @@ module.exports = {
         console.log(interaction.guild.owner)
         console.log(interaction.user.id)
 
-        if (interaction.guild.ownerId !== interaction.user.id) {
-            await db.close()
-            return interaction.editReply({ content:`You are not authorized to whitelist individuals!`, ephemeral:true });
-        }
-
         if (type === "managers") {
+            const authorized = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+            if (!authorized) {
+                await db.close()
+                return interaction.editReply({ content:`You are not authorized to whitelist managers!`, ephemeral:true });
+            }
+
             const managerExists = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [user.id, guild])
             if (managerExists) {
                 await db.close()
@@ -47,6 +48,10 @@ module.exports = {
             }
             await db.run('INSERT INTO Managers(discordid, guild) VALUES (?, ?)', [user.id, guild])
         } else if (type === "admins") {
+            if (interaction.guild.ownerId !== interaction.user.id) {
+                await db.close()
+                return interaction.editReply({ content:`You are not authorized to whitelist admins!`, ephemeral:true });
+            }
             const managerExists = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [user.id, guild])
             if (managerExists) {
                 await db.close()

@@ -180,6 +180,10 @@ client.on(Events.InteractionCreate, async interaction => {
 					break;
 				}
 			}
+		} else {
+			if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+				await db.run("DELETE FROM Admins WHERE discordid = ? AND guild = ?", [user.id, guild])
+			}
 		}
 
 		await db.close()
