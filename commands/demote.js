@@ -69,7 +69,7 @@ module.exports = {
             await userChoice.roles.remove(specialRole);
 
             let teamRole;
-            for (const role of demoterRoles.values()) {
+            for (const role of roles.values()) {
                 const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guild])
                 // we have a valid role in the database!
                 if (roleExists) {
