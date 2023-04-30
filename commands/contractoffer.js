@@ -251,6 +251,8 @@ module.exports = {
                 await userMessage.delete()
              } else if (err.code === 50007) {
                 await interaction.editReply({ content: "This user does not have their DMs open to bots! Ensure that this user can be DMed by bots before sending them another offer!", ephemeral:true })
+            } else if (err.code === 50013) {
+                await interaction.editReply({ content: "This bot does not have permission to grant roles to server members! Ensure that the bot has administrator and the role position of the bot is very high (ideally below your founder role).", ephemeral:true })
             } else {
                 const errmsg = `There was an error while executing ${interaction.commandName}! Please DM Donovan#3771 with a screenshot of this error to report this bug.\n\n Attach this error message below:\`\`\`${err}\`\`\``
                 await interaction.editReply({ content:errmsg, ephemeral:true })
