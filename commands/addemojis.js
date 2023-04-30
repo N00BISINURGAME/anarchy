@@ -30,9 +30,6 @@ module.exports = {
             if (emoji.name.toLowerCase().includes(team.name.toLowerCase().replaceAll(" ", "_"))) {
               existingEmojis.push(team)
               break;
-            } else if (emoji.name.toLowerCase().includes(team.name.toLowerCase().replaceAll(" ", "-"))) {
-              existingEmojis.push(team)
-              break;
             } else if (emoji.name.toLowerCase().includes(team.name.toLowerCase().replaceAll(" ", ""))) {
               existingEmojis.push(team)
               break;
@@ -41,7 +38,7 @@ module.exports = {
           // if it is not existing, add emoji to server
           if (!existingEmojis.includes(team)) {
             try {
-              const newEmoji = await interaction.guild.emojis.create({ attachment:`${team.logo}`, name:`${team.name.replaceAll(" ", "-")}`})
+              const newEmoji = await interaction.guild.emojis.create({ attachment:`${team.logo}`, name:`${team.name.replaceAll(" ", "_")}`})
               emojisAdded += `${newEmoji}`
               count++
             } catch(err) {
