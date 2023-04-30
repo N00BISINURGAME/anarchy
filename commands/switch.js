@@ -43,7 +43,7 @@ module.exports = {
 
         while (team1Temp.length > 0) {
           const member = await team1Temp.pop()
-          await member.roels.add(team2)
+          await member.roles.add(team2)
         }
 
         const channel = await interaction.guild.channels.fetch(statsChannel.channelid)
