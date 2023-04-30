@@ -46,6 +46,7 @@ module.exports = {
               count++
             } catch(err) {
               console.log(err)
+              console.log(team.name.replaceAll(" ", "-"))
             }
             
           }
