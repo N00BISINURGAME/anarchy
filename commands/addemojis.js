@@ -41,7 +41,7 @@ module.exports = {
           // if it is not existing, add emoji to server
           if (!existingEmojis.includes(team)) {
             try {
-              const newEmoji = await interaction.guild.emojis.create({ attachment:`${team.logo}`, name:`${team.replace(" ", "-")}`})
+              const newEmoji = await interaction.guild.emojis.create({ attachment:`${team.logo}`, name:`${team.name.replace(" ", "-")}`})
               emojisAdded += `${newEmoji}`
               count++
             } catch(err) {
