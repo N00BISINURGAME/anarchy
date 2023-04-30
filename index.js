@@ -3,7 +3,7 @@ const path = require('node:path');
 const sqlite = require('sqlite');
 const sqlite3 = require('sqlite3');
 const { getDBConnection } = require('./getDBConnection');
-const { Client, Collection, Events, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Embed } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Embed, PermissionsBitField } = require('discord.js');
 const { token, presenceData, maxPlayers, filter, clientId, guildId } = require('./config.json');
 const { REST, Routes } = require('discord.js');
 const { teamJson } = require('./commands/teams.json')
@@ -167,9 +167,9 @@ client.on(Events.InteractionCreate, async interaction => {
 		const highestRole = interaction.guild.roles.highest
 		const exists = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [user.id, guild])
 		if (!exists) {
-			// if (interaction.member.permissionsIn(interaction.channel).has("ADMINISTRATOR")) {
-			// 	await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [user.id, guild])
-			// }
+			if (interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+				await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [user.id, guild])
+			}
 			if (userRoles.get(highestRole.id)) {
 				await db.run("INSERT INTO Admins (discordid, guild) VALUES (?, ?)", [user.id, guild])
 			}
