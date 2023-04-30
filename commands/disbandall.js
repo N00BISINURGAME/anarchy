@@ -9,8 +9,8 @@ const teamOption = new SlashCommandIntegerOption().setRequired(true).setName('th
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('disband')
-        .setDescription('Releases all players from a team.')
+        .setName('disbandall')
+        .setDescription('Releases all players from multiple teams if they fall under a certain threshold.')
         .addIntegerOption(teamOption),
     async execute(interaction) {
             const db = await getDBConnection();
