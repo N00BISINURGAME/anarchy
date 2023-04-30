@@ -29,14 +29,21 @@ module.exports = {
         const team1 = interaction.options.getRole("team1")
         const team2 = interaction.options.getRole("team2")
 
+        const team1Temp = []
+
         for (const member of team1.members.values()) {
           await member.roles.remove(team1)
-          await member.roles.add(team2)
+          team1Temp.push(member)
         }
 
         for (const member of team2.members.values()) {
           await member.roles.remove(team2)
           await member.roles.add(team1)
+        }
+
+        while (team1Temp.length > 0) {
+          const member = await team1Temp.pop()
+          await member.roels.add(team2)
         }
 
         const channel = await interaction.guild.channels.fetch(statsChannel.channelid)
