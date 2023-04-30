@@ -75,7 +75,6 @@ module.exports = {
         
         embed.setDescription(`${helpStr}`)
         await i.update({ embeds:[embed], components: [buttons], ephemeral:true })
-        await db.close()
     });
     }
 }
