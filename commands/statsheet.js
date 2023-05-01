@@ -72,6 +72,8 @@ module.exports = {
             }
         }
 
+        if (str === "") str = "No stats logged for players in this category!"
+
         embed.setDescription(`${str}`)
 
         await interaction.editReply({ embeds:[embed] })
