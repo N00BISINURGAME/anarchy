@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
-const { SlashCommandBuilder, SlashCommandUserOption, SlashCommandStringOption, SlashCommandIntegerOption, ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle } = require('discord.js');
+const { SlashCommandBuilder, ComponentType, SlashCommandStringOption, SlashCommandIntegerOption, ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle } = require('discord.js');
 const { getDBConnection } = require('../getDBConnection');
 const { admins } = require('../config.json');
 
