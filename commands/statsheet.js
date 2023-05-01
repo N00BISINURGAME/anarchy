@@ -22,7 +22,7 @@ const seasonOption = new SlashCommandIntegerOption()
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('getstats')
+        .setName('statsheet')
         .setDescription('Gets the stats of all players in a particular position.')
         .addStringOption(roleOption)
         .addIntegerOption(seasonOption),
