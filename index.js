@@ -521,6 +521,17 @@ client.on(Events.GuildMemberRemove, async member => {
 	}
 })
 
+client.on(Events.ChannelDelete, async channel => {
+	try {
+		const db = await getDBConnection()
+		const guild = channel.guildId
+		await db.run('DELETE FROM Channels WHERE channelid = ? AND guild = ?', [channel.id, guild]) // no need to check if channel exists
+		await db.close()
+	} catch(err) {
+		console.log(err)
+	}
+})
+
 client.on(Events.MessageCreate, async message => {
 	return;
 	if (!message.author.bot) {
