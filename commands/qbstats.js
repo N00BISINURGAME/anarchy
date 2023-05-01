@@ -65,7 +65,9 @@ module.exports = {
         let passerRating = ((a + b + c + d) / 6) * 100
         passerRating = Math.round(passerRating * 10) / 10
 
-        console.log(passerRating)
+        if (!passerRating) {
+            passerRating = 0
+        }
 
         await db.run("UPDATE QBStats SET passer_rating = ? WHERE discordid = ? AND guild = ? AND season = ?", [passerRating, userid, guild, season])
         
