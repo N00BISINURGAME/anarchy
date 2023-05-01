@@ -76,7 +76,7 @@ module.exports = {
                     .setThumbnail(team.logo)
                     .setColor(teamRole.color)
                     .setDescription(`${interaction.member} \`${interaction.user.tag}\` has demanded from the ${teamRole}! ${specialRole ? `This person was the ${specialRole}.` : ""}
-                    \n>>> **Roster:** ${teamRole.members.size}/${maxPlayerQry.maxplayers}`)
+                    \n>>> **Roster:** \`${teamRole.members.size}/${maxPlayerQry.maxplayers}\``)
         if (interaction.user.avatarURL()) {
             demandEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
         } else {
@@ -91,7 +91,7 @@ module.exports = {
 
         demandEmbed.setDescription(
             `${interaction.user.tag} has demanded from the ${teamRole.name}! ${specialRole ? `This person was the ${specialRole.name}.` : ""}
-                    \n>>> **Roster:** ${teamRole.members.size}/${maxPlayerQry.maxplayers}\n**Guild:** ${interaction.guild.name}`
+                    \n>>> **Roster:** \`${teamRole.members.size}/${maxPlayerQry.maxplayers}\`\n**Guild:** ${interaction.guild.name}`
         )
 
         const foRole = await db.get('SELECT roleid FROM Roles WHERE guild = ?', guild)
@@ -101,7 +101,7 @@ module.exports = {
                 const roleMemberRoles = roleMember.roles.cache
                 if (roleMemberRoles.get(foRole.roleid)) {
                     demandEmbed.setDescription(`${interaction.member} \`${interaction.user.tag}\` has demanded from the ${teamRole.name} in ${interaction.guild.name}! ${specialRole ? `This person was the ${specialRole.name}.` : ""}
-                    \n>>> **Roster:** ${teamRole.members.size}/${maxPlayerQry.maxplayers}`)
+                    \n>>> **Roster:** \`${teamRole.members.size}/${maxPlayerQry.maxplayers}\``)
                     await roleMember.send( {embeds:[demandEmbed]})
                     break
                 }

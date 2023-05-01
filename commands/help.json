@@ -1,6 +1,10 @@
 {
   "commands":[
     {
+      "name":"/addemojis",
+      "description":"Adds all team logos to the server as emojis."
+    },
+    {
       "name":"/advanceseason",
       "description":"Advances the season by 1 and sets teams' season records to 0."
     },
@@ -25,8 +29,8 @@
       "description":"Allows a franchise owner or general manager to send a contract offer to a player, who can choose to accept or decline."
     },
     {
-      "name":"/defensestats <tackles> <ints> <touchdowns> <sacks> <safeties> <fumble-recoveries>",
-      "description":"Logs your defensive stats, as shown on the FF2 'Defense' server stats."
+      "name":"/defensestats <user> <tackles> <ints> <touchdowns> <sacks> <safeties> <fumble-recoveries>",
+      "description":"Logs a player's defensive stats, as shown on the FF2 'Defense' server stats."
     },
     {
       "name":"/demand",
@@ -35,6 +39,14 @@
     {
       "name":"/demote <user>",
       "description":"Allows you to demote a player from their role. To demote franchise owners, you must be an admin. Otherwise, you must be a franchise owner."
+    },
+    {
+      "name":"/disband <team>",
+      "description":"Disbands a team by removing all of the team's players. Only usable by admins."
+    },
+    {
+      "name":"/disbandall <minimum-players>",
+      "description":"Disbands all teams that have less than a certain number of players. Only usable by admins."
     },
     {
       "name":"/fo <user> <team>",
@@ -49,8 +61,8 @@
       "description":"Displays helpful information about Anarchy commands."
     },
     {
-      "name":"/kstats <attempts> <good-attempts>",
-      "description":"Logs your kicker stats, as shown on the FF2 'Kicker' server stats."
+      "name":"/kstats <user> <attempts> <good-attempts>",
+      "description":"Logs a players kicker stats, as shown on the FF2 'Kicker' server stats."
     },
     {
       "name":"/lfp <message>",
@@ -77,16 +89,28 @@
       "description":"Allows the bot owner (Donovan#3771) to change the bot's status."
     },
     {
+      "name":"/pickup <link>",
+      "description":"Posts a pickup game. Only usable by managers or admins."
+    },
+    {
+      "name":"/poststats <your-team> <your-score> <other-team> <other-score> <qb-stats> <rb-stats> <wr-stats> <defense-stats> <kicker-stats>",
+      "description":"Posts stats from a game. Usable by franchise owners, general managers and head coaches."
+    },
+    {
       "name":"/promote <player> <role>",
       "description":"Allows a franchise owner to promote a specific player to either head coach or general manager."
     },
     {
-      "name":"/qbstats <completions> <attempts> <touchdowns> <ints> <yards>",
-      "description":"Logs your quarterback stats, as shown on the FF2 'Passing' server stats."
+      "name":"/qbb <player1> <player2> <link>",
+      "description":"Posts a QBB. Only usable by managers or admins."
     },
     {
-      "name":"/rbstats <attempts> <touchdowns> <yards>",
-      "description":"Logs your runningback stats, as shown on the FF2 'Rushing' server stats."
+      "name":"/qbstats <user> <completions> <attempts> <touchdowns> <ints> <yards>",
+      "description":"Logs a players quarterback stats, as shown on the FF2 'Passing' server stats."
+    },
+    {
+      "name":"/rbstats <user> <attempts> <touchdowns> <yards>",
+      "description":"Logs a players runningback stats, as shown on the FF2 'Rushing' server stats."
     },
     {
       "name":"/refreshcommands",
@@ -95,10 +119,6 @@
     {
       "name":"/release <user>",
       "description":"Releases a user from their team."
-    },
-    {
-      "name":"/releaseall <team>",
-      "description":"Releases all players from a team, as well as their franchise owner. This is pretty much 'disbanding'. Only usable by admins."
     },
     {
       "name":"/removeteam <team>",
@@ -141,6 +161,10 @@
       "description":"Allows you to view team standings for that season. **This command should be used in conjunction with /results, as /results keeps track of scores for one game.**"
     },
     {
+      "name":"/statsheet <position> <season>",
+      "description":"Allows you to view a statsheet for an (optional) previous season, for a specific position."
+    },
+    {
       "name":"/suspend <player> <reason> <duration>",
       "description":"Allows a manager or admin to suspend a player."
     },
@@ -163,6 +187,10 @@
     {
       "name":"/unsuspend <user>",
       "description":"Allows admins or managers to unsuspend a player."
+    },
+    {
+      "name":"/whitelist <user> <role>",
+      "description":"Allows you to unwhitelist a user as a manager or an admin, for use in other commands. May only be run by a server owner."
     },
     {
       "name":"/whitelist <user> <role>",

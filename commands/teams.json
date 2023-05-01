@@ -288,5 +288,187 @@
         "Color": "#5A1414",
         "Logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Washington_Commanders_logo.svg/1200px-Washington_Commanders_logo.svg.png"
       }
+    ],
+    "collegeJson":[
+      {
+        "Name":"Stanford Cardinal",
+        "Abbreviation":"STAN",
+        "Color":"#8C1515",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Stanford_Cardinal_logo.svg/670px-Stanford_Cardinal_logo.svg.png"
+      },
+      {
+        "Name":"West Virginia Mountaineers",
+        "Abbreviation":"WV",
+        "Color":"#EAAA00",
+        "Logo":"https://teamcolorcodes.com/wp-content/uploads/2016/11/West_Virginia_Mountaineers_logo-290x300.jpg?ezimgfmt=ngcb9/notWebP"
+      },
+      {
+        "Name":"Virginia Tech Hokies",
+        "Abbreviation":"VA",
+        "Color":"#861F41",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Virginia_Tech_Hokies_logo.svg/1280px-Virginia_Tech_Hokies_logo.svg.png"
+      },
+      {
+        "Name":"Utah Utes",
+        "Abbreviation":"UTAH",
+        "Color":"#CC0000",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Utah_Utes_primary_logo.svg/1107px-Utah_Utes_primary_logo.svg.png"
+      },
+      {
+        "Name":"Miami Hurricanes",
+        "Abbreviation":"MIAMI",
+        "Color":"#F47321",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Miami_Hurricanes_logo.svg/1024px-Miami_Hurricanes_logo.svg.png"
+      },
+      {
+        "Name":"Texas Longhorns",
+        "Abbreviation":"TX",
+        "Color":"#BF5700",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Texas_Longhorns_logo.svg/1024px-Texas_Longhorns_logo.svg.png"
+      },
+      {
+        "Name":"USC Trojans",
+        "Abbreviation":"USC",
+        "Color":"#990000",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/USC_Trojans_logo.svg/686px-USC_Trojans_logo.svg.png"
+      },
+      {
+        "Name":"Michigan Spartans",
+        "Abbreviation":"MICH",
+        "Color":"#18453B",
+        "Logo":"https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Michigan_State_Athletics_logo.svg/888px-Michigan_State_Athletics_logo.svg.png"
+      },
+      {
+        "Name":"Penn State Nittany Lions",
+        "Abbreviation":"PENN",
+        "Color":"#041E42",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/a/a8/Penn_state_wordmark.png"
+      },
+      {
+        "Name":"Oklahoma Sooners",
+        "Abbreviation":"OK",
+        "Color":"#841617",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Oklahoma_Sooners_logo.svg/795px-Oklahoma_Sooners_logo.svg.png"
+      },
+      {
+        "Name":"Ohio State Buckeyes",
+        "Abbreviation":"OH",
+        "Color":"#BB0000",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Ohio_State_Buckeyes_logo.svg/1041px-Ohio_State_Buckeyes_logo.svg.png"
+      },
+      {
+        "Name":"Old Miss Rebels",
+        "Abbreviation":"MISS",
+        "Color":"#CE1126",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Ole_Miss_Rebels_logo.svg/1280px-Ole_Miss_Rebels_logo.svg.png"
+      },
+      {
+        "Name":"Oregon Ducks",
+        "Abbreviation":"OR",
+        "Color":"#154733",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Oregon_Ducks_logo.svg/1238px-Oregon_Ducks_logo.svg.png"
+      },
+      {
+        "Name":"Notre Dame Fighting Irish",
+        "Abbreviation":"NOTRE",
+        "Color":"#0C2340",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Notre_Dame_Fighting_Irish_logo.svg/1138px-Notre_Dame_Fighting_Irish_logo.svg.png"
+      },
+      {
+        "Name":"North Carolina Tar Heels",
+        "Abbreviation":"NC",
+        "Color":"#7BAFD4",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/North_Carolina_Tar_Heels_logo.svg/1280px-North_Carolina_Tar_Heels_logo.svg.png"
+      },
+      {
+        "Name":"Nebraska Cornhuskers",
+        "Abbreviation":"NEB",
+        "Color":"#E41C38",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Nebraska_Cornhuskers_logo.svg/1024px-Nebraska_Cornhuskers_logo.svg.png"
+      },
+      {
+        "Name":"Michigan Wolverines",
+        "Abbreviation":"MI",
+        "Color":"#FFCB05",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Michigan_Wolverines_logo.svg/1280px-Michigan_Wolverines_logo.svg.png"
+      },
+      {
+        "Name":"Georgia Bulldogs",
+        "Abbreviation":"GA",
+        "Color":"#BA0C2F",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Georgia_Athletics_logo.svg/1280px-Georgia_Athletics_logo.svg.png"
+      },
+      {
+        "Name":"Iowa Hawkeyes",
+        "Abbreviation":"IA",
+        "Color":"#FFCD00",
+        "Logo":"https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/Iowa_Hawkeyes_logo.svg/1280px-Iowa_Hawkeyes_logo.svg.png"
+      },
+      {
+        "Name":"Clemson Tigers",
+        "Abbreviation":"CLEM",
+        "Color":"#F56600",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Clemson_Tigers_logo.svg/1071px-Clemson_Tigers_logo.svg.png"
+      },
+      {
+        "Name":"Alabama Crimson Tide",
+        "Abbreviation":"ALA",
+        "Color":"#9E1B32",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Alabama_Athletics_logo.svg/1067px-Alabama_Athletics_logo.svg.png"
+      },
+      {
+        "Name":"Auburn Tigers",
+        "Abbreviation":"AUB",
+        "Color":"#E87722",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Auburn_Tigers_logo.svg/1158px-Auburn_Tigers_logo.svg.png"
+      },
+      {
+        "Name":"Buston College Eagles",
+        "Abbreviation":"BOS",
+        "Color":"#98002E",
+        "Logo":"https://upload.wikimedia.org/wikipedia/en/thumb/9/96/Boston_College_Eagles_logo.svg/1129px-Boston_College_Eagles_logo.svg.png"
+      },
+      {
+        "Name":"Buffalo Bulls",
+        "Abbreviation":"BULLS",
+        "Color":"#005BBB",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Buffalo_Bulls_logo.svg/1280px-Buffalo_Bulls_logo.svg.png"
+      },
+      {
+        "Name":"Colorado Buffaloes",
+        "Abbreviation":"COL",
+        "Color":"#CFB87C",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Colorado_Buffaloes_wordmark.svg/1063px-Colorado_Buffaloes_wordmark.svg.png"
+      },
+      {
+        "Name":"Cincinnati Bearcats",
+        "Abbreviation":"BEAR",
+        "Color":"#000000",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Cincinnati_Bearcats_logo.svg/655px-Cincinnati_Bearcats_logo.svg.png"
+      },
+      {
+        "Name":"Kansas Jayhawks",
+        "Abbreviation":"KAN",
+        "Color":"#0051ba",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Kansas_Jayhawks_1946_logo.svg/1153px-Kansas_Jayhawks_1946_logo.svg.png"
+      },
+      {
+        "Name":"Maryland Terrapins",
+        "Abbreviation":"MD",
+        "Color":"#E03A3E",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Maryland_Terrapins_logo.svg/934px-Maryland_Terrapins_logo.svg.png"
+      },
+      {
+        "Name":"Pittsburgh Panthers",
+        "Abbreviation":"PITT",
+        "Color":"#FFB81C",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Pitt_Panthers_wordmark.svg/1280px-Pitt_Panthers_wordmark.svg.png"
+      },
+      {
+        "Name":"Rutgers Scarlet Knights",
+        "Abbreviation":"RUT",
+        "Color":"#CC0033",
+        "Logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Rutgers_Scarlet_Knights_logo.svg/1160px-Rutgers_Scarlet_Knights_logo.svg.png"
+      }
     ]
 }

@@ -68,7 +68,7 @@ module.exports = {
         let info
         for (const team of allTeams) {
             if (interaction.member.roles.cache.get(team.roleid)) {
-                if (team.code === "FO" || team.code === "GM") {
+                if (team.code === "FO" || team.code === "GM" || team.code === "HC") {
                     authorized = true
                 }
                 if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
@@ -218,7 +218,7 @@ module.exports = {
                     .setColor(roleObj.color)
                     .setThumbnail(logoStr)
                     .setDescription(`The ${roleObj} have successfully offered a contract to ${userPing} \`${userPing.user.tag}\`!
-                    \n>>> **Contract Terms:** ${terms}\n**Coach:** ${interaction.member} \`${interaction.user.tag}\`\n**Roster:** ${roleObj.members.size}/${maxPlayers}`)
+                    \n>>> **Contract Terms:** ${terms}\n**Coach:** ${interaction.member} \`${interaction.user.tag}\`\n**Roster:** \`${roleObj.members.size}/${maxPlayers}\``)
                 
                 if (interaction.user.avatarURL()) {
                     transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })

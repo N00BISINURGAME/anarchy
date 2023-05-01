@@ -6,7 +6,7 @@ const { getDBConnection } = require('./getDBConnection');
 const { Client, Collection, Events, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Embed, PermissionsBitField } = require('discord.js');
 const { token, presenceData, maxPlayers, filter, clientId, guildId } = require('./config.json');
 const { REST, Routes } = require('discord.js');
-const { teamJson } = require('./commands/teams.json')
+const { teamJson, collegeJson } = require('./commands/teams.json')
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages], presence: presenceData });
 
@@ -303,15 +303,15 @@ client.on(Events.GuildCreate, async guild => {
 			for (const role of guild.roles.cache.values()) {
             const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', role.id, guildid)
             if (!roleExists) {
-                if (role.name.toLowerCase().includes("franchise owner")) {
+                if (role.name.toLowerCase().includes("franchise owner") || role.name.toLowerCase().includes("university president")) {
                     foExists = true
                     await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", role.id, guildid]);
                 }
-                if (role.name.toLowerCase().includes("general manager")) {
+                if (role.name.toLowerCase().includes("general manager") || role.name.toLowerCase().includes("college recruiter")) {
                     gmExists = true
                     await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", role.id, guildid]);
                 }
-                if (role.name.toLowerCase().includes("head coach")) {
+                if (role.name.toLowerCase().includes("head coach") || role.name.toLowerCase().includes("head coach")) {
                     hcExists = true
                     await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", role.id, guildid]);
                 }
@@ -358,8 +358,22 @@ client.on(Events.GuildCreate, async guild => {
 												break;
 										}
 								}
+								for (let i = 0; i < collegeJson.length; i++) {
+									const team = collegeJson[i]
+									if (team.Name.toLowerCase().includes(role.name.toLowerCase())) {
+											// we have a valid team! add it to db and break
+											const teamExists = await db.get('SELECT * FROM Roles WHERE code = ? AND guild = ?', team.Abbreviation.toUpperCase(), guildid)
+											if (!teamExists) {
+													await db.run('INSERT INTO Teams (code, name, logo, guild) VALUES (?, ?, ?, ?)', [team.Abbreviation, team.Name, team.Logo, guildid]);
+													await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', [team.Abbreviation.toUpperCase(), role.id, guildid]);
+											}
+											break;
+									}
+								}
 						}
 				}
+
+				
 		}
 
 		// deploy commands
@@ -469,13 +483,13 @@ client.on(Events.GuildMemberRemove, async member => {
 						.setColor(roleObj.color)
 						.setThumbnail(logo.logo)
 						.setDescription(`${member.user.tag} has left the ${roleObj} due to leaving the server!
-						\n>>> **Roster:** ${roleObj.members.size}/${maxPlayers.maxplayers}`)
+						\n>>> **Roster:** \`${roleObj.members.size}/${maxPlayers.maxplayers}\``)
 					const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guildId);
 					if (roles.get(foRole.roleid)) {
 						const foRoleObj = await member.guild.roles.fetch(foRole.roleid)
 						embed.setTitle("Franchise Owner left!")
 						.setDescription(`The ${foRoleObj} of the ${roleObj}, ${member.user.tag} has left the the server!
-						\n>>> **Roster:** ${roleObj.members.size}/${maxPlayers.maxplayers}`)
+						\n>>> **Roster:** \`${roleObj.members.size}/${maxPlayers.maxplayers}\``)
 
 						const noticeChannel = await db.get('SELECT channelid FROM Channels WHERE purpose = "notices" AND guild = ?', guildId);
 						if (noticeChannel) {
@@ -492,7 +506,7 @@ client.on(Events.GuildMemberRemove, async member => {
 					for (const roleMember of roleObj.members.values()) {
 						const roleMemberRoles = roleMember.roles.cache
 						if (roleMemberRoles.get(foRole.roleid)) {
-							embed.setDescription(`${member.user.tag} has left the ${roleObj.name} in ${member.guild.name} due to leaving the server!\n>>> **Roster:** ${roleObj.members.size}/${maxPlayers.maxplayers}`)
+							embed.setDescription(`${member.user.tag} has left the ${roleObj.name} in ${member.guild.name} due to leaving the server!\n>>> **Roster:** \`${roleObj.members.size}/${maxPlayers.maxplayers}\``)
 							await roleMember.send( {embeds:[embed]})
 							break
 						}

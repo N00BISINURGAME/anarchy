@@ -51,7 +51,7 @@ module.exports = {
         let info
         for (const team of allTeams) {
             if (interaction.member.roles.cache.get(team.roleid)) {
-                if (team.code === "FO" || team.code === "GM") {
+                if (team.code === "FO" || team.code === "GM" || team.code === "HC") {
                     authorized = true
                 }
                 if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
@@ -139,7 +139,7 @@ module.exports = {
         const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
         dmMessage.setDescription(`The ${teamRole} have successfully signed ${userPing} \`${userPing.user.tag}\`!
-        \n>>> **Coach:** ${interaction.member} \`${interaction.user.tag}\`\n**Roster:** ${teamRole.members.size}/${maxPlayers}`)
+        \n>>> **Coach:** ${interaction.member} \`${interaction.user.tag}\`\n**Roster:** \`${teamRole.members.size}/${maxPlayers}\``)
 
         await transactionChannel.send({ embeds:[dmMessage] })
 
