@@ -35,7 +35,7 @@ module.exports = {
 
         for (const member of teamMembers.values()) {
             try {
-                const newMember = await interaction.guild.members.fetch(member.id)
+                const newMember = await interaction.guild.members.fetch({user:member.id, force:true})
                 for (const role of newMember.roles.cache.values()) {
                     console.log(role.name)
                     console.log(role.id)
