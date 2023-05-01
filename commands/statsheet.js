@@ -55,15 +55,15 @@ module.exports = {
         }
 
         if (position === "Quarterbacks") {
-            stats = await db.all('SELECT * FROM QBStats WHERE guild = ? AND season = ? ORDER BY passer_rating', [guild, season])
+            stats = await db.all('SELECT * FROM QBStats WHERE guild = ? AND season = ? ORDER BY passer_rating DESC', [guild, season])
         } else if (position === "Wide Receivers") {
-            stats = await db.all('SELECT * FROM WRStats WHERE guild = ? AND season = ? ORDER BY average', [guild, season])
+            stats = await db.all('SELECT * FROM WRStats WHERE guild = ? AND season = ? ORDER BY average DESC', [guild, season])
         } else if (position === "Runningbacks") {
-            stats = await db.all('SELECT * FROM RBStats WHERE guild = ? AND season = ? ORDER BY average', [guild, season])
+            stats = await db.all('SELECT * FROM RBStats WHERE guild = ? AND season = ? ORDER BY average DESC', [guild, season])
         } else if (position === "Defenders") {
-            stats = await db.all('SELECT * FROM DefenseStats WHERE guild = ? AND season = ? ORDER BY rank', [guild, season])
+            stats = await db.all('SELECT * FROM DefenseStats WHERE guild = ? AND season = ? ORDER BY rank DESC', [guild, season])
         } else if (position === "Kickers") {
-            stats = await db.all('SELECT *, (good_kicks / attempts) AS average FROM KStats WHERE guild = ? AND season = ? ORDER BY average', [guild, season])
+            stats = await db.all('SELECT *, (good_kicks / attempts) AS average FROM KStats WHERE guild = ? AND season = ? ORDER BY average DESC', [guild, season])
         }
 
         for (let i = 0; i < 10 && i < stats.length; i++) {
