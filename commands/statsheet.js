@@ -33,11 +33,12 @@ module.exports = {
 
         if (position === "Quarterbacks") {
             stats = await db.all('SELECT * FROM QBStats WHERE guild = ? ORDER BY passer_rating', guild)
+            console.log(stats)
 
             for (let i = 0; i < stats.length && i < 10; i++) {
                 const user = await interaction.guild.members.fetch(stats[i].discordid)
 
-                str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats.passer_rating} passer rating, ${stats.yards} yards, ${stats.touchdowns} touchdowns, ${Math.round((stats.completions / stats.attempts) * 10) / 10}% completion percentage (${stats.completions} / ${stats.attempts})\n\n`
+                str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].passer_rating} passer rating, ${stats[i].yards} yards, ${stats[i].touchdowns} touchdowns, ${Math.round((stats[i].completions / stats[i].attempts) * 10) / 10}% completion percentage (${stats[i].completions} / ${stats[i].attempts})\n\n`
             }
 
             const embed = new EmbedBuilder()
