@@ -31,7 +31,7 @@ module.exports = {
         // first, check to see if player already has qb stats logged
         const playerExists = await db.get("SELECT * FROM RBStats WHERE discordid = ? AND guild = ?", [userid, guild]);
         if (!playerExists) {
-            await db.run("INSERT INTO RBStats (discordid, guild, average, attempts, touchdowns, yards) VALUES (?, ?, ?, ?, ?)", [userid, guild, 0, 0, 0, 0])
+            await db.run("INSERT INTO RBStats (discordid, guild, average, attempts, touchdowns, yards) VALUES (?, ?, ?, ?, ?, ?)", [userid, guild, 0, 0, 0, 0])
         } 
         await db.run("UPDATE RBStats SET attempts = attempts + ?, touchdowns = touchdowns + ?, yards = yards + ?, WHERE discordid = ? AND guild = ?", [attempts, tds, yards, userid, guild])
         await db.run("UPDATE RBStats SET average = yards / attempts WHERE discordid = ? AND guild = ?", [userid, guild])
