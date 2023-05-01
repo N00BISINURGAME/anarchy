@@ -38,11 +38,25 @@ module.exports = {
             season = seasonSql.season
         }
 
+        let lower = 0;
+        let upper = 10;
         let str = ""
         let stats
         const embed = new EmbedBuilder()
                 .setTitle(`${position} statsheet for ${interaction.guild.name}!`)
                 .setColor([0, 0, 0])
+
+        const buttons = new ActionRowBuilder()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('pagedown')
+                        .setLabel('<')
+                        .setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder()
+                        .setCustomId('pageup')
+                        .setLabel('>')
+                        .setStyle(ButtonStyle.Primary)
+                )
 
         if (interaction.guild.iconURL()) {
             embed.setThumbnail(interaction.guild.iconURL())
@@ -66,7 +80,7 @@ module.exports = {
             stats = await db.all('SELECT *, (good_kicks / attempts) AS average FROM KStats WHERE guild = ? AND season = ? ORDER BY average DESC', [guild, season])
         }
 
-        for (let i = 0; i < 10 && i < stats.length; i++) {
+        for (let i = lower; i < upper && i < stats.length; i++) {
             // str += `**${i + 1})** ${user} \`${user.user.tag}\` - `
             const user = await interaction.guild.members.fetch(stats[i].discordid)
             if (position === "Quarterbacks") {
@@ -86,7 +100,48 @@ module.exports = {
 
         embed.setDescription(`${str}`)
 
-        await interaction.editReply({ embeds:[embed] })
+        if (stats.length < upper) {
+            await db.close()
+            return interaction.editReply({ embeds:[embed], ephemeral:true })
+        }
+        
+
+        const message = await interaction.editReply({ embeds:[embed], components:[buttons], ephemeral:true })
+        const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 300000 });
+
+        collector.on('collect', async i => {
+            const db = await getDBConnection();
+            lower = (i.customId === "pageup" ? (lower + 10 >= stats.length - 10 ? stats.length - 10 : lower + 10) : (lower - 10 <= 0 ? 0 : lower - 10))
+            upper = (i.customId === "pageup" ? (upper + 10 >= stats.length ? stats.length : upper + 10) : (upper - 10 <= 10 ? 10 : upper - 10))
+            str = ""
+
+            for (let i = lower; i < upper && i < stats.length; i++) {
+                // str += `**${i + 1})** ${user} \`${user.user.tag}\` - `
+                let user
+                try {
+                    user = await interaction.guild.members.fetch(stats[i].discordid)
+                } catch(err) {
+                    console.log(err)
+                    continue
+                }
+                
+                if (position === "Quarterbacks") {
+                    str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].passer_rating} passer rating, ${stats[i].yards} yards, ${Math.round((stats[i].completions / stats[i].attempts) * 1000) / 10} completion percentage (${stats[i].completions}/${stats[i].attempts})\n\n`
+                } else if (position === "Wide Receivers") {
+                    str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].average} yards per catch, ${stats[i].catches} catches, ${stats[i].yards} yards, ${stats[i].touchdowns} touchdowns\n\n`
+                } else if (position === "Runningbacks") {
+                    str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].average} yards per attempt, ${stats[i].attempts} attempts, ${stats[i].yards} yards, ${stats[i].touchdowns} touchdowns\n\n`
+                } else if (position === "Defenders") {
+                    str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].tackles} tackles, ${stats[i].interceptions} interceptions, ${stats[i].touchdowns} touchdowns, ${stats[i].sacks} sacks, ${stats[i].safeties} safeties, ${stats[i].fumble_recoveries} fumble recoveries\n\n`
+                } else if (position === "Kickers") {
+                    str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].average} kicking percentage (${stats[i].good_kicks}/${stats[i].attempts})`
+                }
+            }
+            if (str === "") str = "No more stats logged for players in this category!"
+            embed.setDescription(`${str}`)
+            await i.update({ embeds:[embed], components: [buttons], ephemeral:true })
+            await db.close()
+        });
         await db.close();
         
     }
