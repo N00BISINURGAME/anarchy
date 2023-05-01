@@ -26,12 +26,11 @@ module.exports = {
         average = Math.round(average * 10) / 10
 
         // first, check to see if player already has qb stats logged
-        const playerExists = await db.get("SELECT * FROM KStats WHERE discordid = ?", userid);
+        const playerExists = await db.get("SELECT * FROM KStats WHERE discordid = ? AND guild = ?", [userid, guild]);
         if (!playerExists) {
             await db.run("INSERT INTO KStats (discordid, guild, attempts, good_kicks) VALUES (?, ?, ?)", [userid, guild, 0, 0])
-        } else {
-            await db.run("UPDATE KStats SET attempts = ?, good_kicks = ? WHERE discordid = ?", [attempts, good, userid])
-        }
+        } 
+        await db.run("UPDATE KStats SET attempts = attempts + ?, good_kicks = good_kicks + ? WHERE discordid = ? AND guild = ?", [attempts, good, userid, guild])
         
         await db.close()
         return interaction.editReply({ content:`Successfully uploaded kicker stats!`, ephemeral:true })
