@@ -31,7 +31,7 @@ module.exports = {
         let str = ""
         let stats
         const embed = new EmbedBuilder()
-                .setTitle(`${position} statsheet for ${interaction.guild.name}!`).setDescription(`${str}`)
+                .setTitle(`${position} statsheet for ${interaction.guild.name}!`)
                 .setColor([0, 0, 0])
 
         if (interaction.guild.iconURL()) {
