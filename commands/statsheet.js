@@ -84,7 +84,7 @@ module.exports = {
             // str += `**${i + 1})** ${user} \`${user.user.tag}\` - `
             const user = await interaction.guild.members.fetch(stats[i].discordid)
             if (position === "Quarterbacks") {
-                str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].passer_rating} passer rating, ${stats[i].yards} yards, ${Math.round((stats[i].completions / stats[i].attempts) * 1000) / 10} completion percentage (${stats[i].completions}/${stats[i].attempts})\n\n`
+                str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].passer_rating} passer rating, ${stats[i].yards} yards, ${Math.round((stats[i].completions / stats[i].attempts) * 1000) / 10}% completion percentage (${stats[i].completions}/${stats[i].attempts})\n\n`
             } else if (position === "Wide Receivers") {
                 str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].average} yards per catch, ${stats[i].catches} catches, ${stats[i].yards} yards, ${stats[i].touchdowns} touchdowns\n\n`
             } else if (position === "Runningbacks") {
@@ -126,7 +126,7 @@ module.exports = {
                 }
                 
                 if (position === "Quarterbacks") {
-                    str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].passer_rating} passer rating, ${stats[i].yards} yards, ${Math.round((stats[i].completions / stats[i].attempts) * 1000) / 10} completion percentage (${stats[i].completions}/${stats[i].attempts})\n\n`
+                    str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].passer_rating} passer rating, ${stats[i].yards} yards, ${Math.round((stats[i].completions / stats[i].attempts) * 1000) / 10}% completion percentage (${stats[i].completions}/${stats[i].attempts})\n\n`
                 } else if (position === "Wide Receivers") {
                     str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].average} yards per catch, ${stats[i].catches} catches, ${stats[i].yards} yards, ${stats[i].touchdowns} touchdowns\n\n`
                 } else if (position === "Runningbacks") {
