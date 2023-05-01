@@ -24,6 +24,7 @@ module.exports = {
         const attempts = interaction.options.getInteger('catches')
         const tds = interaction.options.getInteger('touchdowns')
         const yards = interaction.options.getInteger('yards')
+        const { season } = await db.get('SELECT season FROM Leagues WHERE guild = ?', guild)
 
         const admin = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
         const manager = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
@@ -36,12 +37,12 @@ module.exports = {
         average = Math.round(average * 10) / 10
 
         // first, check to see if player already has qb stats logged
-        const playerExists = await db.get("SELECT * FROM WRStats WHERE discordid = ?", userid);
+        const playerExists = await db.get("SELECT * FROM WRStats WHERE discordid = ? AND guild = ? AND season = ?", [userid, guild, season]);
         if (!playerExists) {
-            await db.run("INSERT INTO WRStats (discordid, guild, average, catches, touchdowns, yards) VALUES (?, ?, ?, ?, ?, ?)", [userid, guild, 0, 0, 0, 0])
+            await db.run("INSERT INTO WRStats (discordid, guild, average, catches, touchdowns, yards, season) VALUES (?, ?, ?, ?, ?, ?, ?)", [userid, guild, 0, 0, 0, 0, season])
         }
-        await db.run("UPDATE WRStats SET catches = catches + ?, touchdowns = touchdowns + ?, yards = yards + ? WHERE discordid = ? AND guild = ?", [attempts, tds, yards, userid, guild])
-        await db.run("UPDATE WRStats SET average = (yards / catches) WHERE discordid = ? AND guild = ?", [userid, guild])
+        await db.run("UPDATE WRStats SET catches = catches + ?, touchdowns = touchdowns + ?, yards = yards + ? WHERE discordid = ? AND guild = ? AND season = ?", [attempts, tds, yards, userid, guild, season])
+        await db.run("UPDATE WRStats SET average = (yards / catches) WHERE discordid = ? AND guild = ? AND season = ?", [userid, guild, season])
         await db.close()
         return interaction.editReply({ content:`Successfully uploaded WR stats!`, ephemeral:true })
     }

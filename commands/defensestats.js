@@ -35,6 +35,7 @@ module.exports = {
         const scks = interaction.options.getInteger('sacks')
         const sftys = interaction.options.getInteger('safeties')
         const fumrecs = interaction.options.getInteger('fumble-recoveries')
+        const { season } = await db.get('SELECT season FROM Leagues WHERE guild = ?', guild)
 
         const admin = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
         const manager = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
@@ -44,19 +45,19 @@ module.exports = {
         }
 
         // first, check to see if player already has qb stats logged
-        const playerExists = await db.get("SELECT * FROM DefenseStats WHERE discordid = ? AND guild = ?", [userid, guild]);
+        const playerExists = await db.get("SELECT * FROM DefenseStats WHERE discordid = ? AND guild = ? AND season = ?", [userid, guild, season]);
         if (!playerExists) {
-            await db.run("INSERT INTO DefenseStats (discordid, guild, rank, tackles, interceptions, touchdowns, sacks, safeties, fumble_recoveries) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [userid, guild, 0, 0, 0, 0, 0, 0, 0])
+            await db.run("INSERT INTO DefenseStats (discordid, guild, rank, tackles, interceptions, touchdowns, sacks, safeties, fumble_recoveries, season) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [userid, guild, 0, 0, 0, 0, 0, 0, 0, season])
         }
 
-        await db.run("UPDATE DefenseStats SET tackles = tackles + ?, interceptions = interceptions + ?, touchdowns = touchdowns + ?, sacks = sacks + ?, safeties = safeties + ?, fumble_recoveries = fumble_recoveries + ? WHERE discordid = ? AND guild = ?", [tckls, ints, tds, scks, sftys, fumrecs, userid, guild])
+        await db.run("UPDATE DefenseStats SET tackles = tackles + ?, interceptions = interceptions + ?, touchdowns = touchdowns + ?, sacks = sacks + ?, safeties = safeties + ?, fumble_recoveries = fumble_recoveries + ? WHERE discordid = ? AND guild = ? AND season = ?", [tckls, ints, tds, scks, sftys, fumrecs, userid, guild, season])
 
-        const { tackles, interceptions, touchdowns, sacks, safeties, fumble_recoveries  } = await db.get('SELECT * FROM DefenseStats WHERE discordid = ? AND guild = ?', [userid, guild])
+        const { tackles, interceptions, touchdowns, sacks, safeties, fumble_recoveries  } = await db.get('SELECT * FROM DefenseStats WHERE discordid = ? AND guild = ? AND season = ?', [userid, guild, season])
 
         let avg = (0.15 * tackles) + (0.2 * interceptions) + (0.2 * touchdowns) + (0.15 * sacks) + (0.2 * safeties) + (0.1 * fumble_recoveries)
         avg = Math.round(avg * 10) / 10
 
-        await db.run("UPDATE DefenseStats SET rank = ? WHERE discordid = ? AND guild = ?", [avg, userid, guild])
+        await db.run("UPDATE DefenseStats SET rank = ? WHERE discordid = ? AND guild = ? AND season = ?", [avg, userid, guild, season])
         
         await db.close()
         return interaction.editReply({ content:`Successfully uploaded defensive stats!`, ephemeral:true })

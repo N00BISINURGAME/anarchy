@@ -30,6 +30,7 @@ module.exports = {
         const tds = interaction.options.getInteger('touchdowns')
         const ints = interaction.options.getInteger('interceptions')
         const yards = interaction.options.getInteger('yards')
+        const { season } = await db.get('SELECT season FROM Leagues WHERE guild = ?', guild)
 
         const admin = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
         const manager = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
@@ -41,13 +42,13 @@ module.exports = {
         
 
         // first, check to see if player already has qb stats logged
-        const playerExists = await db.get("SELECT * FROM QBStats WHERE discordid = ? AND guild = ?", [userid, guild]);
+        const playerExists = await db.get("SELECT * FROM QBStats WHERE discordid = ? AND guild = ? AND season = ?", [userid, guild, season]);
         if (!playerExists) {
-            await db.run("INSERT INTO QBStats(discordid, guild, passer_rating, completions, attempts, touchdowns, yards, interceptions) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [userid, guild, 0, 0, 0, 0, 0, 0])
+            await db.run("INSERT INTO QBStats(discordid, guild, passer_rating, completions, attempts, touchdowns, yards, interceptions, season) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [userid, guild, 0, 0, 0, 0, 0, 0, season])
         }
-        await db.run("UPDATE QBStats SET completions = completions + ?, attempts = attempts + ?, touchdowns = touchdowns + ?, yards = yards + ?, interceptions = interceptions + ? WHERE discordid = ? AND guild = ?", [completions, attempts, tds, yards, ints, userid, guild])
+        await db.run("UPDATE QBStats SET completions = completions + ?, attempts = attempts + ?, touchdowns = touchdowns + ?, yards = yards + ?, interceptions = interceptions + ? WHERE discordid = ? AND guild = ? AND season = ?", [completions, attempts, tds, yards, ints, userid, guild, season])
 
-        const newStats = await db.get("SELECT * FROM QBStats WHERE discordid = ? AND guild = ?", [userid, guild]);
+        const newStats = await db.get("SELECT * FROM QBStats WHERE discordid = ? AND guild = ? AND season = ?", [userid, guild, season]);
 
         const a = Math.max(0, Math.min(((newStats.completions / newStats.attempts) - 0.3) * 5, 2.375))
         const b = Math.max(0, Math.min(((newStats.yards / newStats.attempts) - 3) * 0.25, 2.375))
@@ -57,7 +58,7 @@ module.exports = {
         let passerRating = ((a + b + c + d) / 6) * 100
         passerRating = Math.round(passerRating * 10) / 10
 
-        await db.run("UPDATE QBStats SET passer_rating = ? WHERE discordid = ? AND guild = ?", [passerRating, userid, guild])
+        await db.run("UPDATE QBStats SET passer_rating = ? WHERE discordid = ? AND guild = ? AND season = ?", [passerRating, userid, guild, season])
         
         await db.close()
         return interaction.editReply({ content:`Successfully uploaded QB stats!`, ephemeral:true })
