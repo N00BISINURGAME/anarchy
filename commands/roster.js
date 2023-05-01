@@ -28,9 +28,9 @@ module.exports = {
         // then, get all players from the specified team
         const teamMembers = team.members
 
-        let fo = "Vacant";
-        let gm = "Vacant";
-        let hc = "Vacant";
+        let fo = "";
+        let gm = "";
+        let hc = "";
         let players = "";
 
         for (const member of teamMembers.values()) {
@@ -38,10 +38,10 @@ module.exports = {
                 for (const role of member.roles.cache.keys()) {
                     const roleExists = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
                     if (roleExists) {
-                        if (roleExists.code === "FO") fo = `${member} \`${member.user.tag}\``;
-                        else if (roleExists.code === "GM") gm = `${member} \`${member.user.tag}\``;
-                        else if (roleExists.code === "HC") hc = `${member} \`${member.user.tag}\``;
-                        else players += `${member} (${member.user.tag})\n`;
+                        if (roleExists.code === "FO") fo += `${member} \`${member.user.tag}\`\n`;
+                        else if (roleExists.code === "GM") gm += `${member} \`${member.user.tag}\`\n`;
+                        else if (roleExists.code === "HC") hc += `${member} \`${member.user.tag}\`\n`;
+                        else players += `${member} \'${member.user.tag}\'\n`;
                         break
                     }
                 }
@@ -51,6 +51,10 @@ module.exports = {
                 continue;
             }
         }
+
+        if (fo === "") fo = "Vacant"
+        if (gm === "") gm = "Vacant"
+        if (hc === "") hc = "Vacant"
 
         if (players === "") players = "None";
         const desc = `**Franchise Owner**\n${fo}\n\n**General Manager**\n${gm}\n\n**Head Coach**\n${hc}\n\n**Players**\n${players}`
