@@ -12,15 +12,24 @@ module.exports = {
         .setName('kickerstats')
         .addIntegerOption(attemptsOption)
         .addIntegerOption(goodOption)
-        .setDescription('Records your all-time kicker stats.'),
+        .setDescription('Records a players kicker stats for use in a statsheet.'),
     async execute(interaction) {
         const db = await getDBConnection();
+
+        
 
         // first, get player stats
         const userid = interaction.user.id;
         const guild = interaction.guild.id
         const attempts = interaction.options.getInteger('attempts')
         const good = interaction.options.getInteger('good-kicks')
+
+        const admin = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+        const manager = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+        if (!(admin || manager)) {
+            await db.close()
+            return interaction.editReply({ content:"You are not permitted to run this command!", ephemeral:true })
+        }
 
         let average = good / attempts
         average = Math.round(average * 10) / 10

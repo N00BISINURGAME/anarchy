@@ -18,7 +18,7 @@ module.exports = {
         .addIntegerOption(tdOption)
         .addIntegerOption(intOption)
         .addIntegerOption(yardsOption)
-        .setDescription('Records your all-time QB stats.'),
+        .setDescription('Records a players quarterback stats for use in a statsheet.'),
     async execute(interaction) {
         const db = await getDBConnection();
 
@@ -30,6 +30,13 @@ module.exports = {
         const tds = interaction.options.getInteger('touchdowns')
         const ints = interaction.options.getInteger('interceptions')
         const yards = interaction.options.getInteger('yards')
+
+        const admin = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+        const manager = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+        if (!(admin || manager)) {
+            await db.close()
+            return interaction.editReply({ content:"You are not permitted to run this command!", ephemeral:true })
+        }
 
         
 

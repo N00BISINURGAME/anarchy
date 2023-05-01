@@ -14,7 +14,7 @@ module.exports = {
         .addIntegerOption(attemptsOption)
         .addIntegerOption(tdOption)
         .addIntegerOption(yardsOption)
-        .setDescription('Records your all-time RB stats.'),
+        .setDescription('Records a players runningback stats for use in a statsheet.'),
     async execute(interaction) {
         const db = await getDBConnection();
 
@@ -24,6 +24,13 @@ module.exports = {
         const attempts = interaction.options.getInteger('attempts')
         const tds = interaction.options.getInteger('touchdowns')
         const yards = interaction.options.getInteger('yards')
+
+        const admin = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+        const manager = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+        if (!(admin || manager)) {
+            await db.close()
+            return interaction.editReply({ content:"You are not permitted to run this command!", ephemeral:true })
+        }
 
         let average = yards / attempts
         average = Math.round(average * 10) / 10

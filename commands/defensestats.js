@@ -36,6 +36,13 @@ module.exports = {
         const sftys = interaction.options.getInteger('safeties')
         const fumrecs = interaction.options.getInteger('fumble-recoveries')
 
+        const admin = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+        const manager = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+        if (!(admin || manager)) {
+            await db.close()
+            return interaction.editReply({ content:"You are not permitted to run this command!", ephemeral:true })
+        }
+
         // first, check to see if player already has qb stats logged
         const playerExists = await db.get("SELECT * FROM DefenseStats WHERE discordid = ? AND guild = ?", [userid, guild]);
         if (!playerExists) {

@@ -14,15 +14,23 @@ module.exports = {
         .addIntegerOption(attemptsOption)
         .addIntegerOption(tdOption)
         .addIntegerOption(yardsOption)
-        .setDescription('Records your all-time WR stats.'),
+        .setDescription('Records a players wide receiver stats for use in a statsheet.'),
     async execute(interaction) {
         const db = await getDBConnection();
 
         // first, get player stats
         const userid = interaction.user.id;
+        const guild = interaction.guild.id
         const attempts = interaction.options.getInteger('catches')
         const tds = interaction.options.getInteger('touchdowns')
         const yards = interaction.options.getInteger('yards')
+
+        const admin = await db.get('SELECT * FROM Admins WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+        const manager = await db.get('SELECT * FROM Managers WHERE discordid = ? AND guild = ?', [interaction.user.id, guild])
+        if (!(admin || manager)) {
+            await db.close()
+            return interaction.editReply({ content:"You are not permitted to run this command!", ephemeral:true })
+        }
 
         let average = yards / attempts
         average = Math.round(average * 10) / 10
@@ -30,11 +38,10 @@ module.exports = {
         // first, check to see if player already has qb stats logged
         const playerExists = await db.get("SELECT * FROM WRStats WHERE discordid = ?", userid);
         if (!playerExists) {
-            await db.run("INSERT INTO WRStats (discordid, average, catches, touchdowns, yards) VALUES (?, ?, ?, ?, ?)", [userid, average, attempts, tds, yards])
-        } else {
-            await db.run("UPDATE WRStats SET average = ?, catches = ?, touchdowns = ?, yards = ? WHERE discordid = ?", [average, attempts, tds, yards, userid])
+            await db.run("INSERT INTO WRStats (discordid, guild, average, catches, touchdowns, yards) VALUES (?, ?, ?, ?, ?, ?)", [userid, guild, 0, 0, 0, 0])
         }
-        
+        await db.run("UPDATE WRStats SET catches = catches + ?, touchdowns = touchdowns + ?, yards = yards + ? WHERE discordid = ? AND guild = ?", [attempts, tds, yards, userid, guild])
+        await db.run("UPDATE WRStats SET average = (yards / catches) WHERE discordid = ? AND guild = ?", [userid, guild])
         await db.close()
         return interaction.editReply({ content:`Successfully uploaded WR stats!`, ephemeral:true })
     }
