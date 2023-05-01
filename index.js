@@ -127,6 +127,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
 	try {
 		await interaction.deferReply({ ephemeral:true })
+		await interaction.guild.members.fetch()
 		if (client.user.id === "1094711775414460416") {
 			return interaction.editReply("This copy of Anarchy is down, add this one instead! https://discord.com/api/oauth2/authorize?client_id=1098837048187682816&permissions=8&scope=bot")
 		}
