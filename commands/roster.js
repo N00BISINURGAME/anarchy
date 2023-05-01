@@ -38,6 +38,7 @@ module.exports = {
                 for (const role of member.roles.cache.keys()) {
                     const roleExists = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
                     if (roleExists) {
+                        console.log(roleExists.code)
                         if (roleExists.code === "FO") fo += `${member} \`${member.user.tag}\`\n`;
                         else if (roleExists.code === "GM") gm += `${member} \`${member.user.tag}\`\n`;
                         else if (roleExists.code === "HC") hc += `${member} \`${member.user.tag}\`\n`;
