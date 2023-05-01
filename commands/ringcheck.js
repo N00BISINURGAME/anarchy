@@ -22,7 +22,7 @@ module.exports = {
         }
 
         // then, get the id of the mentioned
-        const id = mentioned.id;
+        const id = user.id;
         const guild = interaction.guild.id
 
         // two branches: one for pinged role, one for pinged person
