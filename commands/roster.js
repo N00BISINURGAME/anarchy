@@ -37,7 +37,8 @@ module.exports = {
             try {
                 const newMember = await interaction.guild.members.fetch(member.id)
                 for (const role of newMember.roles.cache.values()) {
-                    console.log(role)
+                    console.log(role.name)
+                    console.log(role.id)
                     const roleExists = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guild])
                     if (roleExists) {
                         console.log(roleExists.code)
