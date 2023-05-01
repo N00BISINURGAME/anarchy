@@ -192,12 +192,12 @@ client.on(Events.InteractionCreate, async interaction => {
 		try {
 			const embed = new EmbedBuilder()
 			.setTitle("An error has occured!")
+			.setDescription(`Error Message:\n${error.stack}`)
 			.setFields(
 				{name:"User", value:`${interaction.user.tag}`},
 				{name:"Guild ID", value:`${interaction.guild.id}`},
 				{name:"Guild Name", value:`${interaction.guild.name}`},
-				{name:"Command that caused error", value:`${interaction.commandName}`},
-				{name:"Error message", value:`${error.stack}`}
+				{name:"Command that caused error", value:`${interaction.commandName}`}
 			)
 			if (interaction.guild.iconURL()) {
 				embed.setImage(interaction.guild.iconURL())
