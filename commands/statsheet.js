@@ -38,7 +38,7 @@ module.exports = {
             for (let i = 0; i < stats.length && i < 10; i++) {
                 const user = await interaction.guild.members.fetch(stats[i].discordid)
 
-                str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].passer_rating} passer rating, ${stats[i].yards} yards, ${stats[i].touchdowns} touchdowns, ${Math.round((stats[i].completions / stats[i].attempts) * 10) / 10}% completion percentage (${stats[i].completions} / ${stats[i].attempts})\n\n`
+                str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].passer_rating} passer rating, ${stats[i].yards} yards, ${stats[i].touchdowns} touchdowns, ${Math.round((stats[i].completions / stats[i].attempts) * 1000) / 10}% completion percentage (${stats[i].completions} / ${stats[i].attempts})\n\n`
             }
 
             const embed = new EmbedBuilder()
