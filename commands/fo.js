@@ -110,8 +110,15 @@ module.exports = {
             transactionEmbed.setFooter({ text: `${interaction.user.tag}` })
         }
         if (channelId) {
-            const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
-            await transactionChannel.send({ embeds: [transactionEmbed] })
+            let transactionChannel;
+            try {
+                transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
+                await transactionChannel.send({ embeds: [transactionEmbed] })
+             } catch(err) {
+                await db.close()
+                return interaction.editReply({ content:"Franchise owner promoted, but the notices channel in the database is out of date! Run /channel again and reset the notices channel.", ephemeral:true})
+             }
+           
         }
         
 
