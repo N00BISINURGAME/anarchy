@@ -4,6 +4,7 @@ const { SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandAttachmentOp
 const { getDBConnection } = require('../getDBConnection');
 const { admins, maxPlayers } = require('../config.json');
 
+const userOption = new SlashCommandUserOption().setRequired(true).setName('player').setDescription("The player you want to enter stats for.");
 const completionsOption = new SlashCommandIntegerOption().setRequired(true).setName('completions').setDescription("The number of passes you've completed");
 const attemptsOption = new SlashCommandIntegerOption().setRequired(true).setName('attempts').setDescription("The number of passes you've attempted");
 const tdOption = new SlashCommandIntegerOption().setRequired(true).setName('touchdowns').setDescription("The number of touchdowns you've thrown");
@@ -13,6 +14,7 @@ const yardsOption = new SlashCommandIntegerOption().setRequired(true).setName('y
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('qbstats')
+        .addUserOption(userOption)
         .addIntegerOption(completionsOption)
         .addIntegerOption(attemptsOption)
         .addIntegerOption(tdOption)
@@ -23,7 +25,12 @@ module.exports = {
         const db = await getDBConnection();
 
         // first, get player stats
-        const userid = interaction.user.id;
+        const user = interaction.options.getMember('player')
+        if (!user) {
+            await db.close()
+            await interaction.editReply({ content:"The user you pinged may have left the server! Verify that they are in the server and try again.", ephemeral:true })
+        }
+        const userid = user.id;
         const guild = interaction.guild.id;
         const completions = interaction.options.getInteger('completions')
         const attempts = interaction.options.getInteger('attempts')

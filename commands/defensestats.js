@@ -1,9 +1,10 @@
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
-const { SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandAttachmentOption, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandUserOption, EmbedBuilder } = require('discord.js');
 const { getDBConnection } = require('../getDBConnection');
 const { admins, maxPlayers } = require('../config.json');
 
+const userOption = new SlashCommandUserOption().setRequired(true).setName('player').setDescription("The player you want to enter stats for.");
 const tacklesOption = new SlashCommandIntegerOption().setRequired(true).setName('tackles').setDescription("The number of tackles you've made");
 const intOption = new SlashCommandIntegerOption().setRequired(true).setName('interceptions').setDescription("The number of interceptions you've caught");
 const touchdownOption = new SlashCommandIntegerOption().setRequired(true).setName('defensive-touchdowns').setDescription("The number of defensive touchdowns you've gotten");
@@ -14,6 +15,7 @@ const fumRecOption = new SlashCommandIntegerOption().setRequired(true).setName('
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('defensestats')
+        .addUserOption(userOption)
         .addIntegerOption(tacklesOption)
         .addIntegerOption(intOption)
         .addIntegerOption(touchdownOption)
@@ -27,7 +29,12 @@ module.exports = {
         // return interaction.editReply({ content:"this command is not finished yet!", ephemeral:true })
 
         // first, get player stats
-        const userid = interaction.user.id;
+        const user = interaction.options.getMember('player')
+        if (!user) {
+            await db.close()
+            await interaction.editReply({ content:"The user you pinged may have left the server! Verify that they are in the server and try again.", ephemeral:true })
+        }
+        const userid = user.id;
         const guild = interaction.guild.id
         const tckls = interaction.options.getInteger('tackles')
         const ints = interaction.options.getInteger('interceptions')

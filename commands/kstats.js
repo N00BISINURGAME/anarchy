@@ -4,12 +4,14 @@ const { SlashCommandBuilder, SlashCommandIntegerOption, SlashCommandAttachmentOp
 const { getDBConnection } = require('../getDBConnection');
 const { admins, maxPlayers } = require('../config.json');
 
+const userOption = new SlashCommandUserOption().setRequired(true).setName('player').setDescription("The player you want to enter stats for.");
 const attemptsOption = new SlashCommandIntegerOption().setRequired(true).setName('attempts').setDescription("The number of attempted kicks you have");
 const goodOption = new SlashCommandIntegerOption().setRequired(true).setName('good-kicks').setDescription("The number of good kicks you've made");
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('kickerstats')
+        .addUserOption(userOption)
         .addIntegerOption(attemptsOption)
         .addIntegerOption(goodOption)
         .setDescription('Records a players kicker stats for use in a statsheet.'),
@@ -19,7 +21,12 @@ module.exports = {
         
 
         // first, get player stats
-        const userid = interaction.user.id;
+        const user = interaction.options.getMember('player')
+        if (!user) {
+            await db.close()
+            await interaction.editReply({ content:"The user you pinged may have left the server! Verify that they are in the server and try again.", ephemeral:true })
+        }
+        const userid = user.id;
         const guild = interaction.guild.id
         const attempts = interaction.options.getInteger('attempts')
         const good = interaction.options.getInteger('good-kicks')
