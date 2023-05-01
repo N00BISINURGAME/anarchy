@@ -32,7 +32,11 @@ module.exports = {
         const user = interaction.user.id
         const guild = interaction.guild.id
         const position = interaction.options.getString("position")
-        const season = interaction.options.getInteger("season")
+        let season = interaction.options.getInteger("season")
+        if (!season) {
+            const seasonSql = await db.get('SELECT season FROM Leagues WHERE guild = ?', guild)
+            season = seasonSql.season
+        }
 
         let str = ""
         let stats
