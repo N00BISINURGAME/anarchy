@@ -36,6 +36,7 @@ module.exports = {
         for (const member of teamMembers.values()) {
             try {
                 for (const role of member.roles.cache.keys()) {
+                    console.log(role.name)
                     const roleExists = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
                     if (roleExists) {
                         console.log(roleExists.code)
