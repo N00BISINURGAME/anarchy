@@ -94,15 +94,15 @@ module.exports = {
             if (!roleExists) {
                 if (role.name.toLowerCase().includes("franchise owner") || role.name.toLowerCase().includes("university president")) {
                     foExists = true
-                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", role.id, guildid]);
+                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["FO", role.id, guild]);
                 }
                 if (role.name.toLowerCase().includes("general manager") || role.name.toLowerCase().includes("college recruiter")) {
                     gmExists = true
-                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", role.id, guildid]);
+                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["GM", role.id, guild]);
                 }
                 if (role.name.toLowerCase().includes("head coach") || role.name.toLowerCase().includes("head coach")) {
                     hcExists = true
-                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", role.id, guildid]);
+                    await db.run('INSERT INTO Roles (code, roleid, guild) VALUES (?, ?, ?)', ["HC", role.id, guild]);
                 }
             }
         }
