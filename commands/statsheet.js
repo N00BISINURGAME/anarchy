@@ -16,17 +16,23 @@ const roleOption = new SlashCommandStringOption()
         {name:"Kicker", value:"Kickers"},
     )
 
+const seasonOption = new SlashCommandIntegerOption()
+    .setName("season")
+    .setDescription("The season that you want to get stats from")
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('getstats')
         .setDescription('Gets the stats of all players in a particular position.')
-        .addStringOption(roleOption),
+        .addStringOption(roleOption)
+        .addIntegerOption(seasonOption),
     async execute(interaction) {
         // needs to be implemented
         const db = await getDBConnection();
         const user = interaction.user.id
         const guild = interaction.guild.id
         const position = interaction.options.getString("position")
+        const season = interaction.options.getInteger("season")
 
         let str = ""
         let stats
@@ -45,15 +51,15 @@ module.exports = {
         }
 
         if (position === "Quarterbacks") {
-            stats = await db.all('SELECT * FROM QBStats WHERE guild = ? ORDER BY passer_rating', guild)
+            stats = await db.all('SELECT * FROM QBStats WHERE guild = ? AND season = ? ORDER BY passer_rating', [guild, season])
         } else if (position === "Wide Receivers") {
-            stats = await db.all('SELECT * FROM WRStats WHERE guild = ? ORDER BY average', guild)
+            stats = await db.all('SELECT * FROM WRStats WHERE guild = ? AND season = ? ORDER BY average', [guild, season])
         } else if (position === "Runningbacks") {
-            stats = await db.all('SELECT * FROM RBStats WHERE guild = ? ORDER BY average', guild)
+            stats = await db.all('SELECT * FROM RBStats WHERE guild = ? AND season = ? ORDER BY average', [guild, season])
         } else if (position === "Defenders") {
-            stats = await db.all('SELECT * FROM DefenseStats WHERE guild = ? ORDER BY rank', guild)
+            stats = await db.all('SELECT * FROM DefenseStats WHERE guild = ? AND season = ? ORDER BY rank', [guild, season])
         } else if (position === "Kickers") {
-            stats = await db.all('SELECT *, (good_kicks / attempts) AS average FROM KStats WHERE guild = ? ORDER BY average', guild)
+            stats = await db.all('SELECT *, (good_kicks / attempts) AS average FROM KStats WHERE guild = ? AND season = ? ORDER BY average', [guild, season])
         }
 
         for (let i = 0; i < 10 && i < stats.length; i++) {
