@@ -25,6 +25,8 @@ module.exports = {
             return interaction.editReply("This team does not exist! Ensure you're pinging a team that exists.");
         }
 
+        const specialRoles = await db.all('SELECT * FROM Roles WHERE (code = "FO" OR code = "GM" OR code = "HC") AND guild = ?', guild)
+
         // then, get all players from the specified team
         const teamMembers = team.members
 
@@ -41,11 +43,18 @@ module.exports = {
                     console.log(role.id)
                     const roleExists = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guild])
                     if (roleExists) {
-                        console.log(roleExists.code)
-                        if (roleExists.code === "FO") fo += `${member} \`${member.user.tag}\`\n`;
-                        else if (roleExists.code === "GM") gm += `${member} \`${member.user.tag}\`\n`;
-                        else if (roleExists.code === "HC") hc += `${member} \`${member.user.tag}\`\n`;
-                        else players += `${member} \'${member.user.tag}\'\n`;
+                        flag = false
+                        for (let i = 0; i < specialRoles.length; i++) {
+                            if (newMember.roles.cache.get(specialRoles[i].roleid)) {
+                                if (specialRoles[i].code === "FO") fo += `${member} \`${member.user.tag}\`\n`;
+                                else if (specialRoles[i].code === "GM") gm += `${member} \`${member.user.tag}\`\n`;
+                                else if (specialRoles[i].code === "HC") hc += `${member} \`${member.user.tag}\`\n`;
+                                flag = true
+                            }
+                            break
+                        }
+                        if (flag) break
+                        players += `${member} \'${member.user.tag}\'\n`;
                         break
                     }
                 }
