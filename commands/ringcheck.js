@@ -10,7 +10,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('ringcheck')
         .setDescription('Shows the number of rings a player has.')
-        .addMentionableOption(mentionableOption),
+        .addUserOption(mentionableOption),
     async execute(interaction) {
         const db = await getDBConnection();
 
