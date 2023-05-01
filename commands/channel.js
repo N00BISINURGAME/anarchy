@@ -15,7 +15,8 @@ const channelChoices = new SlashCommandStringOption().setName("channel-options")
                             { name:"Notices", value:"notices" },
                             { name:"Pickups & QBB's", value:"pickups-qbbs" },
                             { name:"Game Schedules", value:"schedules" },
-                            { name:"Game Stats", value:"stats" }
+                            { name:"Game Stats", value:"stats" },
+                            { name:"Contract Offers", value:"contracts" }
                           )
 
 const channelMention = new SlashCommandChannelOption().setName("channel").setDescription("The channel you want to set").setRequired(true).addChannelTypes(ChannelType.GuildText)

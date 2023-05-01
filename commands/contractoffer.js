@@ -42,10 +42,10 @@ module.exports = {
             return interaction.editReply({ content: "Contracts are disabled! These can be enabled by running /toggle.", ephemeral: true})
             }
         // check if a transaction channel has been set
-        const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
+        const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "contracts" AND guild = ?', guild)
         if (!transactionExists) {
             await db.close()
-            return interaction.editReply({ content: "A transaction channel has not been set! This can be set by running /channel or by running /setup if you have not already.", ephemeral: true})
+            return interaction.editReply({ content: "A contracts channel has not been set! This can be set by running /channel or by running /setup if you have not already.", ephemeral: true})
         }
 
         // gets all information that the user sent
@@ -209,7 +209,7 @@ module.exports = {
                 await userPing.roles.add(roleObj);
 
                 // then, get the transaction channel ID and send a transaction message
-                const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
+                const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "contracts" AND guild = ?', guild)
 
                 const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
 
