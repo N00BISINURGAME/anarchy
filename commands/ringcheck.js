@@ -15,7 +15,7 @@ module.exports = {
         const db = await getDBConnection();
 
         // first, get the role or person mentioned
-        const user = interaction.options.getMentionable("user");
+        const user = interaction.options.getMember("user");
         if (!user) {
             await db.close()
             return interaction.editReply({ content:`This user may have left the server! Ensure they are in the server and try again.`, ephemeral:true});
