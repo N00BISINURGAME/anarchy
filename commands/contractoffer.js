@@ -219,7 +219,7 @@ module.exports = {
                     .setThumbnail(logoStr)
                     .setDescription(`The ${roleObj} have successfully offered a contract to ${userPing} \`${userPing.user.tag}\`!
                     \n>>> **Contract Terms:** ${terms}\n**Coach:** ${interaction.member} \`${interaction.user.tag}\`\n**Roster:** \`${roleObj.members.size}/${maxPlayers}\``)
-                
+
                 if (interaction.user.avatarURL()) {
                     transactionEmbed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
                 } else {
