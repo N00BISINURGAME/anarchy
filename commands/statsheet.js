@@ -30,36 +30,51 @@ module.exports = {
 
         let str = ""
         let stats
+        const embed = new EmbedBuilder()
+                .setTitle(`${position} statsheet for ${interaction.guild.name}!`).setDescription(`${str}`)
+                .setColor([0, 0, 0])
+
+        if (interaction.guild.iconURL()) {
+            embed.setThumbnail(interaction.guild.iconURL())
+        }
+
+        if (interaction.user.avatarURL()) {
+            embed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
+        } else {
+            embed.setFooter({ text: `${interaction.user.tag}` })
+        }
 
         if (position === "Quarterbacks") {
             stats = await db.all('SELECT * FROM QBStats WHERE guild = ? ORDER BY passer_rating', guild)
-            console.log(stats)
-
-            for (let i = 0; i < stats.length && i < 10; i++) {
-                const user = await interaction.guild.members.fetch(stats[i].discordid)
-
-                str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].passer_rating} passer rating, ${stats[i].yards} yards, ${stats[i].touchdowns} touchdowns, ${Math.round((stats[i].completions / stats[i].attempts) * 1000) / 10}% completion percentage (${stats[i].completions} / ${stats[i].attempts})\n\n`
-            }
-
-            const embed = new EmbedBuilder()
-                .setTitle(`${position} statsheet for ${interaction.guild.name}!`)
-                .setColor([0, 0, 0])
-                .setDescription(`${str}`)
-            
-            if (interaction.guild.iconURL()) {
-                embed.setThumbnail(interaction.guild.iconURL())
-            }
-    
-            if (interaction.user.avatarURL()) {
-                embed.setFooter({ text: `${interaction.user.tag}`, iconURL: `${interaction.user.avatarURL()}` })
-            } else {
-                embed.setFooter({ text: `${interaction.user.tag}` })
-            }
-            await db.close()
-            return interaction.editReply({ embeds:[embed], ephemeral:true })
+        } else if (position === "Wide Receivers") {
+            stats = await db.all('SELECT * FROM WRStats WHERE guild = ? ORDER BY average', guild)
+        } else if (position === "Runningbacks") {
+            stats = await db.all('SELECT * FROM RBStats WHERE guild = ? ORDER BY average', guild)
+        } else if (position === "Defenders") {
+            stats = await db.all('SELECT * FROM DefenseStats WHERE guild = ? ORDER BY rank', guild)
+        } else if (position === "Kickers") {
+            stats = await db.all('SELECT *, (good_kicks / attempts) AS average FROM KStats WHERE guild = ? ORDER BY average', guild)
         }
 
-        await interaction.editReply("Not implemented yet!")
+        for (let i = 0; i < 10 && i < stats.length; i++) {
+            // str += `**${i + 1})** ${user} \`${user.user.tag}\` - `
+            const user = await interaction.guild.members.fetch(stats[i].discordid)
+            if (position === "Quarterbacks") {
+                str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].passer_rating} passer rating, ${stats[i].yards} yards, ${Math.round((stats[i].completions / stats[i].attempts) * 1000) / 10} completion percentage (${stats[i].completions}/${stats[i].attempts})\n\n`
+            } else if (position === "Wide Receivers") {
+                str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].average} yards per catch, ${stats[i].catches} catches, ${stats[i].yards} yards, ${stats[i].touchdowns} touchdowns\n\n`
+            } else if (position === "Runningbacks") {
+                str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].average} yards per attempt, ${stats[i].attempts} attempts, ${stats[i].yards} yards, ${stats[i].touchdowns} touchdowns\n\n`
+            } else if (position === "Defenders") {
+                str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].tackles} tackles, ${stats[i].interceptions} interceptions, ${stats[i].touchdowns} touchdowns, ${stats[i].sacks} sacks, ${stats[i].safeties} safeties, ${stats[i].fumble_recoveries} fumble recoveries\n\n`
+            } else if (position === "Kickers") {
+                str += `**${i + 1})** ${user} \`${user.user.tag}\` - ${stats[i].average} kicking percentage (${stats[i].good_kicks}/${stats[i].attempts})`
+            }
+        }
+
+        embed.setDescription(`${str}`)
+
+        await interaction.editReply({ embeds:[embed] })
         await db.close();
         
     }
