@@ -34,7 +34,7 @@ module.exports = {
             await db.run("INSERT INTO RBStats (discordid, guild, average, attempts, touchdowns, yards) VALUES (?, ?, ?, ?, ?, ?)", [userid, guild, 0, 0, 0, 0])
         } 
         await db.run("UPDATE RBStats SET attempts = attempts + ?, touchdowns = touchdowns + ?, yards = yards + ?, WHERE discordid = ? AND guild = ?", [attempts, tds, yards, userid, guild])
-        await db.run("UPDATE RBStats SET average = yards / attempts WHERE discordid = ? AND guild = ?", [userid, guild])
+        await db.run("UPDATE RBStats SET average = (yards / attempts) WHERE discordid = ? AND guild = ?", [userid, guild])
         await db.close()
         return interaction.editReply({ content:`Successfully uploaded RB stats!`, ephemeral:true })
     }
