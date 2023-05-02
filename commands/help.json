@@ -61,7 +61,7 @@
       "description":"Displays helpful information about Anarchy commands."
     },
     {
-      "name":"/kstats <user> <attempts> <good-attempts>",
+      "name":"/kickerstats <user> <attempts> <good-attempts>",
       "description":"Logs a players kicker stats, as shown on the FF2 'Kicker' server stats."
     },
     {
