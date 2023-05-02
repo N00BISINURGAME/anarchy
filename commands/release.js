@@ -108,6 +108,11 @@ module.exports = {
             await user.roles.remove(specialRoleRoleid)
         }
 
+        const faRole = await db.get('SELECT * FROM Roles WHERE code = "FA" AND guild = ?', guild)
+        if (faRole) {
+            await user.roles.add(faRole.roleid)
+        }
+
 
         // then, get the team logo and player count
         const logo = await db.get('SELECT t.logo FROM Teams t, Roles r WHERE t.code = r.code AND t.guild = r.guild AND r.roleid = ? AND r.guild = ?', [teamSignedRoleid, guild])

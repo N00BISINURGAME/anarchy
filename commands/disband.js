@@ -44,6 +44,8 @@ module.exports = {
 
             // then, remove roles from players
             let userStr = ""
+
+            const faRole = await db.get('SELECT * FROM Roles WHERE code = "FA" AND guild = ?', guild)
             // this needs to be updated to remove gm/hc roles too
             for (const member of team.members.values()) {
                 userStr += `${member} \`${member.user.tag}\`\n`
@@ -51,6 +53,9 @@ module.exports = {
                 for (const role of frontOfficeRoles) {
                     if (member.roles.cache.get(role.roleid)) {
                         await member.roles.remove(role.roleid)
+                        if (faRole) {
+                            await user.roles.add(faRole.roleid)
+                        }
                     }
                 }
             }

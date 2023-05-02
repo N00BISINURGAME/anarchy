@@ -38,6 +38,8 @@ module.exports = {
             const specialRoles = await db.all('SELECT roleid FROM Roles WHERE (code = "FO" OR code = "GM" OR code = "HC") AND guild = ?', guild)
             let disbandedStr = ""
 
+            const faRole = await db.get('SELECT * FROM Roles WHERE code = "FA" AND guild = ?', guild)
+
             for (const team of allTeams) {
               const teamObj = await interaction.guild.roles.fetch(team.roleid)
               console.log(teamObj.members.size)
@@ -47,12 +49,14 @@ module.exports = {
                   for (const role of specialRoles) {
                     if (member.roles.cache.get(role.roleid)) {
                       await member.roles.remove(role.roleid)
+                      if (faRole) {
+                        await member.roles.add(faRole.roleid)
+                      }
                     }
                   }
                 }
                 disbandedStr += `${teamObj}\n`
               }
-              
             }
 
             if (disbandedStr === "") disbandedStr = "None\n"
