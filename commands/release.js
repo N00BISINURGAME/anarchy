@@ -64,7 +64,7 @@ module.exports = {
                     specialRole = team.code
                     specialRoleRoleid = team.roleid
                 }
-                if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
+                if (!(team.code === "FO" || team.code === "GM" || team.code === "HC" || team.code === "FA" || team.code === "ELIG")) {
                     userSigned = true
                     teamSigned = team.code
                     teamSignedRoleid = team.roleid
@@ -92,7 +92,7 @@ module.exports = {
         // checks to see if FO or GM is on the same team as player being released
         for (const team of allTeams) {
             if (interaction.member.roles.cache.get(team.roleid)) {
-                if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
+                if (!(team.code === "FO" || team.code === "GM" || team.code === "HC" || team.code === "FA" || team.code === "ELIG")) {
                     if (team.code !== teamSigned) {
                         await db.close()
                         return interaction.editReply({ content:"This user is not on the same team as you!", ephemeral:true })
