@@ -105,6 +105,15 @@ module.exports = {
           return interaction.editReply({content:'Signing this player would lead to your team exceeding the maximum player count!', ephemeral:true});
         }
 
+        const eligibleRole = await db.get('SELECT * FROM Roles WHERE code = "ELIG" AND guild = ?', guild)
+        if (eligibleRole) {
+            const memberRoles = userPing.roles.cache
+            if (!memberRoles.get(eligibleRole.roleid)) {
+                await db.close()
+                return interaction.editReply({content:'This player is not eligible to be signed, since they do not have the eligible role!', ephemeral:true});
+            }
+        }
+
         let dmChannel = await userPing.createDM()
 
         let dmMessage = new EmbedBuilder()
@@ -142,6 +151,11 @@ module.exports = {
         \n>>> **Coach:** ${interaction.member} \`${interaction.user.tag}\`\n**Roster:** \`${teamRole.members.size}/${maxPlayers}\``)
 
         await transactionChannel.send({ embeds:[dmMessage] })
+
+        const faRole = await db.get('SELECT * FROM Roles WHERE code = "FA" AND guild = ?', guild)
+        if (faRole) {
+            await userPing.roles.remove(faRole.roleid)
+        }
 
         await db.close()
 

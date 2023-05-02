@@ -144,6 +144,15 @@ module.exports = {
             return interaction.editReply({content:'Signing this player would lead to your team exceeding the maximum player count!', ephemeral:true});
         }
 
+        const eligibleRole = await db.get('SELECT * FROM Roles WHERE code = "ELIG" AND guild = ?', guild)
+        if (eligibleRole) {
+            const memberRoles = pingedUser.roles.cache
+            if (!memberRoles.get(eligibleRole.roleid)) {
+                await db.close()
+                return interaction.editReply({content:'This player is not eligible to be signed, since they do not have the eligible role!', ephemeral:true});
+            }
+        }
+
         // then, get channel information and send an ephemeral reply to the command saying a user has been offered
         // also create the dm message, format it properly, and send it to the user and listen for a button click
         dmChannel = await userPing.createDM()
@@ -207,6 +216,11 @@ module.exports = {
                 }
 
                 await userPing.roles.add(roleObj);
+
+                const faRole = await db.get('SELECT * FROM Roles WHERE code = "FA" AND guild = ?', guild)
+                if (faRole) {
+                    await userPing.roles.remove(faRole.roleid)
+                }
 
                 // then, get the transaction channel ID and send a transaction message
                 const channelId = await db.get('SELECT channelid FROM Channels WHERE purpose = "contracts" AND guild = ?', guild)

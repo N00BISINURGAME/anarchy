@@ -37,7 +37,7 @@ module.exports = {
         if (roleExists) {
             await db.run('UPDATE Roles SET roleid = ? WHERE code = ? AND guild = ?', [role.id, choice, guild])
         } else {
-            await db.run('INSERT INTO ROles(roleid, code, guild) VALUES (?, ?, ?)', [role.id, choice, guild])
+            await db.run('INSERT INTO Roles(roleid, code, guild) VALUES (?, ?, ?)', [role.id, choice, guild])
         }
         await db.close()
         return interaction.editReply({content:`Successfully linked ${role} for ${choice === "FA" ? "Free Agent" : "Eligible player"}!`})
