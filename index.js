@@ -532,6 +532,31 @@ client.on(Events.ChannelDelete, async channel => {
 	}
 })
 
+client.on(Events.GuildDelete, async guild => {
+	try {
+		const db = await getDBConnection()
+		const guild = guild.id
+		await db.run('DELETE FROM Players WHERE guild = ?', guild)
+		await db.run('DELETE FROM Teams WHERE guild = ?', guild)
+		await db.run('DELETE FROM Leagues WHERE guild = ?', guild) // no need to check if channel exists
+		await db.run('DELETE FROM Roles WHERE guild = ?', guild) // no need to check if channel exists
+		await db.run('DELETE FROM Admins WHERE guild = ?', guild) // no need to check if channel exists
+		await db.run('DELETE FROM Managers WHERE guild = ?', guild) // no need to check if channel exists
+		await db.run('DELETE FROM Results WHERE guild = ?', guild) // no need to check if channel exists
+		await db.run('DELETE FROM Channels WHERE guild = ?', guild) // no need to check if channel exists
+		await db.run('DELETE FROM Suspensions WHERE guild = ?', guild) // no need to check if channel exists
+		await db.run('DELETE FROM QBStats WHERE guild = ?', guild) // no need to check if channel exists
+		await db.run('DELETE FROM WRStats WHERE guild = ?', guild) // no need to check if channel exists
+		await db.run('DELETE FROM RBStats WHERE guild = ?', guild) // no need to check if channel exists
+		await db.run('DELETE FROM DefenseStats WHERE guild = ?', guild) // no need to check if channel exists
+		await db.run('DELETE FROM KStats WHERE guild = ?', guild) // no need to check if channel exists
+		await db.run('DELETE FROM Trades WHERE guild = ?', guild) // no need to check if channel exists
+		await db.close()
+	} catch(err) {
+		console.log(err)
+	}
+})
+
 client.on(Events.MessageCreate, async message => {
 	return;
 	if (!message.author.bot) {
