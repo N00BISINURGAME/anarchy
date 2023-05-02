@@ -78,7 +78,7 @@ module.exports = {
         let teamSigned
         for (const team of allTeams) {
             if (userPing.roles.cache.get(team.roleid)) {
-                if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
+                if (!(team.code === "FO" || team.code === "GM" || team.code === "HC" || team.code === "FA" || team.code === "ELIG")) {
                     userSigned = true
                     teamSigned = team.code
                     break
