@@ -22,7 +22,7 @@ module.exports = {
         }
 
         // first, get player stats
-        const link = interaction.options.getString('logo')
+        const link = interaction.options.getAttachment('logo')
         const team = interaction.options.getRole('team')
         const guild = interaction.guild.id
 
