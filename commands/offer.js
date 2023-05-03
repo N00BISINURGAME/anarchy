@@ -194,7 +194,7 @@ module.exports = {
                 for (const role of userPing.roles.cache.keys()) {
                     const roleExists = await db.get('SELECT code FROM Roles WHERE roleid = ? AND guild = ?', [role, guild])
                     if (roleExists) {
-                        if (!(team.code === "FO" || team.code === "GM" || team.code === "HC" || team.code === "FA" || team.code === "ELIG")) {
+                        if (!(roleExists.code === "FO" || roleExists.code === "GM" || roleExists.code === "HC" || roleExists.code === "FA" || roleExists.code === "ELIG")) {
                             playerResigned = true
                             break
                         }
