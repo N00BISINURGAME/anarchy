@@ -73,7 +73,7 @@ module.exports = {
                 const roleExists = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guild])
                 // we have a valid role in the database!
                 if (roleExists) {
-                    if (!(team.code === "FO" || team.code === "GM" || team.code === "HC" || team.code === "FA" || team.code === "ELIG")) {
+                    if (!(roleExists.code === "FO" || roleExists.code === "GM" || roleExists.code === "HC" || roleExists.code === "FA" || roleExists.code === "ELIG")) {
                         // and it's a valid team role! we can now compare against the cache of the
                         // person that was pinged
                         teamRole = role

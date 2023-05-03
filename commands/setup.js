@@ -64,7 +64,7 @@ module.exports = {
             messageCollector = await message.awaitMessageComponent({ componentType: ComponentType.Button, time: 120000})
         } catch(err) {
             await db.close()
-            return message.edit({ content:"Setup expired! Remember that you have 2 minutes per step.", embeds:[], components:[], ephemeral:true})
+            return interaction.editReply({ content:"Setup expired! Remember that you have 2 minutes per step.", embeds:[], components:[], ephemeral:true})
         }
 
         embed.setTitle("Select how you want to add teams")

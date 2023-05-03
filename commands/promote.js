@@ -82,6 +82,11 @@ module.exports = {
             }
         }
 
+        if (!teamRole) {
+            await db.close()
+            return interaction.editReply({ content:"This person is not on your team!", ephemeral:true })
+        }
+
         // then, check to see if the role is taken or not
         const promoteRoleCode = await db.get('SELECT roleid FROM Roles WHERE code = ? AND guild = ?', [roleChoice, guild])
         if (!promoteRoleCode) {

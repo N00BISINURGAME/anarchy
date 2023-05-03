@@ -42,7 +42,9 @@ module.exports = {
 
             for (const team of allTeams) {
               const teamObj = await interaction.guild.roles.fetch(team.roleid)
-              console.log(teamObj.members.size)
+              if (!teamObj || !teamObj.members) {
+                continue
+              }
               if (teamObj.members.size < min) {
                 for (const member of teamObj.members.values()) {
                   await member.roles.remove(team.roleid)
