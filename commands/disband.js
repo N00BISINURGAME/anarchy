@@ -67,7 +67,14 @@ module.exports = {
             const logoStr = logo.logo;
 
             if (channelId) {
-                const transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
+                let transactionChannel;
+                try {
+                    transactionChannel = await interaction.guild.channels.fetch(channelId.channelid);
+                } catch(err) {
+                    await db.close()
+                    await db.run('DELETE FROM Channels WHERE channelid = ? AND guild = ?', [channelId.channelid, guild])
+                    return interaction.editReply({ content:"Team has been successfully disbanded, but the notices channel has been deleted from the server! Ensure that you reset it using /channel before proceeding with other commands."})
+                }
 
                 const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
 
