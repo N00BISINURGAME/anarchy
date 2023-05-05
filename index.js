@@ -8,7 +8,7 @@ const { token, presenceData, maxPlayers, filter, clientId, guildId } = require('
 const { REST, Routes } = require('discord.js');
 const { teamJson, collegeJson } = require('./commands/teams.json')
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildPresences, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages], presence: presenceData });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages], presence: presenceData });
 
 client.commands = new Collection();
 client.cooldowns = new Collection();
