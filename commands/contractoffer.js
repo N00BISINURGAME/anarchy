@@ -256,7 +256,7 @@ module.exports = {
                     }
                     if (foMember) {
                         const dm = await foMember.createDM()
-                        transactionEmbed.setDescription(`The ${roleObj} have successfully offered \`${userPing.user.tag}\`!
+                        transactionEmbed.setDescription(`The ${roleObj.name} have successfully offered \`${userPing.user.tag}\`!
                         \n>>> **Coach:** \`${interaction.user.tag}\`\n**Roster:** \`${roleObj.members.size}/${maxPlayers}\`\n**League:** ${interaction.guild.name}`)
                         await dm.send({ embeds: [transactionEmbed] })
                     }
