@@ -557,6 +557,20 @@ client.on(Events.GuildDelete, async guild => {
 	}
 })
 
+client.on(Events.GuildRoleDelete, async role => {
+	try {
+		const db = await getDBConnection()
+		const guild = role.guild.id
+		const roleData = await db.get('SELECT * FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guild])
+		if (roleData) {
+			await db.run('DELETE FROM Roles WHERE roleid = ? AND guild = ?', [role.id, guild])
+			await db.run('DELETE FROM Teams WHERE code = ? AND guild = ?',[ roleData.code, guild])
+		}
+	} catch(err) {
+		console.log(err)
+	}
+})
+
 client.on(Events.MessageCreate, async message => {
 	return;
 	if (!message.author.bot) {
