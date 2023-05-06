@@ -28,8 +28,13 @@ module.exports = {
         // two branches: one for pinged role, one for pinged person
         const rings = await db.get('SELECT rings FROM Players WHERE discordid = ? AND guild = ?', [id, guild])
 
+        if (!rings) {
+            await db.close()
+            return interaction.editReply({ content:`${user} has 0 rings!`, ephemeral:false});
+        }
+
         await db.close();
-        return interaction.editReply({ content:`${user} has ${rings.rings} rings!`, ephemeral:true});
+        return interaction.editReply({ content:`${user} has ${rings.rings} rings!`, ephemeral:false});
 
     }
 }

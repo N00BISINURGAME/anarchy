@@ -54,7 +54,7 @@ module.exports = {
                     if (member.roles.cache.get(role.roleid)) {
                         await member.roles.remove(role.roleid)
                         if (faRole) {
-                            await user.roles.add(faRole.roleid)
+                            await member.roles.add(faRole.roleid)
                         }
                     }
                 }
