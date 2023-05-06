@@ -175,9 +175,9 @@ module.exports = {
                 )
 
         userMessage = await dmChannel.send({embeds: [dmMessage], components: [buttons]})
-        await interaction.editReply({ content: "Offer has been sent. Awaiting decision...", ephemeral: true})
+        await interaction.editReply({ content: "Offer has been sent. You will get a DM if the offer has been accepted.", ephemeral: true})
         try {
-            const dmInteraction = await userMessage.awaitMessageComponent({ componentType: ComponentType.Button, time: 890000})
+            const dmInteraction = await userMessage.awaitMessageComponent({ componentType: ComponentType.Button, time: 9e7})
             if (dmInteraction.customId === "accept") {
                 // check again to see if player count would be exceeded
                 const newMaxPlayers = await interaction.guild.roles.fetch(memberTeamRole.roleid)
@@ -236,12 +236,20 @@ module.exports = {
                 dmMessage.setTitle("Successfully signed!")
 
                 await dmInteraction.update({ embeds: [dmMessage], components: []})
-                await interaction.editReply({ content:"Offer accepted!", ephemeral:true })
+                const foRole = await db.get('SELECT * FROM Roles WHERE code = "FO" AND guild = ?', guild)
+                
                 await transactionChannel.send({ embeds: [transactionEmbed] })
+                if (foRole) {
+                    // the FO exists, get a DM channel and send them a DM
+                    const foMember = await interaction.guild.members.fetch(foRole.roleid)
+                    const dm = await foMember.createDM()
+                    transactionEmbed.setDescription(`The ${roleObj} have successfully offered \`${userPing.user.tag}\`!
+                    \n>>> **Coach:** \`${interaction.user.tag}\`\n**Roster:** \`${roleObj.members.size}/${maxPlayers}\`\n**League:** ${interaction.guild.name}`)
+                    await dm.send({ embeds: [transactionEmbed] })
+                }
             } else if (dmInteraction.customId === "decline") {
                 dmMessage.setTitle("Offer rejected!")
                 await dmInteraction.update({ embeds: [dmMessage], components: [] })
-                await interaction.editReply({ content:"Offer rejected!", ephemeral:true })
             } else {
                 await dmInteraction.update({ content:"An error has occured! Please ask your FO to send another offer", components: [] })
                 await interaction.editReply({ content:"Error, please DM Donovan#3771 with a description of what happened", ephemeral:true })

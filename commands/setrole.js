@@ -10,7 +10,10 @@ const roleOption = new SlashCommandRoleOption().setName("role").setDescription("
 const roleChoices = new SlashCommandStringOption().setName("role-options").setDescription("The possible types of roles").setRequired(true)
                           .addChoices(
                             { name:"Free Agent", value: "FA" },
-                            { name:"Eligible Player", value:"ELIG" }
+                            { name:"Eligible Player", value:"ELIG" },
+                            { name:"Franchise Owner", value:"FO" },
+                            { name:"General Manager", value:"GM" },
+                            { name:"Head Coach", value:"HC" }
                           )
 
 module.exports = {
@@ -40,6 +43,6 @@ module.exports = {
             await db.run('INSERT INTO Roles(roleid, code, guild) VALUES (?, ?, ?)', [role.id, choice, guild])
         }
         await db.close()
-        return interaction.editReply({content:`Successfully linked ${role} for ${choice === "FA" ? "Free Agent" : "Eligible player"}!`})
+        return interaction.editReply({content:`Successfully linked ${role} for your chosen option!`})
     }
 }

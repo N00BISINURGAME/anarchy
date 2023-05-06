@@ -182,8 +182,8 @@ module.exports = {
                 )
 
         userMessage = await dmChannel.send({embeds: [dmMessage], components: [buttons]})
-        await interaction.editReply({ content: "Offer has been sent. Awaiting decision...", ephemeral: true})
-        const dmInteraction = await userMessage.awaitMessageComponent({ componentType: ComponentType.Button, time: 890000})
+        await interaction.editReply({ content: "Offer has been sent. You will get a DM if the offer has been accepted.", ephemeral: true})
+        const dmInteraction = await userMessage.awaitMessageComponent({ componentType: ComponentType.Button, time: 9e7})
         try {
             if (dmInteraction.customId === "accept") {
                 // check again to see if player count would be exceeded
@@ -243,8 +243,16 @@ module.exports = {
                 dmMessage.setTitle("Successfully signed!")
 
                 await dmInteraction.update({ embeds: [dmMessage], components: []})
-                await interaction.editReply({ content:"Offer accepted!", ephemeral:true })
                 await transactionChannel.send({ embeds: [transactionEmbed] })
+                const foRole = await db.get('SELECT * FROM Roles WHERE code = "FO" AND guild = ?', guild)
+                if (foRole) {
+                    // the FO exists, get a DM channel and send them a DM
+                    const foMember = await interaction.guild.members.fetch(foRole.roleid)
+                    const dm = await foMember.createDM()
+                    transactionEmbed.setDescription(`The ${roleObj} have successfully offered \`${userPing.user.tag}\`!
+                    \n>>> **Coach:** \`${interaction.user.tag}\`\n**Roster:** \`${roleObj.members.size}/${maxPlayers}\`\n**League:** ${interaction.guild.name}`)
+                    await dm.send({ embeds: [transactionEmbed] })
+                }
             } else if (dmInteraction.customId === "decline") {
                 dmMessage.setTitle("Offer rejected!")
                 await dmInteraction.update({ embeds: [dmMessage], components: [] })
