@@ -257,14 +257,13 @@ module.exports = {
                     if (foMember) {
                         const dm = await foMember.createDM()
                         transactionEmbed.setDescription(`The ${roleObj.name} have successfully offered \`${userPing.user.tag}\`!
-                        \n>>> **Coach:** \`${interaction.user.tag}\`\n**Roster:** \`${roleObj.members.size}/${maxPlayers}\`\n**League:** ${interaction.guild.name}`)
+                        \n>>> **Contract Terms:** ${terms}\n**Coach:** \`${interaction.user.tag}\`\n**Roster:** \`${roleObj.members.size}/${maxPlayers}\`\n**League:** ${interaction.guild.name}`)
                         await dm.send({ embeds: [transactionEmbed] })
                     }
                 }
             } else if (dmInteraction.customId === "decline") {
                 dmMessage.setTitle("Offer rejected!")
                 await dmInteraction.update({ embeds: [dmMessage], components: [] })
-                await interaction.editReply({ content:"Offer rejected!", ephemeral:true })
             } else {
                 
                 await dmInteraction.update({ content:"An error has occured! Please ask your FO to send another offer", components: [] })
