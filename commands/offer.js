@@ -241,11 +241,21 @@ module.exports = {
                 await transactionChannel.send({ embeds: [transactionEmbed] })
                 if (foRole) {
                     // the FO exists, get a DM channel and send them a DM
-                    const foMember = await interaction.guild.members.fetch(foRole.roleid)
-                    const dm = await foMember.createDM()
-                    transactionEmbed.setDescription(`The ${roleObj} have successfully offered \`${userPing.user.tag}\`!
-                    \n>>> **Coach:** \`${interaction.user.tag}\`\n**Roster:** \`${roleObj.members.size}/${maxPlayers}\`\n**League:** ${interaction.guild.name}`)
-                    await dm.send({ embeds: [transactionEmbed] })
+                    // get the franchise owner
+                    let foMember
+                    for (const member of roleObj.members.values()) {
+                        if (member.roles.cache.get(foRole.roleid)) {
+                            foMember = member
+                            break
+                        }
+                    }
+                    if (foMember) {
+                        const dm = await foMember.createDM()
+                        transactionEmbed.setDescription(`The ${roleObj} have successfully offered \`${userPing.user.tag}\`!
+                        \n>>> **Coach:** \`${interaction.user.tag}\`\n**Roster:** \`${roleObj.members.size}/${maxPlayers}\`\n**League:** ${interaction.guild.name}`)
+                        await dm.send({ embeds: [transactionEmbed] })
+                    }
+
                 }
             } else if (dmInteraction.customId === "decline") {
                 dmMessage.setTitle("Offer rejected!")
