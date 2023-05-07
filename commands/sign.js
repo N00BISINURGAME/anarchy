@@ -114,7 +114,7 @@ module.exports = {
             }
         }
 
-        let dmChannel = await userPing.createDM()
+        // let dmChannel = await userPing.createDM()
 
         let dmMessage = new EmbedBuilder()
                 .setTitle("Player Signed!")
@@ -128,19 +128,19 @@ module.exports = {
                 dmMessage.setFooter({ text: `${interaction.user.tag}` })
             }
 
-        try {
-            await userPing.roles.add(teamRole)
-        } catch(err) {
-            if (err.code === 50013) {
-                await interaction.editReply({ content: "This bot does not have permission to grant roles to server members! Ensure that the bot has administrator and the role position of the bot is very high (ideally below your founder role).", ephemeral:true })
-            } else {
-                const errmsg = `There was an error while executing ${interaction.commandName}! Please DM Donovan#3771 with a screenshot of this error to report this bug.\n\n Attach this error message below:\`\`\`${err}\`\`\``
-                await interaction.editReply({ content:errmsg, ephemeral:true })
-            }
-            await db.close()
-            return
-        }
-        await dmChannel.send({ embeds:[dmMessage] })
+        // try {
+        //     await userPing.roles.add(teamRole)
+        // } catch(err) {
+        //     if (err.code === 50013) {
+        //         await interaction.editReply({ content: "This bot does not have permission to grant roles to server members! Ensure that the bot has administrator and the role position of the bot is very high (ideally below your founder role).", ephemeral:true })
+        //     } else {
+        //         const errmsg = `There was an error while executing ${interaction.commandName}! Please DM Donovan#3771 with a screenshot of this error to report this bug.\n\n Attach this error message below:\`\`\`${err}\`\`\``
+        //         await interaction.editReply({ content:errmsg, ephemeral:true })
+        //     }
+        //     await db.close()
+        //     return
+        // }
+        // await dmChannel.send({ embeds:[dmMessage] })
         
 
         // then, get the transaction channel ID and send a transaction message
