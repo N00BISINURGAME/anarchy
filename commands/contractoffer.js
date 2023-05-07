@@ -23,6 +23,7 @@ module.exports = {
         .addUserOption(userOption)
         .addStringOption(termsOption),
     async execute(interaction) {
+        return interaction.editReply({ content:"Contract offers are currently disabled until some issues with Discord are resolved. In the meantime, please use /sign. Sorry for the inconvenience.", ephemeral:true })
         let dmChannel;
         let dmMessage;
         let userMessage;

@@ -26,11 +26,11 @@ module.exports = {
         const db = await getDBConnection()
         const maxPlayerCount = await db.get('SELECT maxplayers FROM Leagues WHERE guild = ?', guild)
         const maxPlayers = maxPlayerCount.maxplayers
-        const offerEnabled = await db.get('SELECT signings FROM Leagues WHERE guild = ?', guild)
-        if (!offerEnabled.signings) {
-            await db.close()
-            return interaction.editReply({ content: "Signings are disabled! You can turn them on by running /toggle.", ephemeral: true})
-        }
+        // const offerEnabled = await db.get('SELECT signings FROM Leagues WHERE guild = ?', guild)
+        // if (!offerEnabled.signings) {
+        //     await db.close()
+        //     return interaction.editReply({ content: "Signings are disabled! You can turn them on by running /toggle.", ephemeral: true})
+        // }
 
         // check if a transaction channel has been set
         const transactionExists = await db.get('SELECT * FROM Channels WHERE purpose = "transactions" AND guild = ?', guild)
