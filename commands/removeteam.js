@@ -41,8 +41,9 @@ module.exports = {
 
             await db.run('DELETE FROM Teams WHERE code = ? AND guild = ?', [teamExists.code, guild])
             await db.run('DELETE FROM Roles WHERE code = ? AND guild = ?', [teamExists.code, guild])
-
-            await team.delete()
+            if (team) {
+                await team.delete()
+            }
             
 
             await interaction.editReply({ content:"Team has been removed!", ephemeral:true })
