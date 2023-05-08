@@ -94,19 +94,19 @@ module.exports = {
                     \n>>> **Roster:** \`${teamRole.members.size}/${maxPlayerQry.maxplayers}\`\n**Guild:** ${interaction.guild.name}`
         )
 
-        const foRole = await db.get('SELECT roleid FROM Roles WHERE guild = ?', guild)
-        if (foRole) {
-            // then, dm the franchise owner notifying them
-            for (const roleMember of teamRole.members.values()) {
-                const roleMemberRoles = roleMember.roles.cache
-                if (roleMemberRoles.get(foRole.roleid)) {
-                    demandEmbed.setDescription(`${interaction.member} \`${interaction.user.tag}\` has demanded from the ${teamRole.name} in ${interaction.guild.name}! ${specialRole ? `This person was the ${specialRole.name}.` : ""}
-                    \n>>> **Roster:** \`${teamRole.members.size}/${maxPlayerQry.maxplayers}\``)
-                    await roleMember.send( {embeds:[demandEmbed]})
-                    break
-                }
-            }
-        }
+        // const foRole = await db.get('SELECT roleid FROM Roles WHERE guild = ?', guild)
+        // if (foRole) {
+        //     // then, dm the franchise owner notifying them
+        //     for (const roleMember of teamRole.members.values()) {
+        //         const roleMemberRoles = roleMember.roles.cache
+        //         if (roleMemberRoles.get(foRole.roleid)) {
+        //             demandEmbed.setDescription(`${interaction.member} \`${interaction.user.tag}\` has demanded from the ${teamRole.name} in ${interaction.guild.name}! ${specialRole ? `This person was the ${specialRole.name}.` : ""}
+        //             \n>>> **Roster:** \`${teamRole.members.size}/${maxPlayerQry.maxplayers}\``)
+        //             await roleMember.send( {embeds:[demandEmbed]})
+        //             break
+        //         }
+        //     }
+        // }
         
         await db.close()
         await interaction.editReply( {content:`Successfully demanded! You have ${(maxPlayerQry.demands - currentPlayer.demands) - 1} demands left!`, ephemeral:true})
