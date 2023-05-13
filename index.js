@@ -40,6 +40,7 @@ client.once(Events.ClientReady, async () => {
 						.setLabel("Join our support server!")
 						.setStyle(ButtonStyle.Link)
 						.setURL("https://discord.gg/TuKy4sPcE8"))
+			console.log(guilds.values())
 			for (const guild of guilds.values()) {
 				const fetchedGuild = await guild.fetch()
 				let channel;
