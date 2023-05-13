@@ -24,7 +24,7 @@ for (const file of commandFiles) {
 client.once(Events.ClientReady, async () => {
 	try {
 		const guilds = await client.guilds.fetch()
-		if (client.user.id === "1094711775414460416") {
+		if (client.user.id === "1098837048187682816") {
 			const embed = new EmbedBuilder()
 				.setTitle("We are moving to a new bot!")
 				.setThumbnail(client.user.avatarURL())
@@ -35,7 +35,7 @@ client.once(Events.ClientReady, async () => {
 				.addComponents(new ButtonBuilder()
 						.setLabel("Invite the new Anarchy!")
 						.setStyle(ButtonStyle.Link)
-						.setURL(`https://discord.com/api/oauth2/authorize?client_id=1098837048187682816&permissions=8&scope=applications.commands%20bot`),
+						.setURL(`https://discord.com/api/oauth2/authorize?client_id=1107048043838177280&permissions=8&scope=bot`),
 						new ButtonBuilder()
 						.setLabel("Join our support server!")
 						.setStyle(ButtonStyle.Link)
@@ -127,9 +127,6 @@ client.on(Events.InteractionCreate, async interaction => {
 	setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
 	try {
 		await interaction.deferReply({ ephemeral:true })
-		if (client.user.id === "1094711775414460416") {
-			return interaction.editReply("This copy of Anarchy is down, add this one instead! https://discord.com/api/oauth2/authorize?client_id=1098837048187682816&permissions=8&scope=bot")
-		}
 		const db = await getDBConnection()
 		await client.users.fetch(interaction.user.id) // fetch the user and cache them for future use
 		const user = interaction.member
@@ -501,15 +498,6 @@ client.on(Events.GuildMemberRemove, async member => {
 					if (channelId) {
 						const channel = await member.guild.channels.fetch(channelId.channelid);
 						await channel.send({ embeds:[embed] })
-					}
-					// then, check for FO existence
-					for (const roleMember of roleObj.members.values()) {
-						const roleMemberRoles = roleMember.roles.cache
-						if (roleMemberRoles.get(foRole.roleid)) {
-							embed.setDescription(`${member.user.tag} has left the ${roleObj.name} in ${member.guild.name} due to leaving the server!\n>>> **Roster:** \`${roleObj.members.size}/${maxPlayers.maxplayers}\``)
-							await roleMember.send( {embeds:[embed]})
-							break
-						}
 					}
 					break
 				}

@@ -165,8 +165,8 @@ module.exports = {
                     .setStyle(ButtonStyle.Danger)
             )
 
-        const dmChannel = await otherTeamFo.createDM()
-        const message = await dmChannel.send({ embeds:[embed], components:[buttons] })
+        // const dmChannel = await otherTeamFo.createDM()
+        // const message = await dmChannel.send({ embeds:[embed], components:[buttons] })
         await interaction.editReply({ content: "Trade has been sent. Awaiting decision...", ephemeral: true})
         // put both players into the trade db
         await db.run('INSERT INTO Trades(discordid, guild) VALUES(?, ?)', [player1.id, guild])
