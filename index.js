@@ -53,6 +53,7 @@ client.once(Events.ClientReady, async () => {
 					const otherBotExists = await fetchedGuild.members.fetch("1098837048187682816")
 					if (!otherBotExists) {
 						await channel.send({ embeds:[embed], components:[button]})
+						console.log("one message sent")
 					}
 				} catch(err) {
 					if (err.code === 10007) {
