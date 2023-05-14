@@ -70,6 +70,11 @@ module.exports = {
 
         const team = await db.get('SELECT t.logo FROM Teams t, Roles r WHERE t.code = r.code AND t.guild = r.guild AND r.roleid = ? AND r.guild = ?', [teamRole.id, guild])
 
+        if (!team) {
+            await db.close()
+            await interaction.editReply({ content:"This team does not exist in the database! You may need to run /setup.", ephemeral:true})
+        }
+
         // then, construct the embed
         const demandEmbed = new EmbedBuilder()
                     .setTitle("Player demanded!")
