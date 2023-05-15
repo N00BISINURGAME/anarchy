@@ -15,3 +15,6 @@ After doing that, ensure you have Node.js installed and open up a terminal insid
 Then, go into `config.json` and input your bot's token and client ID into the specified fields. I will assume you know how to make a discord bot.
 
 Then, run `npm start` and things should work!
+
+## Hosting
+For hosting, I recommend using Sparkedhost. They have a $1/month plan that should be just fine for this bot.
