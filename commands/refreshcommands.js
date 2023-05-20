@@ -117,7 +117,7 @@ module.exports = {
 
         // then, add commands to the collection of commands stored in client
         for (const file of commandFiles) {
-            if (file.includes("offer") || file.includes("sign") || file.includes("gametime") || file.includes("schedule") || file.includes("trade")) {
+            if (file.includes("offer") || file.includes("gametime") || file.includes("schedule") || file.includes("trade")) {
                 console.log(file)
                 continue;
             }
