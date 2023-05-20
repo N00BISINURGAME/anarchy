@@ -1,3 +1,5 @@
+// Index.js -- stores all of the major functionality for the bot
+
 const fs = require('node:fs');
 const path = require('node:path');
 const sqlite = require('sqlite');
@@ -7,6 +9,7 @@ const { Client, Collection, Events, GatewayIntentBits, EmbedBuilder, ActionRowBu
 const { token, presenceData, maxPlayers, filter, clientId, guildId } = require('./config.json');
 const { REST, Routes } = require('discord.js');
 const { teamJson, collegeJson } = require('./commands/teams.json')
+const OWNER_ID = "168490999235084288" // change this to your discord id
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers], presence: presenceData });
 
@@ -104,6 +107,10 @@ client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
 
 	const command = client.commands.get(interaction.commandName);
+
+	if (interaction.commandName === "offer" || interaction.commandName === "contractoffer") {
+		return interaction.reply('Offers are not a supported feature of this version of Anarchy!')
+	}
 
 	if (!command) return;
 
@@ -203,12 +210,12 @@ client.on(Events.InteractionCreate, async interaction => {
 				embed.setImage(interaction.guild.iconURL())
 			}
 			try {
-				const errorChannel = await client.channels.fetch("1095573451999281227");
+				const errorChannel = await client.channels.fetch("1095573451999281227"); // this channel can be changed to wherever you want errors to go into
 				await errorChannel.send({embeds:[embed]})
 			} catch(err) {
 				console.log(err)
 			}
-			await client.users.send("168490999235084288", {embeds:[embed]})
+			await client.users.send(OWNER_ID, {embeds:[embed]})
 			await interaction.editReply({content:`An error has occured! Please DM Donovan#3771 with the following screenshot and explain what happened that caused the error:\n\n${error}`})
 			console.error(error);
 		} catch(err) {
