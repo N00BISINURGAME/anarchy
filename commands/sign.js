@@ -54,7 +54,7 @@ module.exports = {
                 if (team.code === "FO" || team.code === "GM" || team.code === "HC") {
                     authorized = true
                 }
-                if (!(team.code === "FO" || team.code === "GM" || team.code === "HC")) {
+                if (!(team.code === "FO" || team.code === "GM" || team.code === "HC" || team.code === "FA" || team.code === "ELIG")) {
                     info = team.code
                 }
             }
