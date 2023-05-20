@@ -102,10 +102,7 @@ module.exports = {
         }
         const teamRole = await interaction.guild.roles.fetch(memberTeamRole.roleid)
 
-        console.log(teamRole.members.size)
-        console.log(maxPlayers)
-
-        if (teamRole.members.size >= maxPlayers) {
+        if (parseInt(teamRole.members.size) >= parseInt(maxPlayers)) {
           await db.close()
           return interaction.editReply({content:'Signing this player would lead to your team exceeding the maximum player count!', ephemeral:true});
         }
