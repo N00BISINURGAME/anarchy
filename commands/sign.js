@@ -60,6 +60,7 @@ module.exports = {
             }
         }
         console.log(info)
+        console.log("this is actually working")
         if (!authorized) {
             await db.close();
             return interaction.editReply({ content:'You are not authorized to sign a player!', ephemeral:true});
