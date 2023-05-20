@@ -105,7 +105,7 @@ module.exports = {
         console.log(teamRole.members.size)
         console.log(maxPlayers)
 
-        if (teamRole.members.size + 1 > maxPlayers) {
+        if (teamRole.members.size >= maxPlayers) {
           await db.close()
           return interaction.editReply({content:'Signing this player would lead to your team exceeding the maximum player count!', ephemeral:true});
         }
