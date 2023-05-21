@@ -72,7 +72,7 @@ module.exports = {
 
         if (!team) {
             await db.close()
-            await interaction.editReply({ content:"This team does not exist in the database! You may need to run /setup.", ephemeral:true})
+            return interaction.editReply({ content:"This team does not exist in the database! You may need to run /setup or manually re-add the team.", ephemeral:true})
         }
 
         // then, construct the embed
